@@ -1,0 +1,91 @@
+{
+    "extension": "internal/com.ajs.application",
+    "propertiesTabs": [
+        {
+            "name": "application",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "window",
+            "icon-type": "icon",
+            "icon": "pip"
+        }
+    ],
+    "propertiesVariables": [
+        {
+            "name": "name",
+            "tab": 0,
+            "label": "Application Name",
+            "type": "text",
+            "description": "Name of the application."
+        },
+        {
+            "name": "version",
+            "tab": 0,
+            "label": "Version",
+            "type": "text",
+            "description": "Version of the application."
+        },
+        {
+            "name": "icon",
+            "tab": 0,
+            "label": "Icon",
+            "type": "image-512",
+            "description": "Icon of the application."
+        },
+        {
+            "name": "compiler",
+            "tab": 0,
+            "label": "Compiler",
+            "type": "compiler",
+            "description": "Plateform compiler of the application."
+        },
+        {
+            "name": "author",
+            "tab": 0,
+            "label": "Author Name",
+            "type": "text",
+            "description": "Author of the application."
+        },
+        {
+            "name": "company",
+            "tab": 0,
+            "label": "Company Name",
+            "type": "text",
+            "description": "Company name of the application."
+        },
+        {
+            "name": "package",
+            "tab": 0,
+            "label": "Package",
+            "type": "text",
+            "description": "Package of the application."
+        },
+        {
+            "name": "width",
+            "tab": 1,
+            "label": "Window Width",
+            "type": "number",
+            "description": "Width of the application window."
+        },
+        {
+            "name": "height",
+            "tab": 1,
+            "label": "Window Height",
+            "type": "number",
+            "description": "Height of the application window."
+        }
+    ],
+    "properties": {
+        "name": "New Game",
+        "version": "1.0",
+        "icon": "favicon.png",
+        "compiler": "Windows",
+        "author": "",
+        "company": "",
+        "package": "com.company.newgame",
+        "width": 640,
+        "height": 480
+    }
+}

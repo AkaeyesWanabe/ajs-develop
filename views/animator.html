@@ -1,0 +1,133 @@
+<!--  -->
+<div id="animatorEditor" class="subWin">
+    <section id="animatorEditorHeader" class="subWinHeader">
+        <img class="subWinIcon" src="../assets/images/favicon.png" />
+        <div>
+            <label>Animations editor - </label>
+            <label id="animatorEditorFileName"></label>
+        </div>
+        <i target="animatorEditorBack" class="subWinCloser ri-close-line"></i>
+    </section>
+    <!--  -->
+    <section id="animatorEditorBody" class="subWinBody">
+        <section id="animatorAnims" class="subWinBox">
+            <section id="animatorAnimsBox" class="subWinBox">
+                <section class="subWinBoxHeader">
+                    <div>
+                        <label>Animations </label>
+                        <label id="animatorAnimsTitle">(2)</label>
+                    </div>
+                    <i class="subWinBoxNewBtn bi ri-add-line"
+                        onclick="animator.addAnimation(animator.cache.curAnimationId)"></i>
+                </section>
+
+                <section id="animatorAnimsBody"></section>
+            </section>
+
+            <section id="animatorFramePoints" class="subWinBox">
+                <section class="subWinBoxHeader">
+                    <label>Frame Points & Collider</label>
+                    <label></label>
+                </section>
+
+                <section id="animatorFramePointsBody">
+                    <span id="afpbColliderEdit" class="afpbEdit" active="true">
+                        <i class="ri-shape-2-line"></i>
+                        <b>Edit Frame Collider</b>
+                    </span>
+                    <span id="afpbPointsEdit" class="afpbEdit" active="false">
+                        <i class="ri-atboard-2-line"></i>
+                        <b>Edit Frame Points</b>
+                    </span>
+                    <!--  -->
+                    <div id="afpbPoints"></div>
+                    <!--  -->
+                    <span id="afpbPointAdd">
+                        Add new point
+                        <i class="ri-add-line"></i>
+                    </span>
+                </section>
+            </section>
+        </section>
+        <!--  -->
+        <!--  -->
+        <section id="animatorBox" class="subWinBox">
+            <section id="animatorInBox">
+                <section id="animatorImage" class="subWinBox">
+                    <section id="animatorImageHeader" class="subWinBoxHeader">
+                        <div>
+                            <i id="animatorZoomMoins" class="ri-zoom-out-line" onclick="animator.zoomOut()"></i>
+                            <input id="animatorZoom" type="range" min="50" max="150" step="10">
+                            <i id="animatorZoomPlus" class="ri-zoom-in-line" onclick="animator.zoomIn()"></i>
+                            <i id="animatorZoomFit" class="ri-fullscreen-line" onclick="animator.fitZoomToImage()"></i>
+                        </div>
+                    </section>
+
+                    <section id="animatorImageBody">
+                        <div id="animatorImageBox">
+                            <img id="aibImg" class="no-antialiasing">
+                            <canvas id="aibColliderCanvas"></canvas>
+                            <div id="aibCollider"></div>
+                            <div id="aibPoints"></div>
+                        </div>
+                    </section>
+                </section>
+                <!--  -->
+                <!--  -->
+                <section id="animatorImagePicker" class="subWinBox">
+                    <section class="subWinBoxHeader">
+                        <label>Image resources</label>
+                        <div class="searchBar">
+                            <i class="ri-search-line"></i>
+                            <input type="text">
+                        </div>
+                    </section>
+
+                    <section id="animatorImagePickerBody"></section>
+                </section>
+            </section>
+            <!--  -->
+            <!--  -->
+            <section id="animatorFrames">
+                <section id="animatorFramesBox">
+                    <section class="subWinBoxHeader">
+                        <div>
+                            <label>Animations frames </label>
+                            <label id="animatorFramesTitle">(5)</label>
+                        </div>
+                        <label></label>
+                    </section>
+
+                    <section id="animatorFramesBody"></section>
+                </section>
+                <!--  -->
+                <!--  -->
+                <section id="animatorFramesActions">
+                    <section class="subWinBoxHeader">
+                        <label>Animation actions</label>
+                        <label></label>
+                    </section>
+
+                    <section id="animatorFramesActionsBody">
+                        <div class="afabItem">
+                            <label>Frame rate (img/s)</label>
+                            <input type="number" id="afaFrameRate" min="0" max="1000">
+                        </div>
+                        <div class="afabItem">
+                            <label>Loop the animation</label>
+                            <input type="checkbox" id="afaLoop" checked="false">
+                        </div>
+                        <div class="afabItem">
+                            <label>Loop start image</label>
+                            <input type="number" id="afaStartLoopFrame" min="0">
+                        </div>
+                        <button class="btn">Play animation</button>
+                        <button class="btn">Save all</button>
+                        <button class="btn">Cancel all</button>
+                    </section>
+                </section>
+            </section>
+        </section>
+
+    </section>
+</div>

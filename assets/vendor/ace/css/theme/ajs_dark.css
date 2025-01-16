@@ -1,0 +1,182 @@
+.ace-ajs_dark .ace_gutter {
+  background: #282828;
+  color: #747474;
+}
+
+.ace-ajs_dark .ace_print-margin {
+  width: 1px;
+  background: #282828
+}
+
+.ace-ajs_dark {
+  background-color: #282828;
+  color: #F8F8F8
+}
+
+.ace-ajs_dark .ace_cursor {
+  color: #A7A7A7
+}
+
+
+
+
+.ace-ajs_dark .ace_marker-layer .ace_selection {
+  background: rgba(221, 240, 255, 0.20);
+}
+
+.ace-ajs_dark.ace_multiselect .ace_selection.ace_start {
+  box-shadow: 0 0 3px 0px #141414;
+}
+
+.ace-ajs_dark .ace_marker-layer .ace_step {
+  background: rgb(102, 82, 0)
+}
+
+.ace-ajs_dark .ace_marker-layer .ace_bracket {
+  margin: -1px 0 0 -1px;
+  border: 1px solid rgba(255, 255, 255, 0.25)
+}
+
+.ace-ajs_dark .ace_marker-layer .ace_active-line {
+  border: solid 1px rgba(221, 240, 255, 0.20);
+}
+
+.ace-ajs_dark .ace_gutter-active-line {
+  /* background-color: rgba(255, 255, 255, 0.031); */
+  border-right: solid 1px rgba(221, 240, 255, 0.20) !important;
+  color: #E2E2E2;
+}
+
+.ace-ajs_dark .ace_marker-layer .ace_selected-word {
+  border: 1px solid rgba(221, 240, 255, 0.20)
+}
+
+.ace-ajs_dark .ace_invisible {
+  color: rgba(255, 255, 255, 0.25)
+}
+
+.ace-ajs_dark .ace_keyword,
+.ace-ajs_dark .ace_meta {
+  color: #905292
+}
+
+.ace-ajs_dark .ace_constant,
+.ace-ajs_dark .ace_constant.ace_character,
+.ace-ajs_dark .ace_constant.ace_character.ace_escape,
+.ace-ajs_dark .ace_constant.ace_other,
+.ace-ajs_dark .ace_heading,
+.ace-ajs_dark .ace_markup.ace_heading,
+.ace-ajs_dark .ace_support.ace_constant {
+  color: #CF6A4C
+}
+
+.ace-ajs_dark .ace_invalid.ace_illegal {
+  color: #F8F8F8;
+  background-color: rgba(86, 45, 86, 0.75)
+}
+
+.ace-ajs_dark .ace_invalid.ace_deprecated {
+  text-decoration: line-through;
+  font-style: italic;
+  color: #D2A8A1
+}
+
+.ace-ajs_dark .ace_support {
+  color: #9B859D
+}
+
+.ace-ajs_dark .ace_fold {
+  background-color: #AC885B;
+  border-color: #F8F8F8
+}
+
+.ace-ajs_dark .ace_support.ace_function {
+  color: #7eabff
+}
+
+.ace-ajs_dark .ace_list,
+.ace-ajs_dark .ace_markup.ace_list,
+.ace-ajs_dark .ace_storage {
+  color: #7eabff
+}
+
+.ace-ajs_dark .ace_entity.ace_name.ace_function,
+.ace-ajs_dark .ace_meta.ace_tag {
+  color: #AC885B
+}
+
+.ace-ajs_dark .ace_comment {
+  color: #65965f
+}
+
+.ace-ajs_dark .ace_variable {
+  color: #3d8bff
+}
+
+.ace-ajs_dark .ace_xml-pe {
+  color: #494949
+}
+
+.ace-ajs_dark .ace_indent-guide {
+  background: url("../twilight-1.png") right repeat-y
+}
+
+.ace-ajs_dark .ace_indent-guide-active {
+  background: url("../twilight-2.png") right repeat-y;
+}
+
+
+
+
+
+
+
+
+
+
+.ace-ajs_dark .ace_constant.ace_buildin {
+  color: rgb(130, 116, 255);
+}
+
+.ace-ajs_dark .ace_constant.ace_language {
+  color: rgb(88, 92, 246);
+}
+
+.ace-ajs_dark .ace_constant.ace_library {
+  color: rgb(158, 240, 255);
+}
+
+.ace-ajs_dark .ace_invalid {
+  background-color: rgb(153, 0, 0);
+  color: white;
+}
+
+.ace-ajs_dark .ace_support.ace_constant {
+  color: rgb(158, 240, 255);
+}
+
+.ace-ajs_dark .ace_support.ace_type,
+.ace-ajs_dark .ace_support.ace_class .ace-ajs_dark .ace_support.ace_other {
+  color: rgb(109, 121, 222);
+}
+
+.ace-ajs_dark .ace_variable.ace_parameter {
+  font-style: italic;
+  color: #FD971F;
+}
+
+.ace-ajs_dark .ace_entity.ace_name.ace_function {
+  color: #F9EE98;
+}
+
+.ace-ajs_dark .ace_identifier {
+  color: #7bdaff;
+}
+
+.ace-ajs_dark .ace_string {
+  color: #ffc2a5;
+}
+
+.ace-ajs_dark .ace_string.ace_regexp {
+  color: #ff5d13;
+}

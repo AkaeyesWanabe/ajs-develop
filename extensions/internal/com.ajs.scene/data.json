@@ -1,0 +1,36 @@
+{
+    "extension": "internal/com.ajs.scene",
+    "propertiesTabs": [
+        {
+            "name": "display",
+            "icon-type": "icon",
+            "icon": "pip"
+        }
+    ],
+    "propertiesVariables": {
+        "name": {
+            "tab": 0,
+            "label": "Scene Name",
+            "type": "text",
+            "defaultValue": "new_scene",
+            "description": "Name of the scene."
+        }
+    },
+    "layers": [
+        {
+            "isRemovable": false,
+            "name": "default"
+        }
+    ],
+    "objects": [
+        {
+            "extension": "com.ajs.image",
+            "properties": {
+                "name": "bg",
+                "width": 80,
+                "height": 80,
+                "src": "images/dust/Shine-PNG-Pic.png"
+            }
+        }
+    ]
+}

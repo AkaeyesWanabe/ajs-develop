@@ -1,0 +1,31 @@
+{
+    "info": {
+        "name": "default",
+        "version": "1.0"
+    },
+    "directories": {
+        "default_16": "dir-x16.png",
+        "default_256": "dir-x256.png"
+    },
+    "files": {
+        "default": "file.png",
+        "animation": "animation.png",
+        "archive": "archive.png",
+        "audio": "audio.png",
+        "configuration": "config.png",
+        "css": "css.png",
+        "effects": "effects.png",
+        "font": "font.png",
+        "html": "html.png",
+        "javascript": "js.png",
+        "json": "json.png",
+        "material": "material.png",
+        "object3d": "3d-object.png",
+        "package": "package.png",
+        "text": "text.png",
+        "timeline": "timeline.png",
+        "video": "video.png",
+        "xml": "xml.png",
+        "scene": "scene.png"
+    }
+}

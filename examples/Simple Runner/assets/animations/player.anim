@@ -1,0 +1,49 @@
+{
+    "animations": [
+        {
+            "name": "idle",
+            "frameRate": 5,
+            "loop": false,
+            "startLoopFrame": 0,
+            "frames": [
+                {
+                    "path": "assets/images/player/Idle/0.png",
+                    "width": 128,
+                    "height": 128,
+                    "points": [
+                        {
+                            "removable":false,
+                            "name":"origin",
+                            "x": 450,
+                            "y": 900
+                        },
+                        {
+                            "removable":false,
+                            "name":"action",
+                            "x": 450,
+                            "y": 450
+                        }
+                    ],
+                    "collider": [
+                        {
+                            "x": 0,
+                            "y": 0
+                        },
+                        {
+                            "x": 900,
+                            "y": 0
+                        },
+                        {
+                            "x": 900,
+                            "y": 900
+                        },
+                        {
+                            "x": 0,
+                            "y": 900
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

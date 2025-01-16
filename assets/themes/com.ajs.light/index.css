@@ -1,0 +1,19 @@
+:root {
+    --primary: #b8b8b8;
+    --primary-more-dark: #a8a8a8;
+    --primary-dark-1: #c0c0c0;
+    --primary-dark-2: #c8c8c8;
+    --primary-dark-3: #d0d0d0;
+    --primary-light-1: #e0e0e0;
+    --primary-light-2: #e8e8e8;
+    --primary-light-3: #f0f0f0;
+    --primary-light-4: #f8f8f8;
+    --primary-light-5: #fff;
+    --primary-more-light: #000;
+    /**/
+    --secondary: #1a573c;
+    --secondary-dark: #60746b;
+    /**/
+    --text: #000;
+    --close-app-btn: brown;
+}

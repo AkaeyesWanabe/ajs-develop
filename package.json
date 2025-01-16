@@ -1,0 +1,48 @@
+{
+  "name": "com.devconsulting.ajsdevelop",
+  "version": "1.0.0",
+  "description": "javacsript 2D game maker engine",
+  "main": "app.html",
+  "directories": {
+    "lib": "libs"
+  },
+  "chromium-args": "--mixed-context",
+  "scripts": {
+    "dev": "nw .",
+    "prod": "nw build --platforms win32,win64,osx64,linux32,linux64 --buildDir dist/"
+  },
+  "window": {
+    "theme": "dark",
+    "icon": "./assets/images/favicon.png",
+    "toolbar": false,
+    "width": 640,
+    "height": 380,
+    "min_width": 240,
+    "min_height": 360,
+    "position": "center",
+    "frame": false,
+    "show": true,
+    "title": "AJS Develop 1.0"
+  },
+  "keywords": [
+    "js",
+    "game",
+    "maker",
+    "develop",
+    "create",
+    "ajs",
+    "engine",
+    "make",
+    "creator",
+    "2D"
+  ],
+  "author": "Dev Consulting",
+  "dependencies": {
+    "file-dialog": "^0.0.8",
+    "jquery": "^3.7.1",
+    "nw": "sdk"
+  },
+  "webkit": {
+    "plugin": true
+  }
+}

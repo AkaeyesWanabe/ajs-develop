@@ -1,0 +1,62 @@
+{
+    "animations": [
+        {
+            "name": "idle",
+            "frameRate": 30,
+            "loop": false,
+            "startLoopImage": 0,
+            "images": [
+                {
+                    "path": "assets/images/player/Idle/0.png",
+                    "originX": 0,
+                    "originY": 0,
+                    "width": 128,
+                    "height": 128,
+                    "actionPointX": 64,
+                    "actionPointY": 128,
+                    "points": [
+                        {
+                            "x": 128,
+                            "y": 64
+                        }
+                    ],
+                    "collisionPoints": {
+                        "x1": 0,
+                        "y1": 0,
+                        "x2": 128,
+                        "y2": 0,
+                        "x3": 0,
+                        "y3": 128,
+                        "x4": 128,
+                        "y4": 128
+                    }
+                },
+                {
+                    "path": "assets/images/player/Idle/0.png",
+                    "originX": 0,
+                    "originY": 0,
+                    "width": 128,
+                    "height": 128,
+                    "actionPointX": 64,
+                    "actionPointY": 128,
+                    "points": [
+                        {
+                            "x": 128,
+                            "y": 64
+                        }
+                    ],
+                    "collisionPoints": {
+                        "x1": 0,
+                        "y1": 0,
+                        "x2": 128,
+                        "y2": 0,
+                        "x3": 0,
+                        "y3": 128,
+                        "x4": 128,
+                        "y4": 128
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,140 @@
+#appIcon {
+  float: left;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 6px;
+}
+
+
+
+#movableBar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: center;
+}
+
+#appTitle {
+  color: var(--primary-more-light);
+  margin-left: -112px;
+}
+
+
+
+
+
+#windowToolsBar {
+  display: flex;
+  align-items: center;
+  float: right;
+  width: 144px;
+  height: 100%;
+  color: var(--primary-more-light);
+}
+
+.windowToolIcon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 100%;
+  font-size: 18px;
+  color: var(--primary-more-light);
+}
+
+.windowToolIcon:nth-child(2) {
+  font-size: 14px;
+}
+
+.windowToolIcon:hover {
+  background-color: var(--primary-dark-1);
+}
+
+.windowToolIcon:last-child:hover {
+  background-color: var(--close-app-btn);
+}
+
+
+
+
+
+
+
+.appMenuItem {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+
+.appMenuItem:hover button {
+  height: 25px;
+  color: var(--text);
+  background-color: var(--primary-dark-1);
+  border-radius: 4px 4px 0 0;
+  z-index: 500;
+}
+
+.appMenuItem:hover .appMenuItemSubMenu {
+  display: block;
+}
+
+.appMenuItem button {
+  background-color: transparent;
+  padding: 2px 8px;
+  margin: 0 2px;
+  font-size: 12px;
+  color: var(--primary-more-light);
+  border: none;
+  height: 22px;
+  line-height: 18px;
+}
+
+.appMenuItemSubMenu {
+  background-color: var(--primary-dark-3);
+  position: absolute;
+  margin-left: 2px;
+  margin-top: 0px;
+  display: none;
+  width: 240px;
+  float: left;
+  padding: 8px 8px;
+  border: solid 1px var(--primary-more-dark);
+  border-radius: 0 0 6px 6px;
+}
+
+.appMenuItemSubMenu div {
+  float: left;
+  width: 100%;
+  padding: 4px 16px;
+  line-height: 20px;
+  border-radius: 4px;
+}
+
+.appMenuItemSubMenu div:hover {
+  color: var(--text);
+  background-color: var(--primary-light-1);
+}
+
+.appMenuItemLabel {
+  float: left;
+}
+
+.appMenuItemCheck {
+  float: left;
+  font-size: 18px;
+  display: none;
+}
+
+.appMenuItemKey {
+  float: right;
+}
+
+.appMenuItemHr {
+  float: left;
+  width: 100%;
+  height: 1px;
+  background-color: var(--primary-light-3);
+  margin: 8px 0;
+  cursor: default;
+}

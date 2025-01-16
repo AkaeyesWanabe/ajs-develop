@@ -1,0 +1,132 @@
+#scriptEditor {
+    flex-direction: column;
+}
+
+.codes {
+    width: 100%;
+    flex: 1;
+    display: none;
+}
+
+.codes[visible=true] {
+    display: block;
+}
+
+#noFileOpened {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-light-5);
+}
+
+#noFileOpened[visible=true] {
+    display: flex;
+}
+
+
+
+
+
+
+
+#codeEditorTabs {
+    border-bottom: solid 1px var(--primary-dark-1);
+    height: 32px;
+    overflow-x: scroll;
+    overflow-y: hidden !important;
+    white-space: nowrap;
+    display: none;
+}
+
+#codeEditorTabs[visible=true] {
+    display: block;
+}
+
+/* width */
+#codeEditorTabs::-webkit-scrollbar {
+    height: 2px;
+    visibility: hidden;
+}
+
+#codeEditorTabs::-webkit-scrollbar:hover {
+    visibility: visible;
+}
+
+/* Track */
+#codeEditorTabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+#codeEditorTabs::-webkit-scrollbar-thumb {
+    width: 2px;
+    height: 2px;
+    background: var(--primary-light-1);
+}
+
+/* Handle on hover */
+#codeEditorTabs::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light-2);
+}
+
+
+
+
+
+
+
+
+
+.codeEditorTab {
+    height: 34px;
+    border-right: solid 1px var(--primary-dark-1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.codeEditorTab[selected=true] {
+    border-top: solid 2px var(--secondary);
+    height: 35px;
+    background-color: var(--primary-dark-3);
+    color: white;
+}
+
+.codeEditorTab .body {
+    float: left;
+    padding: 0 8px;
+}
+
+.codeEditorTab .body .icon {
+    float: left;
+    width: 12px;
+    height: 12px;
+    margin-top: 4px;
+    margin-right: 8px;
+}
+
+.codeEditorTab .body .title {
+    float: left;
+    color: #aaa;
+    margin-top: 4px;
+    margin-right: 8px;
+}
+
+.codeEditorTab .body .save {
+    float: right;
+    color: #aaa;
+    font-size: 7px;
+    margin-top: 7px;
+}
+
+.codeEditorTab .body .close {
+    float: right;
+    color: #aaa;
+    font-size: 20px;
+}
+
+.codeEditorTab[selected=true] .body * {
+    color: white;
+}

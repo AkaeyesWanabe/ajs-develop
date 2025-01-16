@@ -1,0 +1,546 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--primary-light-2);
+  font-size: 12px;
+  color: var(--primary-more-light);
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box !important;
+  -moz-user-select: none !important;
+  -khtml-user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+img {
+  -webkit-user-drag: none;
+  /* Disable drag preview on WebKit (Safari, Chrome) */
+  user-drag: none;
+  /* Disable drag preview on Firefox */
+  user-select: none;
+  /* Prevent text selection on the image */
+}
+
+input:focus {
+  outline: none !important;
+}
+
+input[type="file"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.drag-on {
+  -webkit-app-region: drag !important;
+}
+
+.drag-off {
+  -webkit-app-region: none !important;
+}
+
+
+
+
+/*-------------------------------------------------
+THE SCROLLBAR
+-------------------------------------------------*/
+/* width */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  visibility: hidden;
+}
+
+::-webkit-scrollbar:hover {
+  visibility: visible;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--primary-dark-2);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  width: 8px;
+  height: 8px;
+  background: var(--primary-light-1);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light-2);
+}
+
+
+
+
+
+/*-------------------------------------------------
+the preloader
+-------------------------------------------------*/
+#preloader {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  background-image: url("../images/preloader-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#preloaderTop {
+  position: absolute;
+  width: max-content;
+  height: max-content;
+  left: 20vw;
+  top: 45vh;
+  transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  -moz-transform: translateX(-50%) translateY(-50%);
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -o-transform: translateX(-50%) translateY(-50%);
+}
+
+#preloaderTop img {
+  width: 64px;
+}
+
+#preloaderTop a {
+  font-size: 24px;
+  color: white;
+  font-weight: 500;
+}
+
+#preloaderBottom {
+  position: absolute;
+  width: max-content;
+  height: max-content;
+  left: 20vw;
+  bottom: 64px;
+  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+}
+
+#preloaderBottom a {
+  font-size: 20px;
+  font-weight: 500;
+  color: #888;
+  text-align: center;
+}
+
+#preloaderBottom h1 {
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+#preloaderLoadingBar {
+  z-index: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background-color: #383838;
+}
+
+#preloaderLoadingBar div {
+  height: 100%;
+  width: 0;
+  background-color: #5ECDBB;
+}
+
+
+
+
+/*-------------------------------------------------
+the APPLICATION interfaces
+-------------------------------------------------*/
+#app {
+  display: none;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 50;
+  border: solid 1px var(--primary-more-dark);
+}
+
+section {
+  display: block;
+}
+
+
+
+header {
+  width: 100%;
+  height: 30px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-dark-2);
+  border-bottom: solid 1px var(--primary-more-dark);
+}
+
+#appBody {
+  height: calc(100vh - 50px);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#statusBar {
+  width: 100%;
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--secondary);
+  color: white;
+  padding: 2px 16px;
+  border-top: solid 1px var(--primary-more-dark);
+}
+
+
+
+
+#appMain {
+  width: 100%;
+  display: flex;
+}
+
+
+
+
+#bottomView {
+  width: 100%;
+  height: 280px;
+  display: flex;
+  background-color: var(--primary-dark-3);
+  border-top: solid 1px var(--primary-more-dark);
+}
+
+#console {
+  min-width: 480px;
+  height: 100%;
+  background-color: var(--primary-dark-1);
+  border-right: solid 1px var(--primary-more-dark);
+}
+
+#projectFiles {
+  flex-grow: 1;
+  height: 100%;
+  z-index: 70;
+  background-color: var(--primary);
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+
+#sceneHierachy {
+  width: 280px;
+  height: 100%;
+  background-color: var(--primary-dark-1);
+  border-right: solid 1px var(--primary-more-dark);
+}
+
+main {
+  width: calc(100vw - 560px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--primary-dark-2);
+}
+
+#properties {
+  width: 280px;
+  height: 100%;
+  z-index: 80;
+  background-color: var(--primary-dark-3);
+  border-left: solid 1px var(--primary-more-dark);
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+
+
+#Tabs {
+  width: 100%;
+  height: 28px;
+  background-color: var(--primary-dark-3);
+}
+
+.workFrame {
+  width: 100%;
+  flex: 1;
+  display: none !important;
+}
+
+.workFrame.active {
+  display: flex !important;
+}
+
+
+/*-------------------------------------------------
+the main bar
+-------------------------------------------------*/
+.workspaceMenu {
+  margin-left: 36px;
+  width: calc(100% - 72px);
+  display: flex;
+  float: left;
+  justify-content: center;
+}
+
+.workspaceTitleBar {
+  width: 100%;
+  height: 32px;
+  background-color: var(--primary-light-1);
+  line-height: 32px;
+  border-bottom: solid 1px var(--primary-more-dark);
+}
+
+.workspaceTitleBar a {
+  float: left;
+  padding: 0 8px;
+}
+
+.workspaceTitleBar span {
+  float: left;
+  height: 25px;
+  line-height: 24px;
+  margin: 3px 2px 0 2px;
+  background-color: var(--primary-light-1);
+  color: var(--primary-more-light);
+  padding: 0 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: normal;
+  border: solid 1px var(--primary-more-dark);
+  border-radius: 4px;
+}
+
+.workspaceTitleBar span:hover {
+  background-color: var(--primary-dark-1);
+}
+
+.workspaceTitleBar span.active {
+  background-color: var(--primary-dark-3);
+}
+
+
+
+
+
+/*--------------
+WORKSPACE MENU
+--------------*/
+.workspaceMenuItem {
+  float: right;
+  cursor: pointer;
+  position: relative;
+  display: block;
+  margin-top: -2px;
+}
+
+.workspaceMenuItem:hover button {
+  color: white;
+  background-color: var(--primary-dark-1);
+}
+
+.workspaceMenuItem:hover .workspaceSubMenu {
+  display: block;
+}
+
+.workspaceMenuItem button {
+  background-color: transparent;
+  padding: 0 0 4px 0;
+  font-size: 12px;
+  color: var(--primary-more-light);
+  border: none;
+  height: 32px;
+  width: 32px;
+  text-align: center;
+}
+
+.workspaceSubMenu {
+  background-color: var(--primary-dark-3);
+  position: absolute;
+  z-index: 100;
+  margin-top: 9px;
+  left: calc(-128px + 33px) !important;
+  display: none;
+  width: 128px;
+  float: left;
+  padding: 8px 8px;
+  border: solid 1px rgba(0, 0, 0, 0.5);
+  border-radius: 0 0 4px 4px;
+}
+
+.workspaceSubMenu div {
+  float: left;
+  width: 100%;
+  padding: 4px 4px;
+  line-height: 20px;
+  border-radius: 4px;
+}
+
+.workspaceSubMenu div:hover {
+  color: var(--text);
+  background-color: var(--primary-light-1);
+}
+
+.workspaceMenuItemLabel {
+  float: left;
+}
+
+.workspaceMenuItemCheck {
+  float: right;
+  font-size: 18px;
+  display: none;
+}
+
+
+
+
+
+
+
+/*------------
+SUB WINDOW CSS
+------------*/
+.subWinBack {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+}
+
+.subWin {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  border: solid 1px var(--primary-more-dark);
+}
+
+.subWinHeader {
+  width: 100%;
+  min-height: 30px;
+  background-color: var(--primary-dark-2);
+  border-bottom: solid 1px var(--primary-more-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 0 8px;
+}
+
+
+.subWinHeader label {
+  color: var(--primary-more-light);
+}
+
+.subWinCloser {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 100%;
+  color: var(--primary-more-light);
+  font-size: 20px;
+}
+
+.subWinCloser:hover {
+  background-color: var(--close-app-btn);
+}
+
+.subWinBody {
+  display: flex;
+  width: 100%;
+}
+
+.subWinBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.subWinIcon {
+  float: left;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 6px 0 0;
+}
+
+.subWinBoxHeader {
+  width: 100%;
+  height: 30px;
+  background-color: var(--primary-dark-1);
+  border-bottom: solid 1px var(--primary-more-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.subWinBoxBody {
+  flex: 1;
+  display: flex;
+  width: 100%;
+}
+
+
+
+.subWinBoxHeader .searchBar {
+  background-color: var(--primary-dark-2);
+  border: solid 1px var(--primary-more-dark);
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 6px;
+}
+
+.subWinBoxHeader .searchBar input {
+  max-width: 112px;
+  color: white;
+  border: none;
+  background-color: transparent;
+  height: 100%;
+  font-size: 12px;
+}
+
+.subWinBoxHeader .searchBar i {
+  font-size: 11px;
+}
+
+.subWinBoxNewBtn {
+  font-size: 12px;
+  cursor: pointer;
+}

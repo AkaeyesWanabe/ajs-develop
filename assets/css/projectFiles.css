@@ -1,0 +1,136 @@
+#projectFilesBox {
+    width: 100%;
+    height: calc(100% - 80px);
+    display: flex;
+}
+
+
+
+
+
+#projectFoldersBar {
+    min-width: 280px;
+    height: 100%;
+    /*for overflow auto*/
+    overflow: auto;
+    border-right: solid 1px var(--primary-more-dark);
+}
+
+/* Remove margins and padding from the parent ul */
+#projectFoldersList {
+    margin: 0;
+    padding: 4px;
+}
+
+/* Remove default bullets */
+ul {
+    list-style-type: none;
+}
+
+.projectFoldersListItem {}
+
+.projectFoldersListItem[open="true"]>.projectFoldersListChildren {
+    display: block;
+}
+
+.projectFoldersListItem>.projectFoldersListNode i:first-child {
+    display: block;
+}
+
+.projectFoldersListItem>.projectFoldersListNode i:nth-child(2) {
+    display: none;
+}
+
+.projectFoldersListItem[open="true"]>.projectFoldersListNode i:first-child {
+    display: none;
+}
+
+.projectFoldersListItem[open="true"]>.projectFoldersListNode i:nth-child(2) {
+    display: block;
+}
+
+.projectFoldersListChildren {
+    display: none;
+}
+
+.projectFoldersListNode {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+.projectFoldersListNode img {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    margin-left: 4px;
+}
+
+.projectFoldersListChildren {
+    margin-left: -32px;
+}
+
+.folderTreeActive {
+    background-color: var(--secondary-dark);
+}
+
+
+
+
+
+
+#projectFilesBar {
+    flex-grow: 1;
+    /*for overflow auto*/
+    background-color: var(--primary-dark-3);
+    padding: 8px 12px;
+    overflow: auto;
+}
+
+.projectFilesItem {
+    display: inline-block;
+    margin: 8px 4px;
+    padding-top: 8px;
+    width: 128px;
+    height: 144px;
+    text-align: center;
+}
+
+.projectFilesItem img {
+    display: block;
+    width: 112px;
+    height: 112px;
+    margin-bottom: 8px;
+    margin-left: 8px;
+}
+
+.projectFilesItem img.local-image {
+    background-image: url('../images/transparent-bg.png');
+    background-repeat: repeat;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.projectFilesItem div {
+    display: block;
+    width: max-content;
+    max-width: 112px;
+    padding: 3px 5px;
+    color: var(--text);
+    text-align: center;
+    border-radius: 7px;
+    /**/
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.projectFilesItem.selected img {
+    opacity: 0.7;
+}
+
+.projectFilesItem.selected div {
+    background-color: var(--secondary-dark);
+    color: white;
+}

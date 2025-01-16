@@ -1,0 +1,64 @@
+{
+    "extension": "internal/com.ajs.scene",
+    "cache": {
+        "sceneEditor": {
+            "scrollX": 320,
+            "scrollY": 420
+        }
+    },
+    "properties": {
+        "name": "game",
+        "visible":true,
+        "width": 1000,
+        "height": 1000,
+        "virtualWidth": 2000,
+        "virtualHeight": 2000,
+        "backgroundColor": "white"
+    },
+    "groups": [
+        {
+            "name": "players"
+        }
+    ],
+    "layers": [
+        {
+            "name": "default",
+            "isRemovable": false,
+            "isRenomable": false
+        }
+    ],
+    "objects": [
+        {
+            "extension": "com.ajs.image",
+            "oid": "__ajs_oid_001",
+            "properties": {
+                "name": "bg",
+                "visible": true,
+                "x": 0,
+                "y": 0,
+                "width": 128,
+                "height": 128,
+                "angle": 0,
+                "imagePath": "assets/images/dust/Shine-PNG-Pic.png"
+            },
+            "groups": "",
+            "layer": 0
+        },
+        {
+            "extension": "com.ajs.sprite",
+            "oid": "__ajs_oid_003",
+            "properties": {
+                "name": "sprite 1",
+                "visible": true,
+                "x": 200,
+                "y": 180,
+                "width": 128,
+                "height": 128,
+                "angle": 0,
+                "animator": "assets/animations/player.anim"
+            },
+            "groups": "",
+            "layer": 0
+        }
+    ]
+}

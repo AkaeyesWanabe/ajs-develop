@@ -1,0 +1,93 @@
+{
+    "extension": "com.ajs.sprite",
+    "extensionName": "Sprite Object",
+    "extensionIcon": "icon.png",
+    "propertiesTabs": [
+        {
+            "name": "Object",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Transform",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Display",
+            "icon-type": "icon",
+            "icon": "pip"
+        }
+    ],
+    "propertiesVariables": [
+        {
+            "name": "name",
+            "tab": 0,
+            "label": "Object Name",
+            "type": "text",
+            "description": "Name of the object."
+        },
+        {
+            "name": "visible",
+            "tab": 0,
+            "label": "Object Visibility",
+            "type": "checkbox",
+            "checkbox-label": "visible",
+            "description": "Visibility of the object."
+        },
+        {
+            "name": "x",
+            "tab": 1,
+            "label": "Object X",
+            "type": "number",
+            "description": "X position of object.",
+            "singleObject": true
+        },
+        {
+            "name": "y",
+            "tab": 1,
+            "label": "Object Y",
+            "type": "number",
+            "description": "Y position of object",
+            "singleObject": true
+        },
+        {
+            "name": "width",
+            "tab": 1,
+            "label": "Width",
+            "type": "number",
+            "description": "Width of the object."
+        },
+        {
+            "name": "height",
+            "tab": 1,
+            "label": "Height",
+            "type": "number",
+            "description": "Height of the object."
+        },
+        {
+            "name": "angle",
+            "tab": 1,
+            "label": "Rotation",
+            "type": "number",
+            "description": "Rotation angle of the object."
+        },
+        {
+            "name": "animator",
+            "tab": 2,
+            "label": "Animations",
+            "type": "animator",
+            "description": "Sprite animation to show."
+        }
+    ],
+    "properties": {
+        "name": "New Image",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 240,
+        "angle": 0,
+        "animator": ""
+    }
+}

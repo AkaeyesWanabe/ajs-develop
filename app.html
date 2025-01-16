@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+
+  <link rel="icon" href="./assets/images/favicon.png" />
+  <title>AJS Develop 1.0</title>
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="./assets/vendor/remixicon/remixicon.css" />
+
+  <!-- css -->
+  <link rel="stylesheet" href="./assets/css/app.css" />
+  <link rel="stylesheet" href="./assets/css/header.css" />
+  <link rel="stylesheet" href="./assets/css/hierachy.css" />
+  <link rel="stylesheet" href="./assets/css/projectFiles.css" />
+  <link rel="stylesheet" href="./assets/css/properties.css" />
+  <link rel="stylesheet" href="./assets/css/sceneEditor.css" />
+  <link rel="stylesheet" href="./assets/css/scriptEditor.css" />
+  <link rel="stylesheet" href="./assets/css/player.css" />
+  <link rel="stylesheet" href="./assets/css/console.css" />
+  <link rel="stylesheet" href="./assets/css/footer.css" />
+  <!--  -->
+  <link rel="stylesheet" href="./assets/css/animator.css" />
+  <!--  -->
+  <link rel="stylesheet" href="./assets/vendor/ace/css/theme/ajs_dark.css" />
+
+  <style>
+    input:focus {
+      border-color: var(--secondary);
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<!-- <body oncontextmenu="return false;" class="drag-off"> -->
+<body class="drag-off">
+  <!-- preloader -->
+  <section id="preloader" class="drag-off">
+    <div id="preloaderTop">
+      <center>
+        <img src="../assets/images/favicon.png" />
+        <h1>AJS Develop 1.0</h1>
+      </center>
+    </div>
+
+    <div id="preloaderBottom">
+      <center>
+        <a>from</a>
+        <h1>Dev Consulting</h1>
+      </center>
+    </div>
+
+    <div id="preloaderLoadingBar" value="50">
+      <div></div>
+    </div>
+  </section>
+
+
+  <section id="app">
+    <!-- app menu -->
+    <header id="appMenu" class="drag-off"></header>
+
+    <section id="appBody">
+      <!-- main frame -->
+      <section id="appMain">
+        <!-- scene object hierachy -->
+        <div id="sceneHierachy"></div>
+
+        <!-- editor bar -->
+        <main id="editor">
+          <div class="workspaceTitleBar" id="editorTabs">
+            <div class="workspaceMenu">
+              <span id="sceneEditorTab" for="sceneEditor" class="active">
+                <i class="ri-window-fill"></i>
+                <b>Scene Editor</b>
+              </span>
+
+              <span id="scriptEditorTab" for="scriptEditor">
+                <i class="ri-code-s-slash-fill"></i>
+                <b>Script Editor</b>
+              </span>
+
+              <span id="playerTab" for="player">
+                <i class="bi ri-play-large-fill"></i>
+                <b>Player</b>
+              </span>
+            </div>
+
+            <div class="workspaceMenuItem">
+              <button>...</button>
+              <div class="workspaceSubMenu">
+                <div check="true">
+                  <a class="workspaceMenuItemLabel">Dock</a>
+                  <i class="workspaceMenuItemCheck ri-check-line"></i>
+                </div>
+                <div check="false">
+                  <a class="workspaceMenuItemLabel">Minimize</a>
+                  <i class="workspaceMenuItemCheck ri-check-line"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- editor body -->
+          <div id="sceneEditor" class="workFrame active"></div>
+          <div id="scriptEditor" class="workFrame"></div>
+          <div id="player" class="workFrame"></div>
+        </main>
+
+        <!-- properties -->
+        <section id="properties"></section>
+      </section>
+
+      <!-- ProjectFiles and Console -->
+      <section id="bottomView">
+        <section id="console"></section>
+        <section id="projectFiles"></section>
+      </section>
+    </section>
+
+    <!-- statusBar -->
+    <footer id="statusBar"></footer>
+  </section>
+
+  <!-- animations editor -->
+  <div id="animatorEditorBack" class="subWinBack"></div>
+
+
+  <!-- sub windows -->
+  <input type="file" id="FileInput" />
+  <input type="file" id="FolderInput" nwdirectory />
+
+  <!-- tag temp -->
+  <div id="tagTemp" class="hidden"></div>
+
+  <!-- code editor -->
+  <script src="./assets/vendor/ace/src-noconflict/ace.js"></script>
+  <script src="./assets/vendor/ace/src-noconflict/ext-language_tools.js"></script>
+  <!-- app -->
+  <script src="./assets/js/app.js"></script>
+  <!-- views -->
+  <script src="./assets/js/animatorView.js" defer></script>
+  <script src="./assets/js/consoleView.js" defer></script>
+  <script src="./assets/js/footerView.js" defer></script>
+  <script src="./assets/js/headerView.js" defer></script>
+  <script src="./assets/js/hierachyView.js" defer></script>
+  <script src="./assets/js/playerView.js" defer></script>
+  <script src="./assets/js/propertiesView.js" defer></script>
+  <script src="./assets/js/projectFilesView.js" defer></script>
+  <script src="./assets/js/sceneEditorView.js" defer></script>
+  <script src="./assets/js/scriptEditorView.js" defer></script>
+</body>
+
+</html>
