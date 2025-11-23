@@ -1,16 +1,41 @@
+/**
+ * AJS Develop - Script Editor
+ * Code editing workspace
+ */
+
+/* ==================== SCRIPT EDITOR LAYOUT ==================== */
+
 #scriptEditor {
+    display: flex;
     flex-direction: column;
+    background-color: var(--primary-800);
+    width: 100%;
+    height: 100%;
 }
+
+/* ==================== CODE EDITOR CONTAINERS ==================== */
 
 .codes {
     width: 100%;
     flex: 1;
     display: none;
+    min-height: 0; /* Important for flexbox child */
 }
 
 .codes[visible=true] {
-    display: block;
+    display: flex; /* Changed from block to flex */
+    flex-direction: column;
 }
+
+#codeEditor {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    overflow: hidden;
+    position: relative; /* Monaco needs positioned container */
+}
+
+/* ==================== EMPTY STATE ==================== */
 
 #noFileOpened {
     display: none;
@@ -18,115 +43,129 @@
     height: 100%;
     align-items: center;
     justify-content: center;
-    color: var(--primary-light-5);
+    color: var(--text-tertiary);
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+    padding: var(--space-12);
 }
 
 #noFileOpened[visible=true] {
     display: flex;
 }
 
+#noFileOpened i {
+    font-size: 64px;
+    color: var(--text-disabled);
+    opacity: 0.4;
+    margin-bottom: var(--space-4);
+}
 
+#noFileOpened p {
+    font-size: var(--text-md);
+    color: var(--text-secondary);
+}
 
-
-
-
+/* ==================== CODE EDITOR TABS ==================== */
 
 #codeEditorTabs {
-    border-bottom: solid 1px var(--primary-dark-1);
-    height: 32px;
-    overflow-x: scroll;
+    border-bottom: 1px solid var(--border-subtle);
+    height: var(--tab-bar-height);
+    min-height: var(--tab-bar-height);
+    max-height: var(--tab-bar-height);
+    overflow-x: auto;
     overflow-y: hidden !important;
     white-space: nowrap;
     display: none;
+    background: var(--primary-700);
+    flex-shrink: 0; /* Don't shrink tabs */
 }
 
 #codeEditorTabs[visible=true] {
     display: block;
 }
 
-/* width */
 #codeEditorTabs::-webkit-scrollbar {
-    height: 2px;
-    visibility: hidden;
+    height: 3px;
 }
 
-#codeEditorTabs::-webkit-scrollbar:hover {
-    visibility: visible;
-}
-
-/* Track */
 #codeEditorTabs::-webkit-scrollbar-track {
     background: transparent;
 }
 
-/* Handle */
 #codeEditorTabs::-webkit-scrollbar-thumb {
-    width: 2px;
-    height: 2px;
-    background: var(--primary-light-1);
+    background: var(--primary-500);
+    border-radius: var(--radius-sm);
 }
 
-/* Handle on hover */
 #codeEditorTabs::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-light-2);
+    background: var(--primary-450);
 }
 
-
-
-
-
-
-
-
+/* ==================== EDITOR TABS ==================== */
 
 .codeEditorTab {
-    height: 34px;
-    border-right: solid 1px var(--primary-dark-1);
+    height: 36px;
+    border-right: 1px solid var(--border-subtle);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 0 var(--space-4);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    background-color: var(--primary-750);
+    color: var(--text-tertiary);
+    gap: var(--space-2);
+}
+
+.codeEditorTab:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 .codeEditorTab[selected=true] {
-    border-top: solid 2px var(--secondary);
-    height: 35px;
-    background-color: var(--primary-dark-3);
-    color: white;
+    border-top: 2px solid var(--secondary);
+    height: 37px;
+    background-color: var(--primary-800);
+    color: var(--text-primary);
 }
 
 .codeEditorTab .body {
-    float: left;
-    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
 }
 
 .codeEditorTab .body .icon {
-    float: left;
-    width: 12px;
-    height: 12px;
-    margin-top: 4px;
-    margin-right: 8px;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
 }
 
 .codeEditorTab .body .title {
-    float: left;
-    color: #aaa;
-    margin-top: 4px;
-    margin-right: 8px;
+    color: inherit;
+    font-size: var(--text-sm);
 }
 
 .codeEditorTab .body .save {
-    float: right;
-    color: #aaa;
-    font-size: 7px;
-    margin-top: 7px;
+    color: var(--warning-500);
+    font-size: var(--text-2xs);
 }
 
 .codeEditorTab .body .close {
-    float: right;
-    color: #aaa;
-    font-size: 20px;
+    color: var(--text-tertiary);
+    font-size: var(--icon-lg);
+    margin-left: var(--space-2);
+    transition: color var(--transition-fast);
+}
+
+.codeEditorTab .body .close:hover {
+    color: var(--error);
 }
 
 .codeEditorTab[selected=true] .body * {
-    color: white;
+    color: var(--text-primary);
+}
+
+.codeEditorTab[selected=true] .body .close:hover {
+    color: var(--error);
 }

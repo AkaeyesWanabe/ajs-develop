@@ -47,5 +47,29 @@ module.exports = {
 
     getExtensionsDir() {
         return "./extensions";
+    },
+
+    /**
+     * Save current project data to data.json file
+     */
+    saveProject() {
+        if (!this.projectDir || !this.projectData) {
+            console.warn('No project to save');
+            return false;
+        }
+
+        try {
+            const projectDataPath = this.projectDir + "/data.json";
+            const data = JSON.stringify(this.projectData, null, 4);
+            fs.writeFileSync(projectDataPath, data, 'utf8');
+
+            console.log('Project saved:', projectDataPath);
+            return true;
+        }
+        catch (err) {
+            console.error('Failed to save project:', err);
+            alert('Failed to save project: ' + err.message);
+            return false;
+        }
     }
 };

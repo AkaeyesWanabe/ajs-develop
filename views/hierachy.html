@@ -1,5 +1,11 @@
 <div class="workspaceTitleBar">
-  <a>Scene Hierachy</a>
+  <a>Scene Hierarchy</a>
+
+  <div class="hierachyControls">
+    <button id="addObjectBtn" title="Add Object to Scene">
+      <i class="ri-add-line"></i>
+    </button>
+  </div>
 
   <div class="workspaceMenuItem">
     <button>...</button>
@@ -15,4 +21,27 @@
     </div>
   </div>
 
+</div>
+
+<!-- Hierarchy Tree Container -->
+<div id="hierarchyTreeContainer">
+  <div id="hierarchyTree" class="hierarchyTree">
+    <div class="hierarchy-empty">No scene loaded</div>
+  </div>
+</div>
+
+<div id="addObjectMenu" class="addObjectMenu" style="display: none;">
+  <div class="addObjectMenuHeader">
+    <h4>Add Object</h4>
+    <button id="closeAddObjectMenu">
+      <i class="ri-close-line"></i>
+    </button>
+  </div>
+  <div class="addObjectMenuBody">
+    <div class="objectCategoryTitle">Game Objects</div>
+    <div id="gameObjectsList" class="objectsList"></div>
+
+    <div class="objectCategoryTitle">UI Elements</div>
+    <div id="uiObjectsList" class="objectsList"></div>
+  </div>
 </div>

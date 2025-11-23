@@ -2,63 +2,123 @@
     "extension": "internal/com.ajs.scene",
     "cache": {
         "sceneEditor": {
-            "scrollX": 320,
-            "scrollY": 420
+            "scrollX": 800,
+            "scrollY": 1855.199951171875
         }
     },
     "properties": {
         "name": "game",
-        "visible":true,
-        "width": 1000,
+        "visible": true,
+        "width": 3000,
         "height": 1000,
-        "virtualWidth": 2000,
-        "virtualHeight": 2000,
+        "virtualWidth": 5000,
+        "virtualHeight": 5000,
         "backgroundColor": "white"
     },
     "groups": [
         {
             "name": "players"
+        },
+        {
+            "id": "group_1762720081068_0dixwjrv3",
+            "name": "star1",
+            "objects": [
+                "1a2b3c4d5e6f",
+                "2b3c4d5e6f7a"
+            ],
+            "bounds": {
+                "x": 114,
+                "y": 79,
+                "width": 400,
+                "height": 400
+            },
+            "collapsed": false
         }
     ],
     "layers": [
         {
-            "name": "default",
+            "name": "sky",
             "isRemovable": false,
-            "isRenomable": false
+            "isRenomable": true,
+            "isLocked": false
+        },
+        {
+            "name": "Interface",
+            "isRemovable": true,
+            "isRenomable": true,
+            "isLocked": false
         }
     ],
     "objects": [
         {
             "extension": "com.ajs.image",
-            "oid": "__ajs_oid_001",
+            "oid": "1a2b3c4d5e6f",
             "properties": {
-                "name": "bg",
+                "name": "Background Image",
                 "visible": true,
-                "x": 0,
-                "y": 0,
-                "width": 128,
-                "height": 128,
+                "x": 112,
+                "y": 48,
+                "width": 400,
+                "height": 400,
                 "angle": 0,
                 "imagePath": "assets/images/dust/Shine-PNG-Pic.png"
             },
             "groups": "",
-            "layer": 0
+            "layer": 0,
+            "locked": false,
+            "groupId": "group_1762720081068_0dixwjrv3"
         },
         {
             "extension": "com.ajs.sprite",
-            "oid": "__ajs_oid_003",
+            "oid": "2b3c4d5e6f7a",
             "properties": {
-                "name": "sprite 1",
+                "name": "Player Character",
                 "visible": true,
-                "x": 200,
-                "y": 180,
+                "x": 256,
+                "y": 176,
                 "width": 128,
                 "height": 128,
                 "angle": 0,
-                "animator": "assets/animations/player.anim"
+                "animator": ".\\assets\\animations/player.anim"
+            },
+            "groups": "players",
+            "layer": 0,
+            "locked": false,
+            "groupId": "group_1762720081068_0dixwjrv3"
+        },
+        {
+            "extension": "com.ajs.button",
+            "oid": "3c4d5e6f7a8b",
+            "properties": {
+                "name": "Start Button",
+                "x": 240,
+                "y": 416,
+                "width": 150,
+                "height": 50,
+                "angle": "0",
+                "text": "HELLO WORD",
+                "bkgColor": "#4CAF50"
             },
             "groups": "",
-            "layer": 0
+            "layer": 1,
+            "locked": false
+        },
+        {
+            "extension": "com.ajs.image",
+            "oid": "4d5e6f7a8b9c",
+            "properties": {
+                "name": "Logo",
+                "visible": true,
+                "x": 272,
+                "y": 0,
+                "width": 100,
+                "height": 100,
+                "angle": 0,
+                "imagePath": "assets/images/dust/Shine-PNG-Pic.png"
+            },
+            "groups": "",
+            "layer": 0,
+            "locked": false
         }
     ]
 }

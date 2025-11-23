@@ -1,7 +1,10 @@
 {
     "extension": "com.ajs.sprite",
-    "extensionName": "Sprite Object",
+    "extensionName": "Animated Sprite",
     "extensionIcon": "icon.png",
+    "description": "Animated sprite with multiple frames",
+    "category": "Game Objects",
+    "hierarchyPreview": "preview",
     "propertiesTabs": [
         {
             "name": "Object",

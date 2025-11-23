@@ -1,12 +1,20 @@
 const application = require("./application");
 const sceneEditor = require("./sceneEditor");
+const scriptEditor = require("./scriptEditor");
+const functions = require("../common/functions");
 //
 const fs = nw.require('fs');
+const path = nw.require('path');
 const $ = nw.require('jquery');
 const globals = nw.require('./assets/js/common/globals');
 const animator = nw.require('./assets/js/objects/animator');
+const notifications = nw.require('./assets/js/objects/notifications');
 
 module.exports = {
+    // Current filter and search state
+    currentFilter: 'all',
+    currentSearchQuery: '',
+    allFiles: [], // Cache of all files for filtering
     refreshFolderIcon() {
         let icons = document.querySelectorAll(".projectFoldersListNode>img");
         let path = "./assets/files-icons-themes/" + globals.user.fileIconTheme.theme + "/";
@@ -162,45 +170,134 @@ module.exports = {
             let path = this.getAttribute('path');
             let type = this.getAttribute('type');
             if (type == "dir") {
-                let node = $(".projectFoldersListItem[path='" + path.replaceAll("\\","\\\\") + "'] .projectFoldersListNode")[0];
-                console.log(node);
-                node.click();
+                // Use CSS.escape() to safely escape the path for use in a selector
+                const escapedPath = CSS.escape(path);
+                // Alternative: Use data-path and querySelector for safer selection
+                let nodes = document.querySelectorAll('.projectFoldersListItem');
+                let node = null;
+                for (let i = 0; i < nodes.length; i++) {
+                    if (nodes[i].getAttribute('path') === path) {
+                        node = nodes[i].querySelector('.projectFoldersListNode');
+                        break;
+                    }
+                }
+                if (node) {
+                    node.click();
+                }
                 return;
             }
-            //detect file info for reading or editting
-            const fname = this.getAttribute("filename").toLowerCase();
-            const fext = fname.substring(fname.lastIndexOf("."), fname.length);
-            const fitem = {
-                name: fname,
-                path: path,
-                extension: fext,
-                language: "Plain Text",
-                cursor: {
-                    char: 0,
-                    line: 0,
-                    col: 0,
-                }
-            };
-            //if it's an file read it's content
-            const data = fs.readFileSync(path);
-            //language styling
-            if (fext == ".js") {
-                fitem.language = "JavaScript";
-                globals.project.scriptEditor.files.push(fitem);
-                //open editor
-                scriptEditor.openFile(this.getAttribute("path"), this.getAttribute("filename"), fext, data);
-                document.querySelector("#scriptEditorTab").click();
-            }
-            if (fext == ".scn") {
-                //open editor
-                sceneEditor.openScene(this.getAttribute("path"), this.getAttribute("filename"), data);
-                document.querySelector("#sceneEditorTab").click();
-            }
-            if (fext == ".anim") {
-                //open editor
-                animator.openAnimator(this.getAttribute("path"), this.getAttribute("filename"), data);
-            }
+
+            // Open file using unified method
+            module.exports.openFileByPath(path, this.getAttribute("filename"));
         });
+    },
+
+    /**
+     * Unified method to open any file type
+     * @param {string} filePath - Full path to the file
+     * @param {string} fileName - Name of the file with extension
+     */
+    openFileByPath(filePath, fileName) {
+        console.log('[PROJECT FILES] Opening file:', fileName, 'at path:', filePath);
+
+        // Extract file extension
+        const fname = fileName.toLowerCase();
+        const fext = fname.substring(fname.lastIndexOf("."), fname.length);
+
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+            console.error('[PROJECT FILES] File not found:', filePath);
+            if (notifications) {
+                notifications.error(`File not found: ${fileName}`);
+            }
+            return;
+        }
+
+        try {
+            // Read file content asynchronously for better UX
+            const data = fs.readFileSync(filePath, 'utf8');
+            console.log('[PROJECT FILES] File read successfully, length:', data.length);
+
+            // Determine file type and open in appropriate editor
+            const scriptExtensions = ['.js', '.jsx', '.mjs', '.cjs', '.json', '.html', '.htm', '.css', '.md', '.txt'];
+            const isScriptFile = scriptExtensions.includes(fext);
+
+            if (isScriptFile) {
+                // Open in Script Editor
+                console.log('[PROJECT FILES] Opening in Script Editor...');
+
+                // Create file info for script editor
+                const fitem = {
+                    name: fname,
+                    path: filePath,
+                    extension: fext,
+                    language: this.getLanguageName(fext),
+                    cursor: { char: 0, line: 0, col: 0 }
+                };
+
+                // Add to script editor files if JavaScript
+                if (fext === '.js' || fext === '.jsx' || fext === '.mjs' || fext === '.cjs') {
+                    globals.project.scriptEditor.files.push(fitem);
+                }
+
+                // Open file in script editor
+                scriptEditor.openFile(filePath, fileName, fext, data);
+
+                // Switch to script editor tab
+                const scriptEditorTab = document.querySelector("#scriptEditorTab");
+                if (scriptEditorTab) {
+                    scriptEditorTab.click();
+                }
+            }
+            else if (fext === '.scn') {
+                // Open in Scene Editor
+                console.log('[PROJECT FILES] Opening in Scene Editor...');
+                sceneEditor.openScene(filePath, fileName, data);
+
+                const sceneEditorTab = document.querySelector("#sceneEditorTab");
+                if (sceneEditorTab) {
+                    sceneEditorTab.click();
+                }
+            }
+            else if (fext === '.anim') {
+                // Open in Animator
+                console.log('[PROJECT FILES] Opening in Animator...');
+                animator.openAnimator(filePath, fileName, data);
+            }
+            else {
+                // Unsupported file type
+                console.warn('[PROJECT FILES] Unsupported file type:', fext);
+                if (notifications) {
+                    notifications.warning(`Cannot open ${fext} files in editor yet`);
+                }
+            }
+        } catch (err) {
+            console.error('[PROJECT FILES] Failed to open file:', filePath, err);
+            if (notifications) {
+                notifications.error(`Failed to open ${fileName}: ${err.message}`);
+            }
+        }
+    },
+
+    /**
+     * Get human-readable language name from file extension
+     * @param {string} ext - File extension
+     * @returns {string} Language name
+     */
+    getLanguageName(ext) {
+        const languageMap = {
+            '.js': 'JavaScript',
+            '.jsx': 'JavaScript React',
+            '.mjs': 'JavaScript Module',
+            '.cjs': 'JavaScript CommonJS',
+            '.json': 'JSON',
+            '.html': 'HTML',
+            '.htm': 'HTML',
+            '.css': 'CSS',
+            '.md': 'Markdown',
+            '.txt': 'Plain Text'
+        };
+        return languageMap[ext] || 'Plain Text';
     },
 
     getFileList(dirPath) {
@@ -237,109 +334,546 @@ module.exports = {
         return item;
     },
 
+    /**
+     * Create HTML for a folder tree item (recursive)
+     * @param {Object} dir - Directory object
+     * @returns {string} HTML string for the folder item
+     */
+    createFolderItemHTML(dir) {
+        // Escape all user-controlled data to prevent XSS
+        const escapedPath = functions.escapeAttr(dir.path);
+        const escapedRelative = functions.escapeAttr(dir.relativeParentPath);
+        const escapedFilename = functions.escapeAttr(dir.name);
+        const escapedName = functions.escapeHtml(dir.name);
+
+        // Build children HTML recursively
+        let childrenHTML = '';
+        if (dir.children && dir.children.length > 0) {
+            const subfolders = dir.children.filter(child => child.type === "dir");
+            childrenHTML = subfolders.map(child => this.createFolderItemHTML(child)).join('');
+        }
+
+        return `
+            <li class='projectFoldersListItem' path='${escapedPath}' relative='${escapedRelative}' filename='${escapedFilename}' open='false'>
+                <div class='projectFoldersListNode'>
+                    <i class='ri-arrow-right-s-line'></i>
+                    <i class='ri-arrow-down-s-line'></i>
+                    <img />
+                    <a>${escapedName}</a>
+                </div>
+                <ul class='projectFoldersListChildren'>
+                    ${childrenHTML}
+                </ul>
+            </li>
+        `;
+    },
+
+    /**
+     * Load and display the folder tree
+     */
     loadFolders() {
-        //reset content temp
-        contentTemp = "";
-        //parse all folders
-        globals.project.files.forEach((file) => {
-            if (file.type == "dir") {
-                this.createFolderItem(file);
-            }
-        });
-        //show the folders
-        document.querySelector("#projectFoldersList").innerHTML = contentTemp;
-        //
-        $this = this;
-        //
-        setTimeout(function () {
+        const projectFoldersList = document.querySelector("#projectFoldersList");
+
+        if (!projectFoldersList) {
+            console.error('projectFoldersList element not found');
+            return;
+        }
+
+        // Get all root-level directories
+        const rootFolders = globals.project.files.filter(file => file.type === "dir");
+
+        // Generate HTML for all folders
+        const foldersHTML = rootFolders.map(dir => this.createFolderItemHTML(dir)).join('');
+
+        // Update the DOM
+        projectFoldersList.innerHTML = foldersHTML;
+
+        const $this = this;
+
+        // Attach event handlers after DOM update
+        setTimeout(() => {
             $(".projectFoldersListNode").click(function () {
                 $(".projectFoldersListNode").removeClass("folderTreeActive");
                 this.classList.add("folderTreeActive");
-                //open or close
+
+                // Toggle open/close state
                 let parent = this.parentElement;
-                if (parent.getAttribute("open") == "false") {
-                    parent.setAttribute("open", "true");
-                }
-                else {
-                    parent.setAttribute("open", "false");
-                }
-                //
+                const isOpen = parent.getAttribute("open") === "true";
+                parent.setAttribute("open", isOpen ? "false" : "true");
+
+                // Update current directory path
                 globals.project.current.relativeFileParentPath = parent.getAttribute('relative') + "\\" + parent.getAttribute('filename');
                 globals.project.current.fileName = parent.getAttribute('filename');
-                //
+
+                // Load files for this directory
                 $this.loadFiles(globals.project.current.relativeFileParentPath);
             });
-            //
-            //refresh folders icons
+
+            // Refresh folder icons
             $this.refreshFolderIcon();
         }, 100);
+
+        console.log(`Loaded ${rootFolders.length} root folders`);
     },
 
-    createFolderItem(dir) {
-        contentTemp = contentTemp + "<li class='projectFoldersListItem' path='" + dir.path + "' relative='" + dir.relativeParentPath + "' filename='" + dir.name + "' open='false'>";
-        contentTemp = contentTemp + /**/"<div class='projectFoldersListNode'>";
-        contentTemp = contentTemp + /**//**/"<i class='bi bi-chevron-right'></i>";
-        contentTemp = contentTemp + /**//**/"<i class='bi bi-chevron-down'></i>";
-        contentTemp = contentTemp + /**//**/"<img />";
-        contentTemp = contentTemp + /**//**/"<a>" + dir.name + "</a>";
-        contentTemp = contentTemp + /**/"</div>";
-        contentTemp = contentTemp + /**/"<ul class='projectFoldersListChildren'>";
-        if (dir.children != null && dir.children.length > 0) {
-            dir.children.forEach((child) => {
-                if (child.type == "dir") {
-                    this.createFolderItem(child);
+    /**
+     * Create HTML for a single file item
+     * @param {Object} file - File object with path, name, type, etc.
+     * @returns {string} HTML string for the file item
+     */
+    createFileItemHTML(file) {
+        // Escape all user-controlled data to prevent XSS
+        const escapedType = functions.escapeAttr(file.type);
+        const escapedPath = functions.escapeAttr(file.path);
+        const escapedRelative = functions.escapeAttr(file.relativeFileParentPath || '');
+        const escapedFilename = functions.escapeAttr(file.name);
+        const escapedName = functions.escapeHtml(file.name);
+
+        return `
+            <div class='projectFilesItem' type='${escapedType}' path='${escapedPath}' relative='${escapedRelative}' filename='${escapedFilename}'>
+                <img />
+                <center><div>${escapedName}</div></center>
+            </div>
+        `;
+    },
+
+    /**
+     * Get all files in a specific directory path
+     * @param {Array} fileTree - The file tree to search
+     * @param {string} targetPath - The directory path to match
+     * @returns {Array} Array of files in the target directory
+     */
+    getFilesInDirectory(fileTree, targetPath) {
+        const matchingFiles = [];
+
+        const searchRecursive = (items) => {
+            if (!items || items.length === 0) {
+                return;
+            }
+
+            items.forEach((item) => {
+                // Add file metadata for proper matching
+                if (!item.relativeFileParentPath && item.relativeParentPath) {
+                    item.relativeFileParentPath = item.relativeParentPath;
+                }
+
+                // Check if this item belongs to the target directory
+                if (item.relativeFileParentPath === targetPath) {
+                    // Filter out data.json at root level
+                    if (item.name === "data.json" && item.relativeFileParentPath === ".") {
+                        return;
+                    }
+                    matchingFiles.push(item);
+                }
+
+                // Search in children directories
+                if (item.type === "dir" && item.children && item.children.length > 0) {
+                    // Set relativeFileParentPath for children
+                    item.children.forEach(child => {
+                        if (!child.relativeFileParentPath) {
+                            child.relativeFileParentPath = item.relativeParentPath + "\\" + item.name;
+                        }
+                    });
+                    searchRecursive(item.children);
                 }
             });
-        }
-        contentTemp = contentTemp + /**/"</ul>";
-        contentTemp = contentTemp + "</li >";
+        };
+
+        searchRecursive(fileTree);
+        return matchingFiles;
     },
 
-    createFileItem(file) {
-        contentTemp = contentTemp + "<div class='projectFilesItem' type='" + file.type + "' path='" + file.path + "' relative='" + file.relativeFileParentPath + "' filename='" + file.name + "'>";
-        contentTemp = contentTemp + /**/"<img />";
-        contentTemp = contentTemp + /**/"<center><div>" + file.name + "</div></center>";
-        contentTemp = contentTemp + "</div>";
-    },
+    /**
+     * Load and display files for a given directory path
+     * @param {string} dirPath - The directory path to display files from
+     */
+    loadFiles(dirPath) {
+        const projectFilesBar = document.querySelector("#projectFilesBar");
 
-    tryDirChildren(files, dirPath) {
-        if (files[0].relativeParentPath == dirPath) {
-            files.forEach((file) => {
-                if (!file.relativeFileParentPath && file.name == "data.json") {
-                    //don't show data.json file in projectfiles
-                    return
-                }
-                //create file or folder while no exception encountred
-                this.createFileItem(file);
-            });
+        if (!projectFilesBar) {
+            console.error('projectFilesBar element not found');
             return;
         }
-        //
-        files.forEach((file) => {
-            if (file.type == "dir") {
-                this.tryDirChildren(file.children, dirPath);
+
+        // Get files in the target directory
+        const files = this.getFilesInDirectory(globals.project.files, dirPath);
+
+        // Store files for filtering
+        this.allFiles = files;
+
+        // Generate HTML for all files
+        const filesHTML = files.map(file => this.createFileItemHTML(file)).join('');
+
+        // Get drop overlay HTML
+        const dropOverlayHTML = `
+            <div id="projectFilesDropOverlay" class="project-files-drop-overlay" style="display: none;">
+                <div class="drop-overlay-content">
+                    <i class="ri-upload-cloud-line"></i>
+                    <h3>Drop Files Here</h3>
+                    <p>Release to upload files to this folder</p>
+                </div>
+            </div>
+        `;
+
+        // Update the DOM
+        projectFilesBar.innerHTML = dropOverlayHTML + filesHTML;
+
+        // Refresh icons after DOM update
+        setTimeout(() => {
+            this.refreshFilesIcon();
+
+            // Reapply current filter and search
+            if (this.currentFilter !== 'all' || this.currentSearchQuery.trim() !== '') {
+                this.applyFilterAndSearch();
+            }
+        }, 1);
+
+        console.log(`Loaded ${files.length} files from: ${dirPath}`);
+    },
+
+    /**
+     * Get file type category for filtering
+     * @param {string} filename - The filename to categorize
+     * @returns {string} Category: 'image', 'audio', 'video', 'scene', 'script', or 'other'
+     */
+    getFileCategory(filename) {
+        const ext = filename.toLowerCase();
+
+        if (ext.endsWith('.jpeg') || ext.endsWith('.jpg') || ext.endsWith('.png') ||
+            ext.endsWith('.webp') || ext.endsWith('.bmp') || ext.endsWith('.gif')) {
+            return 'image';
+        }
+        if (ext.endsWith('.mp3') || ext.endsWith('.ogg') || ext.endsWith('.wav') ||
+            ext.endsWith('.m4a') || ext.endsWith('.flac')) {
+            return 'audio';
+        }
+        if (ext.endsWith('.mp4') || ext.endsWith('.mkv') || ext.endsWith('.avi') ||
+            ext.endsWith('.webm') || ext.endsWith('.mov')) {
+            return 'video';
+        }
+        if (ext.endsWith('.scn')) {
+            return 'scene';
+        }
+        if (ext.endsWith('.js') || ext.endsWith('.jsx') || ext.endsWith('.ts') ||
+            ext.endsWith('.tsx') || ext.endsWith('.json')) {
+            return 'script';
+        }
+        return 'other';
+    },
+
+    /**
+     * Apply current filter and search to file items
+     */
+    applyFilterAndSearch() {
+        const fileItems = document.querySelectorAll('.projectFilesItem');
+
+        fileItems.forEach(item => {
+            const filename = item.getAttribute('filename') || '';
+            const category = this.getFileCategory(filename);
+            const isDir = item.getAttribute('type') === 'dir';
+
+            // Apply filter
+            let matchesFilter = this.currentFilter === 'all' || category === this.currentFilter || isDir;
+
+            // Apply search
+            let matchesSearch = true;
+            if (this.currentSearchQuery.trim() !== '') {
+                const query = this.currentSearchQuery.toLowerCase();
+                matchesSearch = filename.toLowerCase().includes(query);
+            }
+
+            // Show/hide based on both filter and search
+            if (matchesFilter && matchesSearch) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
             }
         });
     },
 
-    loadFiles(dirPath) {
-        //reset content temp
-        contentTemp = "";
-        //parse all folders
-        this.tryDirChildren(globals.project.files, dirPath);
-        //show the folders
-        document.querySelector("#projectFilesBar").innerHTML = contentTemp;
-        //
-        setTimeout(() => {
-            this.refreshFilesIcon();
-        }, 1);
+    /**
+     * Initialize search functionality
+     */
+    initSearch() {
+        const searchInput = document.getElementById('projectFilesSearchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+
+        if (!searchInput) return;
+
+        // Search input handler
+        searchInput.addEventListener('input', (e) => {
+            this.currentSearchQuery = e.target.value;
+            this.applyFilterAndSearch();
+
+            // Show/hide clear button
+            if (clearBtn) {
+                clearBtn.style.display = this.currentSearchQuery.trim() !== '' ? 'block' : 'none';
+            }
+        });
+
+        // Clear button handler
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                this.currentSearchQuery = '';
+                this.applyFilterAndSearch();
+                clearBtn.style.display = 'none';
+            });
+        }
+
+        console.log('[ProjectFiles] Search initialized');
+    },
+
+    /**
+     * Initialize filter buttons
+     */
+    initFilters() {
+        const filterButtons = document.querySelectorAll('.projectFiles-filter-btn');
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Update current filter
+                this.currentFilter = btn.getAttribute('data-filter');
+
+                // Apply filter
+                this.applyFilterAndSearch();
+
+                console.log('[ProjectFiles] Filter changed to:', this.currentFilter);
+            });
+        });
+
+        console.log('[ProjectFiles] Filters initialized');
+    },
+
+    /**
+     * Copy files to current directory
+     * @param {FileList} files - Files to import
+     */
+    async importFiles(files) {
+        if (!files || files.length === 0) return;
+
+        const currentDir = globals.project.dir + globals.project.current.relativeFileParentPath.replace(/\./g, '');
+
+        console.log('[ProjectFiles] Importing', files.length, 'files to:', currentDir);
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const sourcePath = file.path;
+            const destPath = path.join(currentDir, file.name);
+
+            try {
+                // Check if file already exists
+                if (fs.existsSync(destPath)) {
+                    console.warn('[ProjectFiles] File already exists:', file.name);
+                    errorCount++;
+                    continue;
+                }
+
+                // Copy file
+                fs.copyFileSync(sourcePath, destPath);
+                successCount++;
+                console.log('[ProjectFiles] Copied:', file.name);
+
+            } catch (err) {
+                console.error('[ProjectFiles] Error copying file:', file.name, err);
+                errorCount++;
+            }
+        }
+
+        // Refresh file list
+        this.getFileList(globals.project.dir);
+        this.loadFiles(globals.project.current.relativeFileParentPath);
+
+        // Show notification
+        if (successCount > 0) {
+            notifications.success(`Imported ${successCount} file${successCount > 1 ? 's' : ''}`);
+        }
+        if (errorCount > 0) {
+            notifications.warning(`Failed to import ${errorCount} file${errorCount > 1 ? 's' : ''}`);
+        }
+
+        console.log('[ProjectFiles] Import complete:', successCount, 'success,', errorCount, 'errors');
+    },
+
+    /**
+     * Initialize bulk import functionality
+     */
+    initBulkImport() {
+        const importBtn = document.getElementById('bulkImportFilesBtn');
+        const fileInput = document.getElementById('projectFilesBulkInput');
+
+        if (!importBtn || !fileInput) return;
+
+        // Import button handler
+        importBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // File input handler
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                this.importFiles(files);
+            }
+            // Reset input
+            fileInput.value = '';
+        });
+
+        console.log('[ProjectFiles] Bulk import initialized');
+    },
+
+    /**
+     * Initialize drag & drop functionality
+     */
+    initDragAndDrop() {
+        const dropZone = document.getElementById('projectFilesBar');
+        const dropOverlay = document.getElementById('projectFilesDropOverlay');
+
+        if (!dropZone || !dropOverlay) return;
+
+        let dragCounter = 0;
+
+        // Prevent default drag behaviors on the entire window
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Show overlay when dragging over
+        dropZone.addEventListener('dragenter', (e) => {
+            dragCounter++;
+            if (e.dataTransfer.types.includes('Files')) {
+                dropOverlay.classList.add('active');
+                dropOverlay.style.display = 'flex';
+            }
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            dragCounter--;
+            if (dragCounter === 0) {
+                dropOverlay.classList.remove('active');
+                dropOverlay.style.display = 'none';
+            }
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        // Handle file drop
+        dropZone.addEventListener('drop', (e) => {
+            dragCounter = 0;
+            dropOverlay.classList.remove('active');
+            dropOverlay.style.display = 'none';
+
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                this.importFiles(files);
+            }
+        });
+
+        console.log('[ProjectFiles] Drag & drop initialized');
+    },
+
+    /**
+     * Initialize all toolbar features
+     */
+    initToolbar() {
+        this.initSearch();
+        this.initFilters();
+        this.initBulkImport();
+        this.initDragAndDrop();
+        console.log('[ProjectFiles] Toolbar initialized');
+    },
+
+    /**
+     * Delete a file
+     * @param {string} filePath - Path to the file to delete
+     * @returns {Promise<boolean>} Success status
+     */
+    async deleteFile(filePath) {
+        if (!filePath || !fs.existsSync(filePath)) {
+            console.error('[ProjectFiles] File does not exist:', filePath);
+            return false;
+        }
+
+        try {
+            // Check if it's a file or directory
+            const stats = fs.statSync(filePath);
+
+            if (stats.isDirectory()) {
+                // Delete directory recursively
+                fs.rmSync(filePath, { recursive: true, force: true });
+                console.log('[ProjectFiles] Deleted directory:', filePath);
+            } else {
+                // Delete file
+                fs.unlinkSync(filePath);
+                console.log('[ProjectFiles] Deleted file:', filePath);
+            }
+
+            // Refresh file list
+            this.getFileList(globals.project.dir);
+            this.loadFiles(globals.project.current.relativeFileParentPath);
+
+            return true;
+        } catch (err) {
+            console.error('[ProjectFiles] Error deleting file/folder:', err);
+            return false;
+        }
+    },
+
+    /**
+     * Delete multiple files
+     * @param {string[]} filePaths - Array of file paths to delete
+     * @returns {Promise<{success: number, failed: number}>} Deletion results
+     */
+    async deleteMultipleFiles(filePaths) {
+        let successCount = 0;
+        let failedCount = 0;
+
+        for (const filePath of filePaths) {
+            const success = await this.deleteFile(filePath);
+            if (success) {
+                successCount++;
+            } else {
+                failedCount++;
+            }
+        }
+
+        return { success: successCount, failed: failedCount };
+    },
+
+    /**
+     * Refresh project files
+     */
+    refresh() {
+        if (globals.project && globals.project.dir) {
+            this.getFileList(globals.project.dir);
+            this.loadFolders();
+            this.loadFiles(globals.project.current.relativeFileParentPath);
+            console.log('[ProjectFiles] Refreshed');
+        }
     },
 
     loadProjectFiles() {
         this.getFileList(globals.project.dir);
         this.loadFolders();
         this.loadFiles(globals.project.current.relativeFileParentPath);
-        //
+
+        // Initialize toolbar features
+        setTimeout(() => {
+            this.initToolbar();
+        }, 200);
+
         //load last scene on opened project
         let lastSceneFPath = application.getFilePathFromResources(globals.project.data.cache.lastScene);
         let lastSceneFName = application.getFileNameFromResources(globals.project.data.cache.lastScene);

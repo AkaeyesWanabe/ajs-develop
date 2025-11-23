@@ -1,0 +1,689 @@
+/**
+ * AJS Develop - Design System
+ * Complete modern design tokens and variables
+ */
+
+:root {
+    /* ==================== COLOR PALETTE ==================== */
+
+    /* Primary Scale - Deep Dark Base */
+    --primary-950: #0a0a0a;
+    --primary-900: #0f0f0f;
+    --primary-850: #141414;
+    --primary-800: #1a1a1a;
+    --primary-750: #1f1f1f;
+    --primary-700: #242424;
+    --primary-650: #292929;
+    --primary-600: #2e2e2e;
+    --primary-550: #333333;
+    --primary-500: #383838;
+    --primary-450: #3d3d3d;
+    --primary-400: #454545;
+    --primary-350: #4d4d4d;
+    --primary-300: #555555;
+    --primary-250: #606060;
+    --primary-200: #6b6b6b;
+    --primary-150: #777777;
+    --primary-100: #858585;
+    --primary-50: #949494;
+
+    /* Legacy Aliases for Compatibility */
+    --primary-more-dark: var(--primary-900);
+    --primary-dark-3: var(--primary-800);
+    --primary-dark-2: var(--primary-700);
+    --primary-dark-1: var(--primary-600);
+    --primary: var(--primary-550);
+    --primary-light-1: var(--primary-450);
+    --primary-light-2: var(--primary-400);
+    --primary-light-3: var(--primary-350);
+    --primary-light-4: var(--primary-300);
+    --primary-light-5: var(--primary-250);
+    --primary-more-light: #d4d4d4;
+
+    /* Secondary - Vibrant Turquoise Accent */
+    --secondary-950: #0a2d28;
+    --secondary-900: #0f4038;
+    --secondary-800: #1a5d51;
+    --secondary-700: #287a6b;
+    --secondary-600: #3a9685;
+    --secondary-500: #5ECDBB;
+    --secondary-400: #70d9c8;
+    --secondary-300: #85e0d1;
+    --secondary-200: #9de8db;
+    --secondary-100: #b8efe6;
+    --secondary-50: #d6f7f1;
+
+    /* Legacy Aliases */
+    --secondary: var(--secondary-500);
+    --secondary-dark: var(--secondary-700);
+    --secondary-light: var(--secondary-400);
+    --secondary-lighter: var(--secondary-300);
+
+    /* Accent Colors */
+    --accent-purple-900: #2e1a47;
+    --accent-purple-700: #5e3aa3;
+    --accent-purple-500: #8b5cf6;
+    --accent-purple-300: #b794f6;
+    --accent-purple-100: #ddd6fe;
+
+    --accent-blue-900: #1e3a5f;
+    --accent-blue-700: #2563eb;
+    --accent-blue-500: #3b82f6;
+    --accent-blue-300: #60a5fa;
+    --accent-blue-100: #dbeafe;
+
+    --accent-pink-900: #4a1942;
+    --accent-pink-700: #be185d;
+    --accent-pink-500: #ec4899;
+    --accent-pink-300: #f9a8d4;
+    --accent-pink-100: #fce7f3;
+
+    --accent-orange-900: #5c2d0a;
+    --accent-orange-700: #ea580c;
+    --accent-orange-500: #f97316;
+    --accent-orange-300: #fdba74;
+    --accent-orange-100: #ffedd5;
+
+    --accent-green-900: #14532d;
+    --accent-green-700: #15803d;
+    --accent-green-500: #22c55e;
+    --accent-green-300: #86efac;
+    --accent-green-100: #dcfce7;
+
+    /* Semantic Colors */
+    --success-900: #14532d;
+    --success-700: #15803d;
+    --success-500: #22c55e;
+    --success-300: #86efac;
+    --success-100: #dcfce7;
+
+    --error-900: #7f1d1d;
+    --error-700: #b91c1c;
+    --error-500: #ef4444;
+    --error-300: #fca5a5;
+    --error-100: #fee2e2;
+
+    --warning-900: #78350f;
+    --warning-700: #c2410c;
+    --warning-500: #f59e0b;
+    --warning-300: #fcd34d;
+    --warning-100: #fef3c7;
+
+    --info-900: #1e3a8a;
+    --info-700: #1d4ed8;
+    --info-500: #3b82f6;
+    --info-300: #93c5fd;
+    --info-100: #dbeafe;
+
+    /* Legacy Semantic Aliases */
+    --success: var(--success-500);
+    --success-dark: var(--success-700);
+    --success-light: var(--success-300);
+
+    --error: var(--error-500);
+    --error-dark: var(--error-700);
+    --error-light: var(--error-300);
+
+    --warning: var(--warning-500);
+    --warning-dark: var(--warning-700);
+    --warning-light: var(--warning-300);
+
+    --info: var(--info-500);
+    --info-dark: var(--info-700);
+    --info-light: var(--info-300);
+
+    /* ==================== TEXT COLORS ==================== */
+
+    --text-primary: #f5f5f5;
+    --text-secondary: #d4d4d4;
+    --text-tertiary: #a3a3a3;
+    --text-quaternary: #737373;
+    --text-disabled: #525252;
+    --text-placeholder: #6b6b6b;
+    --text-inverted: #0f0f0f;
+
+    /* Legacy Aliases */
+    --text: var(--text-primary);
+    --text-muted: var(--text-tertiary);
+
+    /* ==================== BACKGROUNDS ==================== */
+
+    --bg-app: var(--primary-850);
+    --bg-primary: var(--primary-800);
+    --bg-secondary: var(--primary-750);
+    --bg-tertiary: var(--primary-700);
+    --bg-elevated: var(--primary-650);
+    --bg-hover: var(--primary-600);
+    --bg-active: var(--primary-550);
+    --bg-selected: #0a4d61;
+    --bg-selected-hover: #0c5e77;
+    --bg-overlay: rgba(10, 10, 10, 0.85);
+
+    /* Legacy Aliases */
+    --background: var(--bg-app);
+    --background-light: var(--bg-primary);
+    --background-dark: var(--primary-900);
+    --hover: var(--bg-hover);
+    --active: var(--bg-active);
+    --selected: var(--bg-selected);
+    --selected-hover: var(--bg-selected-hover);
+
+    /* ==================== BORDERS ==================== */
+
+    --border-subtle: var(--primary-700);
+    --border-default: var(--primary-600);
+    --border-strong: var(--primary-500);
+    --border-accent: var(--secondary-500);
+    --border-error: var(--error-500);
+    --border-focus: var(--secondary-500);
+
+    /* Legacy Aliases */
+    --border: var(--border-default);
+    --border-light: var(--border-strong);
+    --border-dark: var(--border-subtle);
+
+    /* ==================== SPECIAL UI ==================== */
+
+    --close-btn: #dc2626;
+    --close-btn-hover: #ef4444;
+    --close-app-btn: var(--close-btn);
+
+    /* ==================== SHADOWS ==================== */
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.6);
+    --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 20px rgba(94, 205, 187, 0.4);
+    --shadow-glow-sm: 0 0 10px rgba(94, 205, 187, 0.3);
+    --shadow-glow-lg: 0 0 30px rgba(94, 205, 187, 0.5);
+
+    /* Legacy Aliases */
+    --shadow: var(--shadow-md);
+    --shadow-light: var(--shadow-sm);
+    --shadow-dark: var(--shadow-lg);
+
+    /* ==================== SPACING SYSTEM ==================== */
+
+    --space-0: 0;
+    --space-px: 1px;
+    --space-0-5: 2px;
+    --space-1: 4px;
+    --space-1-5: 6px;
+    --space-2: 8px;
+    --space-2-5: 10px;
+    --space-3: 12px;
+    --space-3-5: 14px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 28px;
+    --space-8: 32px;
+    --space-9: 36px;
+    --space-10: 40px;
+    --space-11: 44px;
+    --space-12: 48px;
+    --space-14: 56px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+    --space-28: 112px;
+    --space-32: 128px;
+
+    /* Legacy Aliases */
+    --spacing-xs: var(--space-1);
+    --spacing-sm: var(--space-2);
+    --spacing-md: var(--space-4);
+    --spacing-lg: var(--space-6);
+    --spacing-xl: var(--space-8);
+
+    /* ==================== BORDER RADIUS ==================== */
+
+    --radius-none: 0;
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+    --radius-3xl: 20px;
+    --radius-full: 9999px;
+
+    /* ==================== TYPOGRAPHY ==================== */
+
+    /* Font Families */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Consolas', 'Courier New', monospace;
+    --font-display: var(--font-sans);
+
+    /* Legacy Alias */
+    --font-family: var(--font-sans);
+
+    /* Font Sizes */
+    --text-2xs: 10px;
+    --text-xs: 11px;
+    --text-sm: 12px;
+    --text-base: 13px;
+    --text-md: 14px;
+    --text-lg: 16px;
+    --text-xl: 18px;
+    --text-2xl: 20px;
+    --text-3xl: 24px;
+    --text-4xl: 28px;
+    --text-5xl: 32px;
+
+    /* Legacy Aliases */
+    --font-size-xs: var(--text-xs);
+    --font-size-sm: var(--text-xs);
+    --font-size-md: var(--text-sm);
+    --font-size-lg: var(--text-md);
+    --font-size-xl: var(--text-lg);
+
+    /* Font Weights */
+    --font-thin: 100;
+    --font-extralight: 200;
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+    --font-black: 900;
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    /* ==================== TRANSITIONS ==================== */
+
+    --transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slower: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Easing Functions */
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* ==================== Z-INDEX LAYERS ==================== */
+    /* Hierarchie stricte pour éviter les chevauchements */
+
+    --z-base: 0;
+    --z-sticky: 100;
+    --z-fixed: 200;
+
+    /* Scene editor controls */
+    --z-transform-controls: 500;
+
+    /* Menus et dropdowns - toujours au-dessus du contenu */
+    --z-dropdown: 10000;
+    --z-dropdown-submenu: 10100;
+    --z-popover: 10200;
+
+    /* Modals et overlays */
+    --z-modal-backdrop: 11000;
+    --z-modal: 11100;
+
+    /* Context menus - au-dessus de tout */
+    --z-context-menu: 12000;
+    --z-context-menu-submenu: 12100;
+
+    /* Tooltips et notifications - niveau le plus élevé */
+    --z-tooltip: 13000;
+    --z-notification: 13100;
+
+    /* ==================== DIMENSIONS ==================== */
+
+    /* Panel Widths */
+    --panel-narrow: 240px;
+    --panel-default: 280px;
+    --panel-wide: 320px;
+    --panel-extra-wide: 400px;
+
+    /* Header & Footer */
+    --header-height: 32px;
+    --footer-height: 20px;
+    --tab-bar-height: 36px;
+
+    /* bottom view */
+    --project-folders-bar-width: 280px;
+
+    /* Icon Sizes */
+    --icon-xs: 12px;
+    --icon-sm: 14px;
+    --icon-md: 16px;
+    --icon-lg: 20px;
+    --icon-xl: 24px;
+    --icon-2xl: 32px;
+
+    /* Button Heights */
+    --btn-sm: 24px;
+    --btn-md: 28px;
+    --btn-lg: 32px;
+    --btn-xl: 40px;
+
+    /* Input Heights */
+    --input-sm: 24px;
+    --input-md: 28px;
+    --input-lg: 32px;
+    --input-xl: 40px;
+}
+
+/* ==================== SCROLLBAR THEMING ==================== */
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--primary-800);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-500);
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--primary-800);
+    transition: background var(--transition-normal);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-400);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: var(--primary-350);
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--primary-800);
+}
+
+/* Thin Scrollbar Variant */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    border-width: 1px;
+}
+
+/* ==================== TEXT SELECTION ==================== */
+
+::selection {
+    background-color: var(--secondary-600);
+    color: white;
+}
+
+::-moz-selection {
+    background-color: var(--secondary-600);
+    color: white;
+}
+
+/* ==================== FOCUS STYLES ==================== */
+
+*:focus {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(94, 205, 187, 0.15);
+}
+
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid var(--border-focus);
+    outline-offset: -2px;
+}
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* ==================== UTILITY CLASSES ==================== */
+
+/* Text Colors */
+.text-primary {
+    color: var(--text-primary) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-tertiary {
+    color: var(--text-tertiary) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-disabled {
+    color: var(--text-disabled) !important;
+}
+
+.text-success {
+    color: var(--success) !important;
+}
+
+.text-error {
+    color: var(--error) !important;
+}
+
+.text-warning {
+    color: var(--warning) !important;
+}
+
+.text-info {
+    color: var(--info) !important;
+}
+
+.text-accent {
+    color: var(--secondary) !important;
+}
+
+/* Background Colors */
+.bg-primary {
+    background-color: var(--bg-primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--bg-secondary) !important;
+}
+
+.bg-tertiary {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.bg-elevated {
+    background-color: var(--bg-elevated) !important;
+}
+
+.bg-success {
+    background-color: var(--success) !important;
+}
+
+.bg-error {
+    background-color: var(--error) !important;
+}
+
+.bg-warning {
+    background-color: var(--warning) !important;
+}
+
+.bg-info {
+    background-color: var(--info) !important;
+}
+
+.bg-accent {
+    background-color: var(--secondary) !important;
+}
+
+/* Shadows */
+.shadow-none {
+    box-shadow: none !important;
+}
+
+.shadow-xs {
+    box-shadow: var(--shadow-xs) !important;
+}
+
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.shadow-xl {
+    box-shadow: var(--shadow-xl) !important;
+}
+
+.shadow-2xl {
+    box-shadow: var(--shadow-2xl) !important;
+}
+
+.shadow-glow {
+    box-shadow: var(--shadow-glow) !important;
+}
+
+/* Borders */
+.border {
+    border: 1px solid var(--border-default) !important;
+}
+
+.border-subtle {
+    border-color: var(--border-subtle) !important;
+}
+
+.border-strong {
+    border-color: var(--border-strong) !important;
+}
+
+.border-accent {
+    border-color: var(--border-accent) !important;
+}
+
+/* Rounded Corners */
+.rounded-none {
+    border-radius: 0 !important;
+}
+
+.rounded-xs {
+    border-radius: var(--radius-xs) !important;
+}
+
+.rounded-sm {
+    border-radius: var(--radius-sm) !important;
+}
+
+.rounded {
+    border-radius: var(--radius-md) !important;
+}
+
+.rounded-lg {
+    border-radius: var(--radius-lg) !important;
+}
+
+.rounded-xl {
+    border-radius: var(--radius-xl) !important;
+}
+
+.rounded-full {
+    border-radius: var(--radius-full) !important;
+}
+
+/* Typography */
+.font-thin {
+    font-weight: var(--font-thin) !important;
+}
+
+.font-light {
+    font-weight: var(--font-light) !important;
+}
+
+.font-normal {
+    font-weight: var(--font-normal) !important;
+}
+
+.font-medium {
+    font-weight: var(--font-medium) !important;
+}
+
+.font-semibold {
+    font-weight: var(--font-semibold) !important;
+}
+
+.font-bold {
+    font-weight: var(--font-bold) !important;
+}
+
+.text-2xs {
+    font-size: var(--text-2xs) !important;
+}
+
+.text-xs {
+    font-size: var(--text-xs) !important;
+}
+
+.text-sm {
+    font-size: var(--text-sm) !important;
+}
+
+.text-base {
+    font-size: var(--text-base) !important;
+}
+
+.text-md {
+    font-size: var(--text-md) !important;
+}
+
+.text-lg {
+    font-size: var(--text-lg) !important;
+}
+
+.text-xl {
+    font-size: var(--text-xl) !important;
+}
+
+/* Transitions */
+.transition-fast {
+    transition: all var(--transition-fast) !important;
+}
+
+.transition {
+    transition: all var(--transition-normal) !important;
+}
+
+.transition-slow {
+    transition: all var(--transition-slow) !important;
+}

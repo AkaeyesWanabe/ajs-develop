@@ -16,10 +16,58 @@
   </div>
 </div>
 
+<!-- Search and Filter Toolbar -->
+<div id="projectFilesToolbar">
+  <div class="projectFiles-search-bar">
+    <i class="ri-search-line"></i>
+    <input type="text" id="projectFilesSearchInput" placeholder="Search files..." />
+    <button id="clearSearchBtn" class="clear-search-btn" style="display: none;">
+      <i class="ri-close-line"></i>
+    </button>
+  </div>
+
+  <div class="projectFiles-filter-bar">
+    <button class="projectFiles-filter-btn active" data-filter="all" title="All Files">
+      <i class="ri-folder-line"></i>
+    </button>
+    <button class="projectFiles-filter-btn" data-filter="image" title="Images">
+      <i class="ri-image-line"></i>
+    </button>
+    <button class="projectFiles-filter-btn" data-filter="audio" title="Audio">
+      <i class="ri-music-line"></i>
+    </button>
+    <button class="projectFiles-filter-btn" data-filter="video" title="Video">
+      <i class="ri-film-line"></i>
+    </button>
+    <button class="projectFiles-filter-btn" data-filter="scene" title="Scenes">
+      <i class="ri-movie-line"></i>
+    </button>
+    <button class="projectFiles-filter-btn" data-filter="script" title="Scripts">
+      <i class="ri-code-line"></i>
+    </button>
+  </div>
+
+  <button id="bulkImportFilesBtn" class="projectFiles-import-btn" title="Import Files">
+    <i class="ri-folder-upload-line"></i>
+  </button>
+</div>
+
 <div id="projectFilesBox">
   <div id="projectFoldersBar">
     <ul id="projectFoldersList"></ul>
   </div>
 
-  <div id="projectFilesBar"></div>
+  <div id="projectFilesBar" class="drop-zone">
+    <!-- Drop zone overlay (hidden by default) -->
+    <div id="projectFilesDropOverlay" class="project-files-drop-overlay" style="display: none;">
+      <div class="drop-overlay-content">
+        <i class="ri-upload-cloud-line"></i>
+        <h3>Drop Files Here</h3>
+        <p>Release to upload files to this folder</p>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Hidden file input for bulk import -->
+<input type="file" id="projectFilesBulkInput" multiple style="display: none;" />

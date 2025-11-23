@@ -1,140 +1,221 @@
+/**
+ * AJS Develop - Header Styles
+ * Top menu bar and window controls
+ */
+
+/* ==================== APP ICON ==================== */
+
 #appIcon {
-  float: left;
-  width: 16px !important;
-  height: 16px !important;
-  margin: 0 6px;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    margin: 0 var(--space-2);
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
 }
 
-
+/* ==================== MOVABLE BAR ==================== */
 
 #movableBar {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  height: 100%;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+    justify-content: center;
+    gap: var(--space-1);
 }
 
 #appTitle {
-  color: var(--primary-more-light);
-  margin-left: -112px;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-left: -112px;
+    letter-spacing: 0.2px;
 }
 
-
-
-
+/* ==================== WINDOW CONTROLS ==================== */
 
 #windowToolsBar {
-  display: flex;
-  align-items: center;
-  float: right;
-  width: 144px;
-  height: 100%;
-  color: var(--primary-more-light);
+    display: flex;
+    align-items: center;
+    width: 144px;
+    height: 100%;
+    flex-shrink: 0;
 }
 
 .windowToolIcon {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 48px;
-  height: 100%;
-  font-size: 18px;
-  color: var(--primary-more-light);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 100%;
+    font-size: var(--icon-lg);
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+.windowToolIcon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: transparent;
+    transition: background-color var(--transition-normal);
 }
 
 .windowToolIcon:nth-child(2) {
-  font-size: 14px;
+    font-size: var(--text-md);
 }
 
 .windowToolIcon:hover {
-  background-color: var(--primary-dark-1);
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 .windowToolIcon:last-child:hover {
-  background-color: var(--close-app-btn);
+    background-color: var(--close-btn);
+    color: white;
 }
 
+.windowToolIcon:last-child:active {
+    background-color: var(--close-btn-hover);
+}
 
-
-
-
-
+/* ==================== APP MENU ==================== */
 
 .appMenuItem {
-  cursor: pointer;
-  position: relative;
-  display: inline-block;
-}
-
-.appMenuItem:hover button {
-  height: 25px;
-  color: var(--text);
-  background-color: var(--primary-dark-1);
-  border-radius: 4px 4px 0 0;
-  z-index: 500;
-}
-
-.appMenuItem:hover .appMenuItemSubMenu {
-  display: block;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    height: 100%;
 }
 
 .appMenuItem button {
-  background-color: transparent;
-  padding: 2px 8px;
-  margin: 0 2px;
-  font-size: 12px;
-  color: var(--primary-more-light);
-  border: none;
-  height: 22px;
-  line-height: 18px;
+    background-color: transparent;
+    padding: 0 var(--space-2-5);
+    margin: 0 var(--space-0-5);
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+    border: none;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    font-weight: var(--font-normal);
+    display: flex;
+    align-items: center;
 }
 
+.appMenuItem:hover button {
+    height: 26px;
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
+    z-index: var(--z-sticky);
+}
+
+.appMenuItem:hover .appMenuItemSubMenu {
+    display: block;
+}
+
+/* ==================== SUBMENU DROPDOWN ==================== */
+
 .appMenuItemSubMenu {
-  background-color: var(--primary-dark-3);
-  position: absolute;
-  margin-left: 2px;
-  margin-top: 0px;
-  display: none;
-  width: 240px;
-  float: left;
-  padding: 8px 8px;
-  border: solid 1px var(--primary-more-dark);
-  border-radius: 0 0 6px 6px;
+    background-color: var(--bg-primary);
+    position: absolute;
+    left: var(--space-0-5);
+    top: 100%;
+    display: none;
+    min-width: 240px;
+    max-width: 400px;
+    max-height: calc(100vh - var(--header-height) - 20px);
+    padding: var(--space-1-5);
+    border: 1px solid var(--border-default);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: var(--z-dropdown);
+    animation: slideDown 0.15s var(--ease-out);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .appMenuItemSubMenu div {
-  float: left;
-  width: 100%;
-  padding: 4px 16px;
-  line-height: 20px;
-  border-radius: 4px;
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    line-height: var(--leading-normal);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-tertiary);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    gap: var(--space-2);
 }
 
 .appMenuItemSubMenu div:hover {
-  color: var(--text);
-  background-color: var(--primary-light-1);
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
 }
 
+.appMenuItemSubMenu div:active {
+    background-color: var(--bg-active);
+}
+
+/* ==================== MENU ITEM COMPONENTS ==================== */
+
 .appMenuItemLabel {
-  float: left;
+    flex: 1;
+    font-size: var(--text-sm);
+    white-space: nowrap;
 }
 
 .appMenuItemCheck {
-  float: left;
-  font-size: 18px;
-  display: none;
+    font-size: var(--icon-md);
+    display: none;
+    color: var(--secondary);
+    margin-right: var(--space-1);
+}
+
+.appMenuItemSubMenu div[data-checked="true"] .appMenuItemCheck,
+.appMenuItemSubMenu div[checked="true"] .appMenuItemCheck {
+    display: block;
 }
 
 .appMenuItemKey {
-  float: right;
+    font-size: var(--text-xs);
+    color: var(--text-quaternary);
+    margin-left: var(--space-3);
+    font-family: var(--font-mono);
+    background-color: var(--primary-700);
+    padding: var(--space-0-5) var(--space-1-5);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
 }
 
+/* ==================== MENU SEPARATOR ==================== */
+
 .appMenuItemHr {
-  float: left;
-  width: 100%;
-  height: 1px;
-  background-color: var(--primary-light-3);
-  margin: 8px 0;
-  cursor: default;
+    width: 100%;
+    height: 1px;
+    background-color: var(--border-subtle);
+    margin: var(--space-1-5) 0;
+    cursor: default;
+    pointer-events: none;
+}
+
+.appMenuItemHr:hover {
+    background-color: var(--border-subtle);
 }

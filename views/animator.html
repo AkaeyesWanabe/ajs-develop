@@ -6,7 +6,10 @@
             <label>Animations editor - </label>
             <label id="animatorEditorFileName"></label>
         </div>
-        <i target="animatorEditorBack" class="subWinCloser ri-close-line"></i>
+        <div>
+            <i id="animatorMaximizeBtn" class="ri-fullscreen-line" title="Maximize (F11)"></i>
+            <i target="animatorEditorBack" class="subWinCloser ri-close-line"></i>
+        </div>
     </section>
     <!--  -->
     <section id="animatorEditorBody" class="subWinBody">
@@ -22,6 +25,17 @@
                 </section>
 
                 <section id="animatorAnimsBody"></section>
+            </section>
+
+            <section id="animatorAnimationEvents" class="subWinBox">
+                <section class="subWinBoxHeader">
+                    <label>Animation Events</label>
+                    <i class="subWinBoxNewBtn bi ri-add-line" id="addAnimationEventBtn" title="Add Event"></i>
+                </section>
+
+                <section id="animatorAnimationEventsBody">
+                    <div id="animationEventsList"></div>
+                </section>
             </section>
 
             <section id="animatorFramePoints" class="subWinBox">
@@ -67,9 +81,52 @@
                         <div id="animatorImageBox">
                             <img id="aibImg" class="no-antialiasing">
                             <canvas id="aibColliderCanvas"></canvas>
-                            <div id="aibCollider"></div>
-                            <div id="aibPoints"></div>
+                            <div id="aibCollider" style="display: block;"></div>
+                            <div id="aibPoints" style="display: none;"></div>
                         </div>
+                    </section>
+
+                    <!-- Horizontal Timeline -->
+                    <section id="animatorTimeline" class="subWinBox">
+                        <section class="subWinBoxHeader">
+                            <div>
+                                <i class="ri-arrow-go-back-line" id="undoBtn" title="Undo (Ctrl+Z)" disabled></i>
+                                <i class="ri-arrow-go-forward-line" id="redoBtn" title="Redo (Ctrl+Y)" disabled></i>
+                                <span style="margin: 0 4px;">|</span>
+                                <i class="ri-play-circle-line" id="timelinePlayBtn" title="Play"></i>
+                                <i class="ri-skip-back-mini-line" id="timelineFirstFrameBtn" title="First Frame"></i>
+                                <i class="ri-skip-forward-mini-line" id="timelineLastFrameBtn" title="Last Frame"></i>
+                                <label id="timelineCurrentFrameLabel">Frame: 0 / 0</label>
+                                <label id="timelineCurrentTimeLabel">0.00s / 0.00s</label>
+                            </div>
+                            <div>
+                                <label>Onion Skin:</label>
+                                <input type="checkbox" id="onionSkinningEnabled">
+                                <label>Frames:</label>
+                                <div class="timelineNumberInput">
+                                    <button class="timelineNumberBtn timelineNumberDecrease" data-input-id="onionSkinningFrames">
+                                        <i class="ri-subtract-line"></i>
+                                    </button>
+                                    <input type="text" id="onionSkinningFrames" data-min="1" data-max="10" value="2">
+                                    <button class="timelineNumberBtn timelineNumberIncrease" data-input-id="onionSkinningFrames">
+                                        <i class="ri-add-line"></i>
+                                    </button>
+                                </div>
+                                <span style="margin-left: 12px;">|</span>
+                                <label>Frame Blend:</label>
+                                <input type="checkbox" id="frameBlendingEnabled">
+                                <label>Amount:</label>
+                                <input type="range" id="frameBlendingAmount" min="0" max="100" value="50" style="width: 80px;">
+                            </div>
+                        </section>
+
+                        <section id="animatorTimelineBody">
+                            <div id="timelineTrack">
+                                <div id="timelinePlayhead"></div>
+                                <div id="timelineFrames"></div>
+                                <canvas id="timelineCanvas"></canvas>
+                            </div>
+                        </section>
                     </section>
                 </section>
                 <!--  -->
@@ -111,7 +168,15 @@
                     <section id="animatorFramesActionsBody">
                         <div class="afabItem">
                             <label>Frame rate (img/s)</label>
-                            <input type="number" id="afaFrameRate" min="0" max="1000">
+                            <div class="afabItemNumber">
+                                <button class="afabNumberBtn afabNumberDecrease" data-input-id="afaFrameRate">
+                                    <i class="ri-subtract-line"></i>
+                                </button>
+                                <input type="text" id="afaFrameRate" data-min="0" data-max="1000">
+                                <button class="afabNumberBtn afabNumberIncrease" data-input-id="afaFrameRate">
+                                    <i class="ri-add-line"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="afabItem">
                             <label>Loop the animation</label>
@@ -119,15 +184,131 @@
                         </div>
                         <div class="afabItem">
                             <label>Loop start image</label>
-                            <input type="number" id="afaStartLoopFrame" min="0">
+                            <div class="afabItemNumber">
+                                <button class="afabNumberBtn afabNumberDecrease" data-input-id="afaStartLoopFrame">
+                                    <i class="ri-subtract-line"></i>
+                                </button>
+                                <input type="text" id="afaStartLoopFrame" data-min="0">
+                                <button class="afabNumberBtn afabNumberIncrease" data-input-id="afaStartLoopFrame">
+                                    <i class="ri-add-line"></i>
+                                </button>
+                            </div>
                         </div>
                         <button class="btn">Play animation</button>
+                        <button class="btn" id="generateTweensBtn">Generate Tweens</button>
                         <button class="btn">Save all</button>
-                        <button class="btn">Cancel all</button>
+                        <button class="btn">Close</button>
                     </section>
                 </section>
             </section>
         </section>
 
     </section>
+</div>
+
+<!-- Tween Generator Modal -->
+<div id="tweenGeneratorModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Generate Tween Frames</h2>
+            <i class="ri-close-line modal-close"></i>
+        </div>
+        <div class="modal-body">
+            <div class="modal-field">
+                <label>From Frame:</label>
+                <select id="tweenFromFrame"></select>
+            </div>
+            <div class="modal-field">
+                <label>To Frame:</label>
+                <select id="tweenToFrame"></select>
+            </div>
+            <div class="modal-field">
+                <label>Number of Tween Frames:</label>
+                <div class="modalNumberInput">
+                    <button class="modalNumberBtn modalNumberDecrease" data-input-id="tweenCount">
+                        <i class="ri-subtract-line"></i>
+                    </button>
+                    <input type="text" id="tweenCount" data-min="1" data-max="100" value="5">
+                    <button class="modalNumberBtn modalNumberIncrease" data-input-id="tweenCount">
+                        <i class="ri-add-line"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-field">
+                <label>Easing Type:</label>
+                <select id="tweenEasingType">
+                    <optgroup label="Basic">
+                        <option value="linear" selected>Linear</option>
+                    </optgroup>
+                    <optgroup label="Quadratic">
+                        <option value="easeInQuad">Ease In Quad</option>
+                        <option value="easeOutQuad">Ease Out Quad</option>
+                        <option value="easeInOutQuad">Ease In-Out Quad</option>
+                    </optgroup>
+                    <optgroup label="Cubic">
+                        <option value="easeInCubic">Ease In Cubic</option>
+                        <option value="easeOutCubic">Ease Out Cubic</option>
+                        <option value="easeInOutCubic">Ease In-Out Cubic</option>
+                    </optgroup>
+                    <optgroup label="Quartic">
+                        <option value="easeInQuart">Ease In Quart</option>
+                        <option value="easeOutQuart">Ease Out Quart</option>
+                        <option value="easeInOutQuart">Ease In-Out Quart</option>
+                    </optgroup>
+                    <optgroup label="Quintic">
+                        <option value="easeInQuint">Ease In Quint</option>
+                        <option value="easeOutQuint">Ease Out Quint</option>
+                        <option value="easeInOutQuint">Ease In-Out Quint</option>
+                    </optgroup>
+                    <optgroup label="Sine">
+                        <option value="easeInSine">Ease In Sine</option>
+                        <option value="easeOutSine">Ease Out Sine</option>
+                        <option value="easeInOutSine">Ease In-Out Sine</option>
+                    </optgroup>
+                    <optgroup label="Exponential">
+                        <option value="easeInExpo">Ease In Expo</option>
+                        <option value="easeOutExpo">Ease Out Expo</option>
+                        <option value="easeInOutExpo">Ease In-Out Expo</option>
+                    </optgroup>
+                    <optgroup label="Circular">
+                        <option value="easeInCirc">Ease In Circ</option>
+                        <option value="easeOutCirc">Ease Out Circ</option>
+                        <option value="easeInOutCirc">Ease In-Out Circ</option>
+                    </optgroup>
+                    <optgroup label="Back">
+                        <option value="easeInBack">Ease In Back</option>
+                        <option value="easeOutBack">Ease Out Back</option>
+                        <option value="easeInOutBack">Ease In-Out Back</option>
+                    </optgroup>
+                    <optgroup label="Elastic">
+                        <option value="easeInElastic">Ease In Elastic</option>
+                        <option value="easeOutElastic">Ease Out Elastic</option>
+                        <option value="easeInOutElastic">Ease In-Out Elastic</option>
+                    </optgroup>
+                    <optgroup label="Bounce">
+                        <option value="easeInBounce">Ease In Bounce</option>
+                        <option value="easeOutBounce">Ease Out Bounce</option>
+                        <option value="easeInOutBounce">Ease In-Out Bounce</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>
+                    <input type="checkbox" id="tweenInterpolatePoints" checked>
+                    Interpolate Frame Points
+                </label>
+            </div>
+            <div class="modal-field">
+                <label>
+                    <input type="checkbox" id="tweenInterpolateCollider" checked>
+                    Interpolate Collider
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary modal-cancel">Cancel</button>
+            <button class="btn btn-primary" id="generateTweensConfirm">Generate</button>
+        </div>
+    </div>
 </div>

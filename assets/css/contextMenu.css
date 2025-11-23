@@ -1,0 +1,179 @@
+/**
+ * AJS Develop - Context Menu
+ * Right-click menus and dropdowns
+ */
+
+/* ==================== CONTEXT MENU ==================== */
+
+.context-menu {
+    position: fixed;
+    z-index: var(--z-context-menu);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    min-width: 220px;
+    max-width: 400px;
+    max-height: calc(100vh - 40px);
+    padding: var(--space-1-5);
+    display: none;
+    font-size: var(--text-sm);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ==================== CONTEXT MENU ITEM ==================== */
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    position: relative;
+    transition: all var(--transition-fast);
+    gap: var(--space-2);
+}
+
+.context-menu-item:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.context-menu-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.context-menu-item.danger:hover {
+    background-color: var(--error);
+    color: white;
+}
+
+.context-menu-item i {
+    font-size: var(--icon-sm);
+    width: var(--icon-md);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.context-menu-icon-spacer {
+    display: inline-block;
+    width: var(--icon-md);
+    flex-shrink: 0;
+}
+
+.context-menu-label {
+    flex: 1;
+    white-space: nowrap;
+}
+
+.context-menu-shortcut {
+    margin-left: var(--space-4);
+    font-size: var(--text-xs);
+    opacity: 0.6;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+}
+
+/* ==================== CONTEXT MENU SEPARATOR ==================== */
+
+.context-menu-separator {
+    height: 1px;
+    background-color: var(--border-subtle);
+    margin: var(--space-1) 0;
+}
+
+/* ==================== SUBMENU ==================== */
+
+.context-menu-submenu {
+    position: relative;
+}
+
+.context-menu-arrow {
+    margin-left: auto;
+    margin-right: 0;
+    font-size: var(--icon-md);
+    color: var(--text-tertiary);
+}
+
+.context-menu-submenu-content {
+    position: absolute;
+    left: 100%;
+    top: calc(var(--space-1) * -1);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    min-width: 220px;
+    max-width: 400px;
+    max-height: calc(100vh - 40px);
+    padding: var(--space-1-5);
+    display: none;
+    z-index: var(--z-context-menu-submenu);
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-left: 4px;
+}
+
+/* When submenu is positioned on left side */
+.context-menu-submenu-content[style*="right: 100%"] {
+    margin-left: 0;
+    margin-right: 4px;
+}
+
+.context-menu-submenu:hover > .context-menu-submenu-content {
+    display: block;
+}
+
+/* ==================== CATEGORY HEADERS ==================== */
+
+.context-menu-category {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-2xs);
+    font-weight: var(--font-semibold);
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: var(--space-1);
+}
+
+.context-menu-category:first-child {
+    margin-top: 0;
+}
+
+/* ==================== EXTENSION CHOOSER ==================== */
+
+.context-menu-extension-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+}
+
+.context-menu-extension-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: var(--space-2);
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.context-menu-extension-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.context-menu-extension-name {
+    font-weight: var(--font-medium);
+    color: var(--text-primary);
+}
+
+.context-menu-extension-desc {
+    font-size: var(--text-2xs);
+    opacity: 0.7;
+    margin-top: var(--space-0-5);
+    color: var(--text-tertiary);
+}

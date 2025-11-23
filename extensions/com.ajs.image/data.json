@@ -1,7 +1,10 @@
 {
     "extension": "com.ajs.image",
-    "extensionName": "Simple Image",
+    "extensionName": "Image",
     "extensionIcon": "icon.png",
+    "description": "Display a static image",
+    "category": "Game Objects",
+    "hierarchyPreview": "preview",
     "propertiesTabs": [
         {
             "name": "Object",

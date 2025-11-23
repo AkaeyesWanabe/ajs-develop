@@ -1,9 +1,36 @@
+/**
+ * AJS Develop - Scene Editor
+ * Visual scene editing canvas
+ */
+
+/* ==================== SCENE EDITOR LAYOUT ==================== */
+
 #sceneEditor {
-    flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 100%;
+    background-color: var(--primary-800);
 }
 
+#sceneEditorContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
+#layerManagerPanel {
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+    background-color: var(--primary-750);
+    border-left: 1px solid var(--border-subtle);
+    overflow-y: auto;
+    flex-shrink: 0;
+}
 
+/* ==================== EMPTY STATE ==================== */
 
 #noScnOpened {
     display: none;
@@ -11,37 +38,56 @@
     height: 100%;
     align-items: center;
     justify-content: center;
-    color: var(--primary-light-5);
+    color: var(--text-tertiary);
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-12);
+    text-align: center;
 }
 
 #noScnOpened[visible=true] {
     display: flex;
 }
 
+#noScnOpened i {
+    font-size: 64px;
+    color: var(--text-disabled);
+    opacity: 0.4;
+}
 
+#noScnOpened p {
+    font-size: var(--text-md);
+    color: var(--text-secondary);
+}
 
+/* ==================== SCENE TABS ==================== */
 
 #scnEditorTabs {
-    border-bottom: solid 1px var(--primary-dark-1);
-    height: 32px;
-    overflow-x: scroll;
+    border-bottom: 1px solid var(--border-dark);
+    height: var(--tab-bar-height);
+    overflow-x: auto;
     overflow-y: hidden !important;
     white-space: nowrap;
     display: none;
+    background: var(--primary-700);
 }
 
 #scnEditorTabs[visible=true] {
     display: block;
 }
 
-
-
+/* ==================== SCENE EDITOR CANVAS ==================== */
 
 #scnEditor {
-    width: 100%;
+    flex: 1;
     display: none;
     overflow: auto;
     position: relative;
+    background-color: var(--primary-850);
+    background-image:
+        linear-gradient(rgba(94, 205, 187, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(94, 205, 187, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
 #scnEditor[visible=true] {
@@ -49,32 +95,166 @@
 }
 
 #scnVirtualBox {
-    background-color: gray;
+    position: relative;
+    background-color: var(--primary-700);
+    outline: 1px dotted black;
+    outline-offset: 0;
+    min-width: 100%;
+    min-height: 100%;
 }
 
 #scnSceneAppBox {
     position: absolute;
-    border: dashed 1px black;
+    outline: 2px dashed black;
+    outline-offset: 0;
+    z-index: 1;
+    pointer-events: none;
 }
 
 #scnAppBox {
     position: absolute;
-    border: dashed 1px black;
+    outline: 2px dashed black;
+    outline-offset: 0;
+    z-index: 3;
+    pointer-events: none;
 }
 
 #scnSceneBox {
     position: absolute;
+    box-shadow: var(--shadow-lg);
+    outline: 2px dashed black;
+    outline-offset: 0;
+    z-index: 2;
+    pointer-events: none;
 }
+
+/* ==================== SCENE LAYERS ==================== */
 
 .__ajs_scene_layer {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
 }
 
+.__ajs_scene_layer>* {
+    pointer-events: auto;
+}
 
+.__ajs_scene_layer[data-layer-number="0"] {
+    z-index: 0;
+}
 
+.__ajs_scene_layer[data-layer-number="1"] {
+    z-index: 1;
+}
+
+.__ajs_scene_layer[data-layer-number="2"] {
+    z-index: 2;
+}
+
+.__ajs_scene_layer[data-layer-number="3"] {
+    z-index: 3;
+}
+
+.__ajs_scene_layer[data-layer-number="4"] {
+    z-index: 4;
+}
+
+.__ajs_scene_layer[data-layer-number="5"] {
+    z-index: 5;
+}
+
+.__ajs_scene_layer[data-layer-number="6"] {
+    z-index: 6;
+}
+
+.__ajs_scene_layer[data-layer-number="7"] {
+    z-index: 7;
+}
+
+.__ajs_scene_layer[data-layer-number="8"] {
+    z-index: 8;
+}
+
+.__ajs_scene_layer[data-layer-number="9"] {
+    z-index: 9;
+}
+
+/* ==================== SELECTION ==================== */
 
 .clickable_selected {
-    box-shadow: 0px 0px 0px 1px blue;
+    box-shadow: 0 0 0 1px var(--secondary);
+    position: relative;
+}
+
+/* 
+ Enhanced visual for selected objects when hovering
+.clickable_selected:hover {
+    box-shadow: 0 0 0 1px var(--secondary), 0 0 0 4px rgba(94, 205, 187, 0.3);
+} */
+
+/* Locked object visual state */
+.locked-object {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+    cursor: not-allowed;
+}
+
+.locked-object::before {
+    content: '\EB9C';
+    /* Remix Icon lock-line */
+    font-family: 'remixicon';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 12px;
+    color: var(--warning);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 4px;
+    border-radius: 3px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Multi-selection counter indicator (optional - can be added via JS) */
+.clickable_selected::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background: var(--secondary);
+    border: 2px solid var(--bg-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 1px var(--secondary);
+}
+
+/* ==================== DRAG AND DROP ==================== */
+
+.__ajs_scene_object[draggable="true"] {
+    cursor: default;
+}
+
+/* Visual feedback when Alt is pressed */
+body.alt-pressed .__ajs_scene_object[draggable="true"] {
+    cursor: grab !important;
+    outline: 1px dashed rgba(94, 205, 187, 0.5);
+    outline-offset: 2px;
+}
+
+body.alt-pressed .__ajs_scene_object[draggable="true"]:hover {
+    outline-color: rgba(94, 205, 187, 0.8);
+    box-shadow: 0 0 0 2px rgba(94, 205, 187, 0.3);
+}
+
+.__ajs_scene_object.dragging-object {
+    opacity: 0.6;
+    filter: brightness(0.8);
+    box-shadow: 0 0 20px rgba(94, 205, 187, 0.5);
+    cursor: grabbing !important;
 }

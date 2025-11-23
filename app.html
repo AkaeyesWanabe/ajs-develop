@@ -11,16 +11,27 @@
   <link rel="stylesheet" href="./assets/vendor/remixicon/remixicon.css" />
 
   <!-- css -->
+  <link rel="stylesheet" href="./assets/css/variables.css" />
   <link rel="stylesheet" href="./assets/css/app.css" />
   <link rel="stylesheet" href="./assets/css/header.css" />
   <link rel="stylesheet" href="./assets/css/hierachy.css" />
   <link rel="stylesheet" href="./assets/css/projectFiles.css" />
+  <link rel="stylesheet" href="./assets/css/projectFilesToolbar.css" />
   <link rel="stylesheet" href="./assets/css/properties.css" />
   <link rel="stylesheet" href="./assets/css/sceneEditor.css" />
   <link rel="stylesheet" href="./assets/css/scriptEditor.css" />
   <link rel="stylesheet" href="./assets/css/player.css" />
   <link rel="stylesheet" href="./assets/css/console.css" />
   <link rel="stylesheet" href="./assets/css/footer.css" />
+  <link rel="stylesheet" href="./assets/css/notifications.css" />
+  <link rel="stylesheet" href="./assets/css/contextMenu.css" />
+  <link rel="stylesheet" href="./assets/css/tooltips.css" />
+  <link rel="stylesheet" href="./assets/css/loadingStates.css" />
+  <link rel="stylesheet" href="./assets/css/zoom.css" />
+  <link rel="stylesheet" href="./assets/css/transformControls.css" />
+  <link rel="stylesheet" href="./assets/css/layerManager.css" />
+  <link rel="stylesheet" href="./assets/css/objectCreator.css" />
+  <link rel="stylesheet" href="./assets/css/alignTools.css" />
   <!--  -->
   <link rel="stylesheet" href="./assets/css/animator.css" />
   <!--  -->
@@ -38,8 +49,7 @@
   </style>
 </head>
 
-<!-- <body oncontextmenu="return false;" class="drag-off"> -->
-<body class="drag-off">
+<body oncontextmenu="return false;" class="drag-off">
   <!-- preloader -->
   <section id="preloader" class="drag-off">
     <div id="preloaderTop">
@@ -139,17 +149,45 @@
   <!-- tag temp -->
   <div id="tagTemp" class="hidden"></div>
 
-  <!-- code editor -->
-  <script src="./assets/vendor/ace/src-noconflict/ace.js"></script>
-  <script src="./assets/vendor/ace/src-noconflict/ext-language_tools.js"></script>
+  <!-- code editor - Monaco Editor -->
+  <script>
+    // Save Node.js require before Monaco overwrites it
+    window.nodeRequire = require;
+    const path = require('path');
+
+    // Load js-beautify
+    try {
+      window.js_beautify = require('js-beautify').js;
+    } catch (e) {
+      console.warn('js-beautify not available:', e.message);
+    }
+
+    // Configure Monaco AMD loader (will overwrite require temporarily)
+    require = {
+      paths: {
+        'vs': path.join(__dirname, 'node_modules/monaco-editor/min/vs')
+      }
+    };
+  </script>
+  <script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
+  <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+  <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
+  <script>
+    // Restore Node.js require after Monaco is loaded
+    require = window.nodeRequire;
+  </script>
   <!-- app -->
   <script src="./assets/js/app.js"></script>
-  <!-- views -->
+  <!-- objects -->
+  <script src="./assets/js/objects/contextMenu.js"></script>
+  <script src="./assets/js/objects/dropdownPositioning.js"></script>
+  <!-- objectPlacer and transformControls are CommonJS modules, loaded via nw.require() -->
+  <!-- views - load hierarchy first (needed by sceneEditor) -->
+  <script src="./assets/js/hierachyView.js"></script>
   <script src="./assets/js/animatorView.js" defer></script>
   <script src="./assets/js/consoleView.js" defer></script>
   <script src="./assets/js/footerView.js" defer></script>
   <script src="./assets/js/headerView.js" defer></script>
-  <script src="./assets/js/hierachyView.js" defer></script>
   <script src="./assets/js/playerView.js" defer></script>
   <script src="./assets/js/propertiesView.js" defer></script>
   <script src="./assets/js/projectFilesView.js" defer></script>

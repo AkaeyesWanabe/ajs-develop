@@ -1,6 +1,13 @@
 function foo(items) {
-    var i;
-    for (i = 0; i<items.length; i++) {
-        alert("Ace Rocks " + items[i]);
+    var i=0;
+    for (; i<items.length; i++) {
+        alert("Ace Rocks " + items[i]);    
+    }
+}
+
+function test(items) {
+    var i=0;
+    for (; i<items.length; i++) {
+        alert("Ace Rocks " + items[i]);    
     }
 }

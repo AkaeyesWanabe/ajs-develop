@@ -1,0 +1,105 @@
+<!-- Object Creator Modal - Redesigned for 500+ Extensions -->
+<div id="objectCreatorModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-container object-creator-modal">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <h2><i class="ri-add-box-line"></i> Create New Object</h2>
+                <span class="modal-header-count" id="objectCreatorCount">0 objects</span>
+            </div>
+            <button class="modal-close-btn" id="objectCreatorClose" title="Close (ESC)">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="modal-toolbar">
+            <!-- Search Bar -->
+            <div class="modal-search">
+                <i class="ri-search-line"></i>
+                <input
+                    type="text"
+                    id="objectCreatorSearch"
+                    placeholder="Search objects by name or description..."
+                    autocomplete="off"
+                />
+                <button class="search-clear-btn" id="objectCreatorSearchClear" style="display: none;" title="Clear search">
+                    <i class="ri-close-circle-fill"></i>
+                </button>
+            </div>
+
+            <!-- View Controls -->
+            <div class="view-controls">
+                <button class="view-control-btn active" data-view="grid" title="Grid view">
+                    <i class="ri-grid-line"></i>
+                </button>
+                <button class="view-control-btn" data-view="list" title="List view">
+                    <i class="ri-list-check"></i>
+                </button>
+            </div>
+
+            <!-- Sort Controls -->
+            <div class="sort-controls">
+                <select id="objectCreatorSort" title="Sort by">
+                    <option value="name-asc">Name A-Z</option>
+                    <option value="name-desc">Name Z-A</option>
+                    <option value="category-asc">Category A-Z</option>
+                    <option value="recent">Recently Used</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Categories Pills -->
+        <div class="modal-categories" id="objectCreatorCategories">
+            <!-- Categories will be dynamically generated -->
+        </div>
+
+        <!-- Objects Container -->
+        <div class="modal-body">
+            <!-- Loading State -->
+            <div class="loading-state" id="objectCreatorLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading objects...</p>
+            </div>
+
+            <!-- Objects Grid/List -->
+            <div class="objects-container grid-view" id="objectCreatorContainer">
+                <!-- Objects will be dynamically generated -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="objects-empty" id="objectCreatorEmpty" style="display: none;">
+                <i class="ri-inbox-line"></i>
+                <p class="empty-title">No objects found</p>
+                <p class="empty-subtitle">Try adjusting your search or filters</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="modal-pagination" id="objectCreatorPagination" style="display: none;">
+            <button class="pagination-btn" id="paginationPrev" disabled>
+                <i class="ri-arrow-left-s-line"></i> Previous
+            </button>
+            <div class="pagination-info">
+                <span id="paginationInfo">Page 1 of 1</span>
+            </div>
+            <button class="pagination-btn" id="paginationNext" disabled>
+                Next <i class="ri-arrow-right-s-line"></i>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <div class="modal-footer-info">
+                <i class="ri-information-line"></i>
+                <span id="objectCreatorInfo">Select an object type to create</span>
+            </div>
+            <div class="modal-footer-actions">
+                <button class="btn btn-secondary" id="objectCreatorCancel">Cancel</button>
+                <button class="btn btn-primary" id="objectCreatorCreate" disabled>
+                    <i class="ri-add-line"></i> Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

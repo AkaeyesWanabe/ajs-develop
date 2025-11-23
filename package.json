@@ -8,8 +8,8 @@
   },
   "chromium-args": "--mixed-context",
   "scripts": {
-    "dev": "nw .",
-    "prod": "nw build --platforms win32,win64,osx64,linux32,linux64 --buildDir dist/"
+    "dev": "npx nw .",
+    "prod": "npx nw build --platforms win32,win64,osx64,linux32,linux64 --buildDir dist/"
   },
   "window": {
     "theme": "dark",
@@ -40,6 +40,8 @@
   "dependencies": {
     "file-dialog": "^0.0.8",
     "jquery": "^3.7.1",
+    "js-beautify": "^1.15.1",
+    "monaco-editor": "^0.52.0",
     "nw": "sdk"
   },
   "webkit": {

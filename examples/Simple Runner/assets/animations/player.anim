@@ -1,49 +1,383 @@
 {
-    "animations": [
+  "animations": [
+    {
+      "name": "idle",
+      "frameRate": 10,
+      "loop": true,
+      "startLoopFrame": 0,
+      "frames": [
         {
-            "name": "idle",
-            "frameRate": 5,
-            "loop": false,
-            "startLoopFrame": 0,
-            "frames": [
-                {
-                    "path": "assets/images/player/Idle/0.png",
-                    "width": 128,
-                    "height": 128,
-                    "points": [
-                        {
-                            "removable":false,
-                            "name":"origin",
-                            "x": 450,
-                            "y": 900
-                        },
-                        {
-                            "removable":false,
-                            "name":"action",
-                            "x": 450,
-                            "y": 450
-                        }
-                    ],
-                    "collider": [
-                        {
-                            "x": 0,
-                            "y": 0
-                        },
-                        {
-                            "x": 900,
-                            "y": 0
-                        },
-                        {
-                            "x": 900,
-                            "y": 900
-                        },
-                        {
-                            "x": 0,
-                            "y": 900
-                        }
-                    ]
-                }
-            ]
+          "path": ".\\assets\\images\\player\\Idle/0.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 454,
+              "y": 739
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 465,
+              "y": 649
+            }
+          ],
+          "collider": [
+            {
+              "x": 373.75,
+              "y": 577.5
+            },
+            {
+              "x": 517.5,
+              "y": 580
+            },
+            {
+              "x": 517.5,
+              "y": 742.5
+            },
+            {
+              "x": 368.75,
+              "y": 742.5
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/1.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/2.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/3.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/4.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/5.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/6.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/7.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/8.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
+        },
+        {
+          "path": ".\\assets\\images\\player\\Idle/9.png",
+          "width": 900,
+          "height": 900,
+          "points": [
+            {
+              "removable": false,
+              "name": "origin",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "removable": false,
+              "name": "action",
+              "x": 450,
+              "y": 450
+            }
+          ],
+          "collider": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 0
+            },
+            {
+              "x": 900,
+              "y": 900
+            },
+            {
+              "x": 0,
+              "y": 900
+            }
+          ]
         }
-    ]
+      ],
+      "events": []
+    }
+  ]
 }

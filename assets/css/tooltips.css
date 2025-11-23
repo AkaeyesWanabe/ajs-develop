@@ -1,0 +1,110 @@
+/**
+ * Tooltips System
+ * Custom tooltips that appear on hover
+ */
+
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]::before,
+[data-tooltip]::after {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 100000;
+}
+
+/* Tooltip content */
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    background: var(--primary-800);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-default);
+}
+
+/* Tooltip arrow */
+[data-tooltip]::after {
+    content: '';
+    border: 5px solid transparent;
+}
+
+/* Show tooltip on hover */
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0.5s;
+}
+
+/* Bottom position (default) */
+[data-tooltip]:not([data-tooltip-position])::before,
+[data-tooltip][data-tooltip-position="bottom"]::before {
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-tooltip]:not([data-tooltip-position])::after,
+[data-tooltip][data-tooltip-position="bottom"]::after {
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-color: var(--primary-800);
+}
+
+/* Top position */
+[data-tooltip][data-tooltip-position="top"]::before {
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-tooltip][data-tooltip-position="top"]::after {
+    top: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-color: var(--primary-800);
+}
+
+/* Left position */
+[data-tooltip][data-tooltip-position="left"]::before {
+    right: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+[data-tooltip][data-tooltip-position="left"]::after {
+    right: calc(100% + 5px);
+    top: 50%;
+    transform: translateY(-50%);
+    border-left-color: var(--primary-800);
+}
+
+/* Right position */
+[data-tooltip][data-tooltip-position="right"]::before {
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+[data-tooltip][data-tooltip-position="right"]::after {
+    left: calc(100% + 5px);
+    top: 50%;
+    transform: translateY(-50%);
+    border-right-color: var(--primary-800);
+}
+
+/* Disable tooltip on disabled elements */
+[data-tooltip][disabled]::before,
+[data-tooltip][disabled]::after {
+    display: none;
+}

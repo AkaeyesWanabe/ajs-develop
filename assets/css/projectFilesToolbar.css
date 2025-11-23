@@ -1,0 +1,197 @@
+/* Project Files Toolbar Styles */
+#projectFilesToolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+    min-height: 40px;
+}
+
+/* Search Bar */
+.projectFiles-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--background-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    flex: 0 1 180px;
+    min-width: 120px;
+    max-width: 220px;
+    height: 32px;
+}
+
+.projectFiles-search-bar i.ri-search-line {
+    color: var(--text-secondary);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.projectFiles-search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 12px;
+    padding: 0;
+    min-width: 0;
+}
+
+.projectFiles-search-bar input::placeholder {
+    color: var(--text-secondary);
+}
+
+.clear-search-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: 3px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 3px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.clear-search-btn:hover {
+    background: var(--background-hover);
+    color: var(--text);
+}
+
+.clear-search-btn i {
+    font-size: 12px;
+}
+
+/* Filter Bar */
+.projectFiles-filter-bar {
+    display: flex;
+    gap: 3px;
+    flex: 1;
+    align-items: center;
+    padding-left: 6px;
+    border-left: 1px solid var(--border);
+    margin-left: 2px;
+}
+
+.projectFiles-filter-btn {
+    background: var(--background-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+}
+
+.projectFiles-filter-btn i {
+    font-size: 15px;
+}
+
+.projectFiles-filter-btn:hover {
+    background: var(--background-hover);
+    color: var(--text);
+    border-color: var(--secondary);
+}
+
+.projectFiles-filter-btn.active {
+    background: var(--secondary);
+    color: var(--background);
+    border-color: var(--secondary);
+}
+
+/* Import Button */
+.projectFiles-import-btn {
+    background: var(--primary);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 8px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    margin-left: 6px;
+    padding-left: 6px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.projectFiles-import-btn i {
+    font-size: 15px;
+}
+
+.projectFiles-import-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.projectFiles-import-btn:active {
+    transform: translateY(0);
+}
+
+/* Drop Zone Overlay */
+.project-files-drop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(94, 205, 187, 0.1);
+    border: 2px dashed var(--secondary);
+    border-radius: 8px;
+    display: none;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.project-files-drop-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drop-overlay-content {
+    text-align: center;
+    color: var(--secondary);
+}
+
+.drop-overlay-content i {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.drop-overlay-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.drop-overlay-content p {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.8;
+}
+
+/* File Item Filtering */
+.projectFilesItem.hidden {
+    display: none !important;
+}
+
+/* Make projectFilesBar relative for overlay positioning */
+#projectFilesBar {
+    position: relative;
+}

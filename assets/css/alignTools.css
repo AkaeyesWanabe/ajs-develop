@@ -1,0 +1,148 @@
+/**
+ * AJS Develop - Align & Distribute Tools
+ * Toolbar for aligning and distributing objects
+ */
+
+/* ==================== ALIGN TOOLBAR ==================== */
+
+#alignToolbar {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--primary-700);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-2xl), var(--shadow-glow);
+    z-index: var(--z-modal);
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.2s var(--ease-out);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* ==================== TOOLBAR HEADER ==================== */
+
+.align-toolbar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+    background: linear-gradient(180deg, var(--primary-650) 0%, var(--primary-700) 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.align-toolbar-header h4 {
+    margin: 0;
+    font-size: var(--text-md);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+}
+
+.align-toolbar-close {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    font-size: var(--icon-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    width: var(--btn-md);
+    height: var(--btn-md);
+}
+
+.align-toolbar-close:hover {
+    background-color: var(--bg-hover);
+    color: var(--error);
+}
+
+/* ==================== TOOLBAR SECTIONS ==================== */
+
+.align-toolbar-section {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.align-toolbar-section:last-child {
+    border-bottom: none;
+}
+
+.align-toolbar-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: var(--space-2);
+}
+
+/* ==================== TOOLBAR BUTTONS ==================== */
+
+.align-toolbar-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+}
+
+.align-btn {
+    background: var(--primary-600);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--icon-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    min-height: 48px;
+    position: relative;
+}
+
+.align-btn:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--secondary);
+    color: var(--secondary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.align-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.align-btn i {
+    pointer-events: none;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    #alignToolbar {
+        width: 90%;
+        min-width: unset;
+    }
+
+    .align-toolbar-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

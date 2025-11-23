@@ -1,0 +1,51 @@
+<div id="playerContainer">
+    <!-- Player Controls -->
+    <div id="playerControls">
+        <div class="playerControlsLeft">
+            <button id="playBtn" class="playerBtn" title="Play (F5)">
+                <i class="ri-play-fill"></i>
+            </button>
+            <button id="pauseBtn" class="playerBtn" title="Pause" style="display: none;">
+                <i class="ri-pause-fill"></i>
+            </button>
+            <button id="stopBtn" class="playerBtn" title="Stop">
+                <i class="ri-stop-fill"></i>
+            </button>
+            <button id="restartBtn" class="playerBtn" title="Restart">
+                <i class="ri-restart-line"></i>
+            </button>
+            <div class="playerSeparator"></div>
+            <button id="debugToggleBtn" class="playerBtn" title="Toggle Debug Overlay">
+                <i class="ri-bug-line"></i>
+            </button>
+        </div>
+
+        <div class="playerControlsRight">
+            <span id="fpsCounter" class="playerInfo">FPS: 0</span>
+            <span id="objectCounter" class="playerInfo">Objects: 0</span>
+        </div>
+    </div>
+
+    <!-- Player Canvas Container -->
+    <div id="playerCanvasContainer">
+        <canvas id="playerCanvas"></canvas>
+
+        <!-- Debug Overlay -->
+        <div id="debugOverlay" style="display: none;">
+            <div class="debugInfo">
+                <h4>Debug Info</h4>
+                <div id="debugFPS">FPS: 0</div>
+                <div id="debugFrameTime">Frame Time: 0ms</div>
+                <div id="debugObjects">Objects: 0</div>
+                <div id="debugMemory">Memory: 0 MB</div>
+            </div>
+        </div>
+
+        <!-- No Scene Message -->
+        <div id="noScenePlayer" class="centerMessage">
+            <i class="ri-play-circle-line"></i>
+            <h3>No Scene Loaded</h3>
+            <p>Open a scene from the Scene Editor to preview it here</p>
+        </div>
+    </div>
+</div>

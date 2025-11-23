@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell:*)",
+      "Bash(node -e:*)",
+      "Bash(node -c:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx stylelint:*)",
+      "Bash(npm start)",
+      "Bash(test:*)",
+      "Bash(npm install)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

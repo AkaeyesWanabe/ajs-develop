@@ -1,0 +1,11 @@
+/**
+ * Zoom System Styles
+ */
+
+#scnZoomWrapper {
+    position: relative;
+    transform-origin: 0 0;
+    display: inline-block;
+    min-width: 100%;
+    min-height: 100%;
+}

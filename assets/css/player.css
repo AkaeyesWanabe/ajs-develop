@@ -1,0 +1,186 @@
+/**
+ * AJS Develop - Player View
+ * Game preview and testing interface
+ */
+
+/* ==================== PLAYER CONTAINER ==================== */
+
+#playerContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+}
+
+/* ==================== PLAYER CONTROLS ==================== */
+
+#playerControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-default);
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.playerControlsLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.playerControlsRight {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.playerBtn {
+    width: var(--btn-lg);
+    height: var(--btn-lg);
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--icon-lg);
+    transition: all var(--transition-normal);
+}
+
+.playerBtn:hover {
+    background: var(--bg-hover);
+}
+
+.playerBtn:active {
+    background: var(--bg-active);
+    transform: scale(0.95);
+}
+
+.playerBtn.active {
+    background: var(--secondary-700);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.playerSeparator {
+    width: 1px;
+    height: var(--icon-lg);
+    background: var(--border-default);
+    margin: 0 var(--space-1);
+}
+
+.playerInfo {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.playerInfo span {
+    padding: var(--space-0-5) var(--space-2);
+    background: var(--primary-800);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+}
+
+/* ==================== PLAYER CANVAS CONTAINER ==================== */
+
+#playerCanvasContainer {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-tertiary);
+    background-image:
+        linear-gradient(rgba(94, 205, 187, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(94, 205, 187, 0.02) 1px, transparent 1px);
+    background-size: 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#playerCanvas {
+    border: 1px solid var(--border-default);
+    background: #000;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    box-shadow: var(--shadow-xl);
+}
+
+/* ==================== DEBUG OVERLAY ==================== */
+
+#debugOverlay {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    background: rgba(0, 0, 0, 0.9);
+    color: #0f0;
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(15, 255, 15, 0.3);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    min-width: 220px;
+    pointer-events: none;
+    z-index: var(--z-tooltip);
+    box-shadow: var(--shadow-lg);
+}
+
+.debugInfo h4 {
+    margin: 0 0 var(--space-2) 0;
+    color: #0f0;
+    font-size: var(--text-sm);
+    border-bottom: 1px solid rgba(15, 255, 15, 0.3);
+    padding-bottom: var(--space-1);
+    font-weight: var(--font-semibold);
+}
+
+.debugInfo > div {
+    margin: var(--space-1) 0;
+    color: #0f0;
+}
+
+/* ==================== NO SCENE MESSAGE ==================== */
+
+#noScenePlayer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    text-align: center;
+    padding: var(--space-12);
+}
+
+#noScenePlayer i {
+    font-size: 72px;
+    margin-bottom: var(--space-4);
+    opacity: 0.4;
+    color: var(--text-disabled);
+}
+
+#noScenePlayer h3 {
+    margin: 0 0 var(--space-2) 0;
+    color: var(--text-primary);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+}
+
+#noScenePlayer p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+}
+
+.centerMessage {
+    width: 100%;
+    height: 100%;
+}

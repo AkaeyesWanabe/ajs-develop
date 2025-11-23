@@ -1,6 +1,25 @@
 <div class="workspaceTitleBar">
     <a>Console</a>
-    
+
+    <div class="consoleControls">
+      <button id="consoleClearBtn" title="Clear Console">
+        <i class="ri-delete-bin-line"></i>
+      </button>
+      <div class="consoleSeparator"></div>
+      <button id="consoleFilterAll" class="consoleFilterBtn active" data-filter="all" title="All">
+        All
+      </button>
+      <button id="consoleFilterLog" class="consoleFilterBtn" data-filter="log" title="Logs">
+        <i class="ri-information-line"></i>
+      </button>
+      <button id="consoleFilterWarn" class="consoleFilterBtn" data-filter="warn" title="Warnings">
+        <i class="ri-error-warning-line"></i>
+      </button>
+      <button id="consoleFilterError" class="consoleFilterBtn" data-filter="error" title="Errors">
+        <i class="ri-close-circle-line"></i>
+      </button>
+    </div>
+
     <div class="workspaceMenuItem">
       <button>...</button>
       <div class="workspaceSubMenu">
@@ -14,5 +33,9 @@
         </div>
       </div>
     </div>
-  
+
+  </div>
+
+  <div id="consoleContent">
+    <div id="consoleMessages"></div>
   </div>

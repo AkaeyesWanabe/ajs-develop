@@ -1,5 +1,10 @@
 {
     "extension": "com.ajs.button",
+    "extensionName": "Button",
+    "extensionIcon": "icon.png",
+    "description": "Interactive button with click events",
+    "category": "UI Elements",
+    "hierarchyPreview": "preview",
     "propertiesTabs": [
         {
             "name": "Object",

@@ -1,0 +1,174 @@
+/**
+ * Loading States - Spinners and Progress Bars
+ */
+
+/* Spinner container */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-default);
+    border-top-color: var(--secondary);
+    border-radius: 50%;
+    animation: spinner-rotate 0.8s linear infinite;
+}
+
+.loading-spinner.large {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+}
+
+.loading-spinner.small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+@keyframes spinner-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    backdrop-filter: blur(2px);
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-overlay-content {
+    background: var(--primary-700);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.loading-overlay-text {
+    color: var(--text-primary);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Progress bar */
+.loading-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--primary-600);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.loading-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Indeterminate progress (no specific percentage) */
+.loading-progress-bar.indeterminate {
+    width: 30% !important;
+    animation: progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-indeterminate {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(400%);
+    }
+}
+
+/* Inline loading indicator */
+.loading-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Button loading state */
+button.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+button.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spinner-rotate 0.6s linear infinite;
+}
+
+/* Loading skeleton (for content placeholders) */
+.loading-skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--primary-600) 0%,
+        var(--primary-500) 50%,
+        var(--primary-600) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.loading-skeleton.text {
+    height: 12px;
+    width: 100%;
+    margin: 4px 0;
+}
+
+.loading-skeleton.title {
+    height: 20px;
+    width: 60%;
+    margin: 8px 0;
+}
+
+.loading-skeleton.circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}

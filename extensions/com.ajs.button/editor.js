@@ -9,6 +9,7 @@ const script = {
         sceneEditor.setObjectName(object, data.properties.name);//do not remove this line
         sceneEditor.setObjectGroups(object, data.groups);//do not remove this line
         sceneEditor.renderObjectClickable(object);//do not remove this line
+        sceneEditor.renderObjectResizable(object);
         sceneEditor.renderObjectRotable(object);
         //
         //add object to the scene

@@ -16,16 +16,21 @@
             <a class="appMenuItemLabel">Open Project</a>
             <a class="appMenuItemKey">Ctrl+O</a>
         </div>
-        <div>
-            <a class="appMenuItemLabel">Save</a>
+        <span class="appMenuItemHr"></span>
+        <div id="saveSceneBtn">
+            <a class="appMenuItemLabel">Save Scene</a>
             <a class="appMenuItemKey">Ctrl+S</a>
+        </div>
+        <div id="saveProjectBtn">
+            <a class="appMenuItemLabel">Save Project</a>
+            <a class="appMenuItemKey">Ctrl+Shift+S</a>
         </div>
         <span class="appMenuItemHr"></span>
         <div>
             <a class="appMenuItemLabel">Preferences</a>
         </div>
         <span class="appMenuItemHr"></span>
-        <div>
+        <div id="exitAppBtn">
             <a class="appMenuItemLabel">Exit</a>
             <a class="appMenuItemKey">Alt+F4</a>
         </div>
@@ -35,24 +40,24 @@
 <div class="appMenuItem">
     <button>Edit</button>
     <div class="appMenuItemSubMenu">
-        <div>
+        <div id="undoBtn">
             <a class="appMenuItemLabel">Undo</a>
             <a class="appMenuItemKey">Ctrl+Z</a>
         </div>
-        <div>
+        <div id="redoBtn">
             <a class="appMenuItemLabel">Redo</a>
             <a class="appMenuItemKey">Ctrl+Y</a>
         </div>
         <span class="appMenuItemHr"></span>
-        <div>
+        <div id="copyBtn">
             <a class="appMenuItemLabel">Copy</a>
             <a class="appMenuItemKey">Ctrl+C</a>
         </div>
-        <div>
+        <div id="cutBtn">
             <a class="appMenuItemLabel">Cut</a>
             <a class="appMenuItemKey">Ctrl+X</a>
         </div>
-        <div>
+        <div id="pasteBtn">
             <a class="appMenuItemLabel">Paste</a>
             <a class="appMenuItemKey">Ctrl+V</a>
         </div>
@@ -60,6 +65,20 @@
         <div>
             <a class="appMenuItemLabel">Delete</a>
             <a class="appMenuItemKey">Del</a>
+        </div>
+        <span class="appMenuItemHr"></span>
+        <div id="alignToolsBtn">
+            <a class="appMenuItemLabel">Align & Distribute</a>
+            <a class="appMenuItemKey">Ctrl+Shift+A</a>
+        </div>
+        <span class="appMenuItemHr"></span>
+        <div id="groupObjectsBtn">
+            <a class="appMenuItemLabel">Group</a>
+            <a class="appMenuItemKey">Ctrl+G</a>
+        </div>
+        <div id="ungroupObjectsBtn">
+            <a class="appMenuItemLabel">Ungroup</a>
+            <a class="appMenuItemKey">Ctrl+Shift+G</a>
         </div>
     </div>
 </div>
@@ -86,21 +105,33 @@
 <div class="appMenuItem">
     <button>View</button>
     <div class="appMenuItemSubMenu">
-        <div>
+        <div id="zoomInBtn">
             <a class="appMenuItemLabel">Zoom+</a>
             <a class="appMenuItemKey">Ctrl++(num.)</a>
         </div>
-        <div>
+        <div id="zoomOutBtn">
             <a class="appMenuItemLabel">Zoom-</a>
             <a class="appMenuItemKey">Ctrl+-(num.)</a>
         </div>
+        <div id="zoomResetBtn">
+            <a class="appMenuItemLabel">Reset Zoom</a>
+            <a class="appMenuItemKey">Ctrl+0(num.)</a>
+        </div>
         <span class="appMenuItemHr"></span>
-        <div check="true">
+        <div id="showGridBtn" check="true">
             <a class="appMenuItemLabel">Show Grid</a>
             <i class="appMenuItemCheck ri-check-line"></i>
         </div>
-        <div>
-            <a class="appMenuItemLabel">Grid Size</a>
+        <div id="snapToGridBtn" check="true">
+            <a class="appMenuItemLabel">Snap to Grid</a>
+            <i class="appMenuItemCheck ri-check-line"></i>
+        </div>
+        <div id="gridLinesBtn" check="true">
+            <a class="appMenuItemLabel">Grid Lines</a>
+            <i class="appMenuItemCheck ri-check-line"></i>
+        </div>
+        <div id="gridSizeBtn">
+            <a class="appMenuItemLabel">Grid Size (16px)</a>
         </div>
     </div>
 </div>
