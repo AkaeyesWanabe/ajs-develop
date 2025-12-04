@@ -20,6 +20,63 @@ class RuntimeAPI {
         const mouseExt = this.runtimeManager.getSystemInstance('com.ajs.input.mouse');
 
         return {
+            // ========== API SIMPLIFIÉE TYPE UNITY ==========
+
+            /**
+             * Vérifie si une touche est actuellement pressée (maintenue)
+             * Usage: Input.GetKey(KeyCode.A) ou Input.GetKey('a')
+             * @param {string} key - KeyCode ou string
+             * @returns {boolean}
+             */
+            GetKey: (key) => {
+                if (!keyboardExt || !keyboardExt.runtime.GetKey) return false;
+                return keyboardExt.runtime.GetKey(keyboardExt, key);
+            },
+
+            /**
+             * Vérifie si une touche a été pressée cette frame
+             * Usage: Input.GetKeyDown(KeyCode.Space)
+             * @param {string} key - KeyCode ou string
+             * @returns {boolean}
+             */
+            GetKeyDown: (key) => {
+                if (!keyboardExt || !keyboardExt.runtime.GetKeyDown) return false;
+                return keyboardExt.runtime.GetKeyDown(keyboardExt, key);
+            },
+
+            /**
+             * Vérifie si une touche a été relâchée cette frame
+             * Usage: Input.GetKeyUp(KeyCode.Escape)
+             * @param {string} key - KeyCode ou string
+             * @returns {boolean}
+             */
+            GetKeyUp: (key) => {
+                if (!keyboardExt || !keyboardExt.runtime.GetKeyUp) return false;
+                return keyboardExt.runtime.GetKeyUp(keyboardExt, key);
+            },
+
+            /**
+             * Obtient l'axe horizontal (-1, 0, 1)
+             * Usage: Input.GetAxisHorizontal()
+             * @returns {number}
+             */
+            GetAxisHorizontal: () => {
+                if (!keyboardExt || !keyboardExt.runtime.GetAxisHorizontal) return 0;
+                return keyboardExt.runtime.GetAxisHorizontal(keyboardExt);
+            },
+
+            /**
+             * Obtient l'axe vertical (-1, 0, 1)
+             * Usage: Input.GetAxisVertical()
+             * @returns {number}
+             */
+            GetAxisVertical: () => {
+                if (!keyboardExt || !keyboardExt.runtime.GetAxisVertical) return 0;
+                return keyboardExt.runtime.GetAxisVertical(keyboardExt);
+            },
+
+            // ========== API CLASSIQUE (pour compatibilité) ==========
+
             /**
              * Vérifier si une touche est pressée
              * @param {string} key - Nom de la touche (ex: 'a', 'ArrowUp', 'Space')

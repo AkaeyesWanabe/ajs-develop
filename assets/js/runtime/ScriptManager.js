@@ -67,6 +67,14 @@ class ScriptManager {
                 }
                 this.scriptInstances.get(gameObject.oid).push(scriptInstance);
 
+                // Attacher également au GameObject pour un accès facile
+                if (!gameObject.scripts) {
+                    gameObject.scripts = [];
+                }
+                gameObject.scripts.push(scriptInstance);
+                // Ajouter aussi le scriptPath pour l'identification
+                scriptInstance.scriptPath = scriptPath;
+
                 // Appeler onStart si défini
                 if (typeof scriptInstance.onStart === 'function') {
                     const api = this.createScriptAPI(gameObject);

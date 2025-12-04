@@ -9,7 +9,7 @@
   "chromium-args": "--mixed-context",
   "scripts": {
     "dev": "npx nw .",
-    "prod": "npx nw build --platforms win32,win64,osx64,linux32,linux64 --buildDir dist/"
+    "prod": "npx nw build --platforms win64,osx64,linux64 --buildDir dist/"
   },
   "window": {
     "theme": "dark",
@@ -22,7 +22,7 @@
     "position": "center",
     "frame": false,
     "show": true,
-    "title": "AJS Develop 1.0"
+    "title": "AJS Develop 2D"
   },
   "keywords": [
     "js",

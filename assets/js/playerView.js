@@ -93,6 +93,12 @@ window.initPlayerHandlers = function() {
         $(this).toggleClass('active');
     });
 
+    // Show colliders toggle button
+    $("#showCollidersBtn").click(function () {
+        window.player.toggleShowColliders();
+        $(this).toggleClass('active');
+    });
+
     // Keyboard shortcuts
     $(document).keydown(async function (e) {
         // F5 - Play Scene

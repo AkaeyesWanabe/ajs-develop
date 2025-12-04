@@ -2,8 +2,8 @@
     "extension": "internal/com.ajs.scene",
     "cache": {
         "sceneEditor": {
-            "scrollX": 447.20001220703125,
-            "scrollY": 456.79998779296875
+            "scrollX": 460.79998779296875,
+            "scrollY": 432.79998779296875
         }
     },
     "properties": {
@@ -21,13 +21,15 @@
             "name": "Game",
             "isRemovable": false,
             "isRenomable": true,
-            "isLocked": false
+            "isLocked": false,
+            "isVisible": true
         },
         {
             "name": "Interface",
             "isRemovable": true,
             "isRenomable": true,
-            "isLocked": false
+            "isLocked": false,
+            "isVisible": false
         }
     ],
     "objects": [
@@ -58,7 +60,8 @@
                 "scripts": []
             },
             "groups": "",
-            "layer": 0
+            "layer": 0,
+            "locked": false
         },
         {
             "extension": "com.ajs.image",
@@ -79,48 +82,6 @@
                         "properties": {
                             "rotationSpeed": 45,
                             "clockwise": true
-                        }
-                    }
-                ]
-            },
-            "groups": "",
-            "layer": 0
-        },
-        {
-            "extension": "com.ajs.sprite",
-            "oid": "__ajs_oid_3fd7af9158",
-            "properties": {
-                "name": "Player",
-                "visible": true,
-                "x": 64,
-                "y": 240,
-                "width": 256,
-                "height": 240,
-                "angle": 0,
-                "animator": ".\\assets\\animations/player.anim",
-                "scripts": [
-                    {
-                        "path": "internal/physics/BoxCollider2D/BoxCollider2D.js",
-                        "enabled": true,
-                        "properties": {
-                            "showInEditor": true,
-                            "offsetX": 0,
-                            "offsetY": 56,
-                            "width": 48,
-                            "height": 48,
-                            "isTrigger": false
-                        }
-                    },
-                    {
-                        "path": "internal/physics/Rigidbody2D/Rigidbody2D.js",
-                        "enabled": true,
-                        "properties": {
-                            "mass": 1,
-                            "gravityScale": 1,
-                            "drag": 0,
-                            "angularDrag": 0.05,
-                            "isKinematic": false,
-                            "useGravity": true
                         }
                     }
                 ]
@@ -189,6 +150,69 @@
                             "width": 1024,
                             "height": 96,
                             "isTrigger": false
+                        }
+                    }
+                ]
+            },
+            "groups": "",
+            "layer": 0
+        },
+        {
+            "extension": "com.ajs.sprite",
+            "oid": "__ajs_oid_3fd7af9158",
+            "properties": {
+                "name": "Player",
+                "visible": true,
+                "x": 0,
+                "y": 0,
+                "width": 256,
+                "height": 240,
+                "angle": 0,
+                "animator": ".\\assets\\animations/player.anim",
+                "scripts": [
+                    {
+                        "path": "internal/physics/Rigidbody2D/Rigidbody2D.js",
+                        "enabled": true,
+                        "properties": {
+                            "mass": 1,
+                            "gravityScale": 1,
+                            "drag": 0,
+                            "angularDrag": 0.05,
+                            "isKinematic": false,
+                            "useGravity": true
+                        }
+                    },
+                    {
+                        "path": "scripts/PlayerMovement.js",
+                        "enabled": true,
+                        "properties": {
+                            "speed": 200
+                        }
+                    },
+                    {
+                        "path": "internal/physics/BoxCollider2D/BoxCollider2D.js",
+                        "enabled": true,
+                        "properties": {
+                            "showInEditor": true,
+                            "offsetX": 0,
+                            "offsetY": 56,
+                            "width": 48,
+                            "height": 48,
+                            "isTrigger": false
+                        }
+                    },
+                    {
+                        "path": ".\\scripts/AnimationController.js",
+                        "enabled": true,
+                        "properties": {
+                            "idleAnimation": "idle",
+                            "walkAnimation": "walk",
+                            "runAnimation": "run",
+                            "jumpAnimation": "jump",
+                            "fallAnimation": "fall",
+                            "useRunKey": false,
+                            "autoDetectMovement": true,
+                            "movementThreshold": 0.1
                         }
                     }
                 ]

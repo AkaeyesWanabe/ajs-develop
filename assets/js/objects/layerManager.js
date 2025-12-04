@@ -120,6 +120,12 @@ module.exports = {
         }
         layerDiv.dataset.layer = layerIndex;
 
+        // Check visibility state (default to visible if not set)
+        const isVisible = layerData.isVisible !== false;
+        if (!isVisible) {
+            layerDiv.classList.add('hidden-layer');
+        }
+
         // Layer header
         const header = document.createElement('div');
         header.className = 'layer-header';
@@ -127,7 +133,7 @@ module.exports = {
         // Visibility toggle
         const visibilityBtn = document.createElement('button');
         visibilityBtn.className = 'layer-visibility-btn';
-        visibilityBtn.innerHTML = '<i class="ri-eye-line"></i>';
+        visibilityBtn.innerHTML = isVisible ? '<i class="ri-eye-line"></i>' : '<i class="ri-eye-off-line"></i>';
         visibilityBtn.title = 'Toggle visibility';
         visibilityBtn.onclick = (e) => {
             e.stopPropagation();
@@ -379,16 +385,73 @@ module.exports = {
      * Toggle layer visibility
      */
     toggleLayerVisibility(layerIndex) {
-        const layer = document.querySelector(`[id*="layer_${layerIndex}"]`);
-        if (!layer) return;
+        const editor = window.sceneEditor || sceneEditor;
+        if (!editor.sceneData || !editor.sceneData.layers) return;
 
-        const isVisible = layer.style.display !== 'none';
-        layer.style.display = isVisible ? 'none' : 'block';
+        const layerData = editor.sceneData.layers[layerIndex];
+        if (!layerData) return;
 
-        // Update button icon
+        // Toggle visibility state
+        layerData.isVisible = !layerData.isVisible;
+        const isVisible = layerData.isVisible !== false; // Default to visible if not set
+
+        // Get the scene layer DOM element
+        const layerElement = document.querySelector(`.__ajs_scene_layer[data-layer-number="${layerIndex}"]`);
+        if (layerElement) {
+            layerElement.style.display = isVisible ? 'block' : 'none';
+        }
+
+        // Update all objects on this layer
+        const objects = this.getObjectsInLayer(layerIndex);
+        objects.forEach(obj => {
+            const objectElement = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${obj.oid}"]`);
+            if (objectElement) {
+                if (isVisible) {
+                    // Show object
+                    objectElement.style.display = 'block';
+                    objectElement.style.pointerEvents = 'auto';
+                } else {
+                    // Hide object and make inaccessible
+                    objectElement.style.display = 'none';
+                    objectElement.style.pointerEvents = 'none';
+                }
+            }
+
+            // Hide/show collider overlays
+            if (objectElement && objectElement.parentElement) {
+                const overlayId = `collider-overlay-${obj.oid}`;
+                const colliderOverlay = objectElement.parentElement.querySelector(`#${overlayId}`);
+                if (colliderOverlay) {
+                    colliderOverlay.style.display = isVisible ? 'block' : 'none';
+                }
+            }
+        });
+
+        // Update button icon in layer manager UI
         const btn = this.container.querySelector(`[data-layer="${layerIndex}"] .layer-visibility-btn i`);
         if (btn) {
-            btn.className = isVisible ? 'ri-eye-off-line' : 'ri-eye-line';
+            btn.className = isVisible ? 'ri-eye-line' : 'ri-eye-off-line';
+        }
+
+        // Update layer item appearance
+        const layerDiv = this.container.querySelector(`[data-layer="${layerIndex}"]`);
+        if (layerDiv) {
+            if (isVisible) {
+                layerDiv.classList.remove('hidden-layer');
+            } else {
+                layerDiv.classList.add('hidden-layer');
+            }
+        }
+
+        // Mark scene as modified
+        if (editor.markAsModified) {
+            editor.markAsModified();
+        }
+
+        // Show notification
+        const notifications = nw.require('./assets/js/objects/notifications');
+        if (notifications) {
+            notifications.info(`Layer "${layerData.name}" ${isVisible ? 'shown' : 'hidden'}`);
         }
     },
 

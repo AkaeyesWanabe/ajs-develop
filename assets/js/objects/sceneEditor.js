@@ -275,6 +275,9 @@ module.exports = {
                         // Refresh all scene UI (hierarchy, layer manager, add object button)
                         this.refreshSceneUI();
 
+                        // Apply layer visibility states
+                        this.applyLayerVisibilityStates();
+
                         // Initialize status bar with scene dimensions
                         const footer = nw.require('./assets/js/objects/footer');
                         if (footer) {
@@ -2157,5 +2160,52 @@ module.exports = {
         }
 
         container.appendChild(circle);
+    },
+
+    /**
+     * Apply layer visibility states to all objects
+     * Called when scene is loaded to ensure objects match their layer's visibility
+     */
+    applyLayerVisibilityStates() {
+        if (!this.sceneData || !this.sceneData.layers) {
+            return;
+        }
+
+        this.sceneData.layers.forEach((layerData, layerIndex) => {
+            // Default to visible if not set
+            const isVisible = layerData.isVisible !== false;
+
+            // Get the scene layer DOM element
+            const layerElement = document.querySelector(`.__ajs_scene_layer[data-layer-number="${layerIndex}"]`);
+            if (layerElement) {
+                layerElement.style.display = isVisible ? 'block' : 'none';
+            }
+
+            // Get all objects in this layer
+            const objects = this.sceneData.objects.filter(obj => (obj.layer || 0) === layerIndex);
+
+            // Apply visibility to each object
+            objects.forEach(obj => {
+                const objectElement = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${obj.oid}"]`);
+                if (objectElement) {
+                    if (isVisible) {
+                        objectElement.style.display = 'block';
+                        objectElement.style.pointerEvents = 'auto';
+                    } else {
+                        objectElement.style.display = 'none';
+                        objectElement.style.pointerEvents = 'none';
+                    }
+                }
+
+                // Hide/show collider overlays
+                if (objectElement && objectElement.parentElement) {
+                    const overlayId = `collider-overlay-${obj.oid}`;
+                    const colliderOverlay = objectElement.parentElement.querySelector(`#${overlayId}`);
+                    if (colliderOverlay) {
+                        colliderOverlay.style.display = isVisible ? 'block' : 'none';
+                    }
+                }
+            });
+        });
     }
 };

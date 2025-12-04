@@ -52,8 +52,7 @@
 
 .scriptsListBody {
     padding: var(--space-3);
-    max-height: 600px;
-    overflow-y: auto;
+    height: max-content;
     background: var(--primary-850);
     border: 1px solid var(--border-subtle);
     border-top: none;
@@ -422,6 +421,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

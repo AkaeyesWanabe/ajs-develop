@@ -2,7 +2,7 @@ module.exports = {
     action: "",
 
     app: {
-        name: "AJS Develop",
+        name: "AJS Develop 2D",
         versionName: "1.0",
         versionCode: "1.0.0",
         tabName: "sceneEditor",

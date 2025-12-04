@@ -31,6 +31,9 @@ module.exports = {
     // Animation frame ID for stopping
     animationId: null,
 
+    // Debug options
+    showColliders: false,
+
     /**
      * Initialize the player
      */
@@ -79,6 +82,9 @@ module.exports = {
         // Initialize Physics Manager
         physicsManager.init();
         window.physicsManager = physicsManager; // Make globally accessible
+
+        // Create global Input object for Unity-style access
+        window.Input = this.runtimeAPI.input;
     },
 
     /**
@@ -482,6 +488,11 @@ module.exports = {
         // Render with layer system
         this.renderByLayers();
 
+        // Render colliders if enabled (before camera restore so they transform correctly)
+        if (this.showColliders) {
+            this.renderColliders();
+        }
+
         // Restore camera transform
         if (cameraExt && cameraExt.runtime.restore) {
             cameraExt.runtime.restore(cameraExt, this.ctx);
@@ -667,6 +678,148 @@ module.exports = {
         if (overlay) {
             overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
         }
+    },
+
+    /**
+     * Toggle collider visualization
+     */
+    toggleShowColliders() {
+        this.showColliders = !this.showColliders;
+    },
+
+    /**
+     * Render collider bounds for debugging
+     */
+    renderColliders() {
+        if (!this.gameObjects) {
+            console.log('[Player] No gameObjects to render colliders for');
+            return;
+        }
+
+        console.log('[Player] Rendering colliders for', this.gameObjects.length, 'objects');
+
+        // Save current context state
+        this.ctx.save();
+
+        let colliderCount = 0;
+
+        this.gameObjects.forEach(gameObj => {
+            if (gameObj.isDestroyed || !gameObj.isActive) return;
+
+            // Get all scripts attached to this object
+            const scripts = gameObj.scripts || [];
+
+            scripts.forEach(scriptInstance => {
+                const scriptPath = scriptInstance.scriptPath || '';
+
+                // Check if this is a BoxCollider2D
+                if (scriptPath.includes('BoxCollider2D')) {
+                    console.log('[Player] Rendering BoxCollider for', gameObj.name);
+                    this.renderBoxCollider(gameObj, scriptInstance);
+                    colliderCount++;
+                }
+                // Check if this is a CircleCollider2D
+                else if (scriptPath.includes('CircleCollider2D')) {
+                    console.log('[Player] Rendering CircleCollider for', gameObj.name);
+                    this.renderCircleCollider(gameObj, scriptInstance);
+                    colliderCount++;
+                }
+            });
+        });
+
+        console.log('[Player] Rendered', colliderCount, 'colliders');
+
+        // Restore context state
+        this.ctx.restore();
+    },
+
+    /**
+     * Render BoxCollider2D bounds
+     */
+    renderBoxCollider(gameObj, scriptInstance) {
+        const props = scriptInstance.properties || {};
+        const objProps = gameObj.properties;
+
+        // Get collider dimensions
+        const width = props.width || objProps.width || 64;
+        const height = props.height || objProps.height || 64;
+        const offsetX = props.offsetX || 0;
+        const offsetY = props.offsetY || 0;
+
+        // Get object position and dimensions
+        const objX = objProps.x || 0;
+        const objY = objProps.y || 0;
+        const objWidth = objProps.width || 64;
+        const objHeight = objProps.height || 64;
+
+        // Calculate center of object's box (from top-left position)
+        const objCenterX = objX + objWidth / 2;
+        const objCenterY = objY + objHeight / 2;
+
+        // Collider center = center of object's box + offset
+        const centerX = objCenterX + offsetX;
+        const centerY = objCenterY + offsetY;
+
+        // Calculate top-left corner for drawing
+        const x = centerX - width / 2;
+        const y = centerY - height / 2;
+
+        // Draw collider bounds
+        this.ctx.strokeStyle = props.isTrigger ? '#00ff00' : '#ff8800';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(x, y, width, height);
+
+        // Fill with semi-transparent color
+        this.ctx.fillStyle = props.isTrigger ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 136, 0, 0.1)';
+        this.ctx.fillRect(x, y, width, height);
+
+        // Draw label
+        this.ctx.fillStyle = '#ff8800';
+        this.ctx.font = '10px Arial';
+        this.ctx.fillText(props.isTrigger ? 'Trigger' : 'Box', x + 2, y - 4);
+    },
+
+    /**
+     * Render CircleCollider2D bounds
+     */
+    renderCircleCollider(gameObj, scriptInstance) {
+        const props = scriptInstance.properties || {};
+        const objProps = gameObj.properties;
+
+        // Get collider radius and offset
+        const radius = props.radius || 32;
+        const offsetX = props.offsetX || 0;
+        const offsetY = props.offsetY || 0;
+
+        // Get object position and dimensions
+        const objX = objProps.x || 0;
+        const objY = objProps.y || 0;
+        const objWidth = objProps.width || 64;
+        const objHeight = objProps.height || 64;
+
+        // Calculate center of object's box (from top-left position)
+        const objCenterX = objX + objWidth / 2;
+        const objCenterY = objY + objHeight / 2;
+
+        // Collider center = center of object's box + offset
+        const centerX = objCenterX + offsetX;
+        const centerY = objCenterY + offsetY;
+
+        // Draw collider bounds
+        this.ctx.strokeStyle = props.isTrigger ? '#00ff00' : '#ff8800';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // Fill with semi-transparent color
+        this.ctx.fillStyle = props.isTrigger ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 136, 0, 0.1)';
+        this.ctx.fill();
+
+        // Draw label
+        this.ctx.fillStyle = '#ff8800';
+        this.ctx.font = '10px Arial';
+        this.ctx.fillText(props.isTrigger ? 'Trigger' : 'Circle', centerX - radius, centerY - radius - 4);
     },
 
     /**

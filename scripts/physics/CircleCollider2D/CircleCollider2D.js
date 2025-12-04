@@ -1,11 +1,11 @@
 /**
  * CircleCollider2D - Circular Collision Shape
  *
- * Detects collisions with other colliders using circular bounds.
- * More efficient for round objects than BoxCollider2D.
+ * Detects collisions with other colliders via PhysicsManager.
+ * Can be used as a trigger or a solid collider.
  *
  * @internal
- * @version 1.0.0
+ * @version 2.0.0
  * @author AJS Engine
  */
 
@@ -19,186 +19,84 @@ class CircleCollider2D {
     };
 
     onStart(gameObject, api) {
-        this._colliding = new Set();
-        this._collidingLastFrame = new Set();
-
-        this.registerCollider(gameObject, api);
-
-        console.log(`[CircleCollider2D] Initialized for ${gameObject.name}`, this.properties);
-    }
-
-    onUpdate(gameObject, deltaTime, api) {
-        // Update collision tracking
-        this._collidingLastFrame = new Set(this._colliding);
-        this._colliding.clear();
-
-        const allColliders = this.getAllColliders(api);
-
-        allColliders.forEach(other => {
-            if (other.gameObject.oid === gameObject.oid) return;
-
-            if (this.checkCollision(gameObject, other)) {
-                this._colliding.add(other.gameObject.oid);
-
-                if (!this._collidingLastFrame.has(other.gameObject.oid)) {
-                    this.onCollisionEnter(gameObject, other.gameObject, api);
-                } else {
-                    this.onCollisionStay(gameObject, other.gameObject, api);
-                }
-            }
-        });
-
-        this._collidingLastFrame.forEach(oid => {
-            if (!this._colliding.has(oid)) {
-                const otherGameObject = this.findGameObjectByOid(oid, api);
-                if (otherGameObject) {
-                    this.onCollisionExit(gameObject, otherGameObject, api);
-                }
-            }
-        });
-    }
-
-    /**
-     * Get circle center and radius
-     */
-    getBounds(gameObject) {
-        return {
-            centerX: gameObject.properties.x + this.properties.offsetX + this.properties.radius,
-            centerY: gameObject.properties.y + this.properties.offsetY + this.properties.radius,
-            radius: this.properties.radius
-        };
-    }
-
-    /**
-     * Check collision with another collider
-     */
-    checkCollision(gameObject, otherCollider) {
-        const circle = this.getBounds(gameObject);
-
-        // Check if other collider is also a circle
-        if (otherCollider.scriptInstance.constructor.name === 'CircleCollider2D') {
-            return this.checkCircleCircle(circle, otherCollider.scriptInstance.getBounds(otherCollider.gameObject));
-        }
-
-        // Check if other collider is a box
-        if (otherCollider.scriptInstance.constructor.name === 'BoxCollider2D') {
-            return this.checkCircleBox(circle, otherCollider.scriptInstance.getBounds(otherCollider.gameObject));
-        }
-
-        return false;
-    }
-
-    /**
-     * Circle vs Circle collision
-     */
-    checkCircleCircle(circle1, circle2) {
-        const dx = circle1.centerX - circle2.centerX;
-        const dy = circle1.centerY - circle2.centerY;
-        const distanceSquared = dx * dx + dy * dy;
-        const radiusSum = circle1.radius + circle2.radius;
-
-        return distanceSquared < (radiusSum * radiusSum);
-    }
-
-    /**
-     * Circle vs Box collision
-     */
-    checkCircleBox(circle, box) {
-        // Find closest point on box to circle center
-        const closestX = Math.max(box.left, Math.min(circle.centerX, box.right));
-        const closestY = Math.max(box.top, Math.min(circle.centerY, box.bottom));
-
-        // Calculate distance from closest point to circle center
-        const dx = circle.centerX - closestX;
-        const dy = circle.centerY - closestY;
-        const distanceSquared = dx * dx + dy * dy;
-
-        return distanceSquared < (circle.radius * circle.radius);
-    }
-
-    /**
-     * Collision callbacks
-     */
-    onCollisionEnter(gameObject, otherGameObject, api) {
-        this.callScriptEvent(gameObject, 'onCollisionEnter', otherGameObject, api);
-
-        if (!this.properties.isTrigger) {
-            this.resolveCollision(gameObject, otherGameObject);
-        }
-    }
-
-    onCollisionStay(gameObject, otherGameObject, api) {
-        this.callScriptEvent(gameObject, 'onCollisionStay', otherGameObject, api);
-    }
-
-    onCollisionExit(gameObject, otherGameObject, api) {
-        this.callScriptEvent(gameObject, 'onCollisionExit', otherGameObject, api);
-    }
-
-    /**
-     * Resolve collision
-     */
-    resolveCollision(gameObject, otherGameObject) {
-        const circle = this.getBounds(gameObject);
-        const otherBounds = this.getBounds(otherGameObject);
-
-        // Calculate direction from other to this
-        const dx = circle.centerX - otherBounds.centerX;
-        const dy = circle.centerY - otherBounds.centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance === 0) return;
-
-        // Normalize direction
-        const nx = dx / distance;
-        const ny = dy / distance;
-
-        // Calculate overlap
-        const overlap = (circle.radius + otherBounds.radius) - distance;
-
-        // Push apart
-        gameObject.properties.x += nx * overlap / 2;
-        gameObject.properties.y += ny * overlap / 2;
-    }
-
-    callScriptEvent(gameObject, eventName, otherGameObject, api) {
-        // Called by ScriptManager
-    }
-
-    registerCollider(gameObject, api) {
+        // Register with physics manager
         const physicsManager = require('../PhysicsManager');
         physicsManager.registerCollider(gameObject, this);
     }
 
-    getAllColliders(api) {
-        const physicsManager = require('../PhysicsManager');
-        return physicsManager.getAllColliders();
-    }
+    /**
+     * Get the center and radius of this collider
+     * Positioned from the center of the object's box (x + w/2, y + h/2)
+     */
+    getBounds(gameObject) {
+        const radius = this.properties.radius || 32;
+        const offsetX = this.properties.offsetX || 0;
+        const offsetY = this.properties.offsetY || 0;
 
-    findGameObjectByOid(oid, api) {
-        const physicsManager = require('../PhysicsManager');
-        return physicsManager.findGameObjectByOid(oid, api);
+        // Get object dimensions
+        const objWidth = gameObject.properties.width || 64;
+        const objHeight = gameObject.properties.height || 64;
+
+        // Calculate center of object's box (from top-left position)
+        const objCenterX = gameObject.properties.x + objWidth / 2;
+        const objCenterY = gameObject.properties.y + objHeight / 2;
+
+        // Collider center = center of object's box + offset
+        const centerX = objCenterX + offsetX;
+        const centerY = objCenterY + offsetY;
+
+        return {
+            centerX: centerX,
+            centerY: centerY,
+            radius: radius
+        };
     }
 
     /**
-     * Draw debug visualization
+     * Called when collision enters (from PhysicsManager)
      */
-    onRenderGizmos(gameObject, ctx) {
-        const bounds = this.getBounds(gameObject);
+    onCollisionEnter(otherGameObject) {
+        // Override in user scripts if needed
+    }
 
-        ctx.save();
-        ctx.strokeStyle = this.properties.isTrigger ? '#00ff00' : '#ff0000';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(bounds.centerX, bounds.centerY, bounds.radius, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
+    /**
+     * Called while collision continues (from PhysicsManager)
+     */
+    onCollisionStay(otherGameObject) {
+        // Override in user scripts if needed
+    }
+
+    /**
+     * Called when collision exits (from PhysicsManager)
+     */
+    onCollisionExit(otherGameObject) {
+        // Override in user scripts if needed
+    }
+
+    /**
+     * Called when trigger enters (from PhysicsManager)
+     */
+    onTriggerEnter(otherGameObject) {
+        // Override in user scripts if needed
+    }
+
+    /**
+     * Called while trigger continues (from PhysicsManager)
+     */
+    onTriggerStay(otherGameObject) {
+        // Override in user scripts if needed
+    }
+
+    /**
+     * Called when trigger exits (from PhysicsManager)
+     */
+    onTriggerExit(otherGameObject) {
+        // Override in user scripts if needed
     }
 
     onDestroy(gameObject, api) {
         const physicsManager = require('../PhysicsManager');
         physicsManager.unregisterCollider(gameObject, this);
-        api.log(`[CircleCollider2D] Destroyed for ${gameObject.name}`);
     }
 }
 
