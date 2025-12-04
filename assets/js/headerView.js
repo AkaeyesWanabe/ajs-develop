@@ -41,16 +41,9 @@ $(document).ready(function () {
     });
     //close event
     $("#appCloseBtn").click(function () {
-        console.log('[CLOSE] ====== CLOSE BUTTON CLICKED ======');
-        console.log('[CLOSE] sceneEditor exists:', !!sceneEditor);
-        console.log('[CLOSE] sceneData exists:', !!sceneEditor.sceneData);
-        console.log('[CLOSE] hasUnsavedChanges:', sceneEditor.hasUnsavedChanges);
-        console.log('[CLOSE] sceneData.objects count:', sceneEditor.sceneData?.objects?.length || 0);
-        console.log('[CLOSE] sceneFilePath:', sceneEditor.cache?.sceneFilePath);
 
         // Check if there's an open scene WITH unsaved changes
-        if (sceneEditor.sceneData && sceneEditor.cache.sceneFilePath && sceneEditor.hasUnsavedChanges) {
-            console.log('[CLOSE] Scene has unsaved changes - showing save confirmation dialog');
+        if (window.sceneEditor.sceneData && window.sceneEditor.cache.sceneFilePath && window.sceneEditor.hasUnsavedChanges) {
 
             // Create custom dialog
             const dialog = document.createElement('div');
@@ -101,13 +94,10 @@ $(document).ready(function () {
 
             dialog.appendChild(dialogBox);
             document.body.appendChild(dialog);
-            console.log('[CLOSE] Dialog created and displayed');
 
             // Save and close
             document.getElementById('closeSave').addEventListener('click', function() {
-                console.log('[CLOSE] Save button clicked - saving scene...');
-                const result = sceneEditor.saveScene();
-                console.log('[CLOSE] Save result:', result);
+                const result = window.sceneEditor.saveScene();
 
                 if (result && notifications) {
                     notifications.success('Scene saved');
@@ -118,25 +108,33 @@ $(document).ready(function () {
                     document.body.removeChild(dialogEl);
                 }
 
-                console.log('[CLOSE] Closing application');
+                // Save project cache before closing
+                const projectCache = nw.require('./assets/js/objects/projectCache');
+                if (projectCache) {
+                    projectCache.autoSave();
+                }
+
                 app.quit();
             });
 
             // Close without saving
             document.getElementById('closeNoSave').addEventListener('click', function() {
-                console.log('[CLOSE] Don\'t Save button clicked - closing without saving');
                 const dialogEl = document.getElementById('closeConfirmDialog');
                 if (dialogEl) {
                     document.body.removeChild(dialogEl);
                 }
 
-                console.log('[CLOSE] Closing application');
+                // Save project cache before closing (even if scene not saved)
+                const projectCache = nw.require('./assets/js/objects/projectCache');
+                if (projectCache) {
+                    projectCache.autoSave();
+                }
+
                 app.quit();
             });
 
             // Cancel close
             document.getElementById('closeCancel').addEventListener('click', function() {
-                console.log('[CLOSE] Cancel button clicked - not closing');
                 const dialogEl = document.getElementById('closeConfirmDialog');
                 if (dialogEl) {
                     document.body.removeChild(dialogEl);
@@ -144,7 +142,13 @@ $(document).ready(function () {
             });
         } else {
             // No scene open OR no unsaved changes - just close
-            console.log('[CLOSE] No unsaved changes - closing immediately');
+
+            // Save project cache before closing
+            const projectCache = nw.require('./assets/js/objects/projectCache');
+            if (projectCache) {
+                projectCache.autoSave();
+            }
+
             app.quit();
         }
     });
@@ -166,11 +170,49 @@ $(document).ready(function () {
         }
     });
 
+    // Project Settings menu item
+    $("#projectSettingsBtn").click(function () {
+
+        // Load projectSettings module
+        const projectSettings = nw.require('./assets/js/objects/projectSettings');
+        if (!projectSettings) {
+            console.error('[MENU] Failed to load projectSettings module');
+            return;
+        }
+
+        // Expose projectSettings globally so onclick handlers can access it
+        window.projectSettings = projectSettings;
+
+        // Load projectSettings modal HTML if not already loaded
+        if (!document.getElementById('projectSettingsModal')) {
+            const fs = nw.require('fs');
+            const path = nw.require('path');
+            const modalPath = path.join(__dirname, 'views', 'projectSettings.html');
+
+            try {
+                const html = fs.readFileSync(modalPath, 'utf8');
+                document.getElementById('projectSettingsContainer').innerHTML = html;
+
+                // Initialize the projectSettings module after HTML is loaded
+                projectSettings.init();
+            } catch (err) {
+                console.error('[MENU] Failed to load project settings:', err);
+                const notifications = nw.require('./assets/js/objects/notifications');
+                if (notifications) {
+                    notifications.error('Failed to load project settings');
+                }
+                return;
+            }
+        }
+
+        // Open the settings modal
+        projectSettings.open();
+    });
+
     // Save Scene menu item
     $("#saveSceneBtn").click(function () {
-        console.log('[MENU] Save Scene clicked');
 
-        if (!sceneEditor.sceneData) {
+        if (!window.sceneEditor.sceneData) {
             console.warn('[MENU] No scene data to save');
             if (notifications) {
                 notifications.warning('No scene is open');
@@ -178,7 +220,7 @@ $(document).ready(function () {
             return;
         }
 
-        if (!sceneEditor.cache.sceneFilePath) {
+        if (!window.sceneEditor.cache.sceneFilePath) {
             console.warn('[MENU] No scene file path');
             if (notifications) {
                 notifications.warning('No scene file path');
@@ -186,9 +228,7 @@ $(document).ready(function () {
             return;
         }
 
-        console.log('[MENU] Saving scene...');
-        const result = sceneEditor.saveScene();
-        console.log('[MENU] Save result:', result);
+        const result = window.sceneEditor.saveScene();
 
         if (result && notifications) {
             notifications.success('Scene saved successfully');
@@ -197,9 +237,55 @@ $(document).ready(function () {
         }
     });
 
+    // Run Scene menu item
+    $("#runSceneBtn").click(async function () {
+
+        const notifications = nw.require('./assets/js/objects/notifications');
+
+        if (!window.sceneEditor.sceneData) {
+            console.warn('[MENU] No scene to run');
+            if (notifications) {
+                notifications.warning('No scene is open');
+            }
+            return;
+        }
+
+        // Close menu
+        $(".appMenuItemSubMenu").removeClass("show");
+
+        // Run the current scene
+        try {
+            await window.player.loadScene(window.sceneEditor.sceneData);
+            window.player.play();
+        } catch (err) {
+            console.error('[MENU] Failed to run scene:', err);
+            if (notifications) {
+                notifications.error('Failed to run scene: ' + err.message);
+            }
+        }
+    });
+
+    // Run Application menu item
+    $("#runApplicationBtn").click(async function () {
+
+        const notifications = nw.require('./assets/js/objects/notifications');
+
+        // Close menu
+        $(".appMenuItemSubMenu").removeClass("show");
+
+        // Run from main scene
+        try {
+            await window.player.playFromMainScene();
+        } catch (err) {
+            console.error('[MENU] Failed to run application:', err);
+            if (notifications) {
+                notifications.error('Failed to run application: ' + err.message);
+            }
+        }
+    });
+
     // Save Project menu item
     $("#saveProjectBtn").click(function () {
-        console.log('[MENU] Save Project clicked');
 
         if (!globals.project.dir) {
             console.warn('[MENU] No project loaded');
@@ -209,9 +295,7 @@ $(document).ready(function () {
             return;
         }
 
-        console.log('[MENU] Saving project...');
         const result = header.saveProject();
-        console.log('[MENU] Save project result:', result);
 
         if (result && notifications) {
             notifications.success('Project saved successfully');
@@ -222,13 +306,11 @@ $(document).ready(function () {
 
     // Exit menu item - trigger the same logic as close button
     $("#exitAppBtn").click(function () {
-        console.log('[MENU] Exit clicked - triggering close button logic');
         $("#appCloseBtn").trigger('click');
     });
 
     // Undo
     $("#undoBtn").click(function () {
-        console.log('[MENU] Undo clicked');
         const commandManager = nw.require('./assets/js/objects/commandManager');
         if (commandManager) {
             commandManager.undo();
@@ -237,7 +319,6 @@ $(document).ready(function () {
 
     // Redo
     $("#redoBtn").click(function () {
-        console.log('[MENU] Redo clicked');
         const commandManager = nw.require('./assets/js/objects/commandManager');
         if (commandManager) {
             commandManager.redo();
@@ -246,7 +327,6 @@ $(document).ready(function () {
 
     // Copy
     $("#copyBtn").click(function () {
-        console.log('[MENU] Copy clicked');
         const clipboard = nw.require('./assets/js/objects/clipboard');
         if (clipboard) {
             clipboard.copy();
@@ -255,7 +335,6 @@ $(document).ready(function () {
 
     // Cut
     $("#cutBtn").click(function () {
-        console.log('[MENU] Cut clicked');
         const clipboard = nw.require('./assets/js/objects/clipboard');
         if (clipboard) {
             clipboard.cut();
@@ -264,16 +343,35 @@ $(document).ready(function () {
 
     // Paste
     $("#pasteBtn").click(function () {
-        console.log('[MENU] Paste clicked');
         const clipboard = nw.require('./assets/js/objects/clipboard');
         if (clipboard) {
             clipboard.paste();
         }
     });
 
+    // Toggle colliders visualization
+    $("#toggleCollidersBtn").click(function () {
+        const sceneEditor = nw.require('./assets/js/objects/sceneEditor');
+        if (sceneEditor) {
+            sceneEditor.showColliders = !sceneEditor.showColliders;
+
+            // Update icon
+            const icon = $(this).find('i');
+            if (sceneEditor.showColliders) {
+                icon.removeClass('ri-checkbox-blank-line').addClass('ri-checkbox-fill');
+            } else {
+                icon.removeClass('ri-checkbox-fill').addClass('ri-checkbox-blank-line');
+            }
+
+            // Refresh all collider visualizations
+            if (sceneEditor.refreshAllColliderVisualizations) {
+                sceneEditor.refreshAllColliderVisualizations();
+            }
+        }
+    });
+
     // Align & Distribute tools
     $("#alignToolsBtn").click(function () {
-        console.log('[MENU] Align & Distribute clicked');
         const alignTools = nw.require('./assets/js/objects/alignTools');
         if (alignTools) {
             alignTools.showToolbar();
@@ -282,7 +380,6 @@ $(document).ready(function () {
 
     // Group objects
     $("#groupObjectsBtn").click(function () {
-        console.log('[MENU] Group Objects clicked');
         const groupManager = nw.require('./assets/js/objects/groupManager');
         if (groupManager) {
             groupManager.groupObjects();
@@ -291,7 +388,6 @@ $(document).ready(function () {
 
     // Ungroup objects
     $("#ungroupObjectsBtn").click(function () {
-        console.log('[MENU] Ungroup Objects clicked');
         const groupManager = nw.require('./assets/js/objects/groupManager');
         if (groupManager) {
             groupManager.ungroupObjects();
@@ -300,7 +396,6 @@ $(document).ready(function () {
 
     // Zoom In
     $("#zoomInBtn").click(function () {
-        console.log('[MENU] Zoom In clicked');
         const zoom = window.zoom || nw.require('./assets/js/objects/zoom');
         if (zoom) {
             zoom.zoomIn();
@@ -309,7 +404,6 @@ $(document).ready(function () {
 
     // Zoom Out
     $("#zoomOutBtn").click(function () {
-        console.log('[MENU] Zoom Out clicked');
         const zoom = window.zoom || nw.require('./assets/js/objects/zoom');
         if (zoom) {
             zoom.zoomOut();
@@ -318,7 +412,6 @@ $(document).ready(function () {
 
     // Reset Zoom
     $("#zoomResetBtn").click(function () {
-        console.log('[MENU] Reset Zoom clicked');
         const zoom = window.zoom || nw.require('./assets/js/objects/zoom');
         if (zoom) {
             zoom.resetZoom();
@@ -327,7 +420,6 @@ $(document).ready(function () {
 
     // Show Grid
     $("#showGridBtn").click(function () {
-        console.log('[MENU] Show Grid clicked');
         const grid = window.grid || nw.require('./assets/js/objects/grid');
         if (grid) {
             grid.toggle();
@@ -339,7 +431,6 @@ $(document).ready(function () {
 
     // Snap to Grid
     $("#snapToGridBtn").click(function () {
-        console.log('[MENU] Snap to Grid clicked');
         const grid = window.grid || nw.require('./assets/js/objects/grid');
         if (grid) {
             grid.toggleSnap();
@@ -351,7 +442,6 @@ $(document).ready(function () {
 
     // Grid Lines
     $("#gridLinesBtn").click(function () {
-        console.log('[MENU] Grid Lines clicked');
         const grid = window.grid || nw.require('./assets/js/objects/grid');
         if (grid) {
             grid.toggleShowLines();
@@ -363,7 +453,6 @@ $(document).ready(function () {
 
     // Grid Size
     $("#gridSizeBtn").click(function () {
-        console.log('[MENU] Grid Size clicked');
         const grid = window.grid || nw.require('./assets/js/objects/grid');
         const notifications = nw.require('./assets/js/objects/notifications');
 

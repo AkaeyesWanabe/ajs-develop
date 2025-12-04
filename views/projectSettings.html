@@ -1,0 +1,553 @@
+<!-- Project Settings Modal -->
+<div id="projectSettingsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-container project-settings-modal">
+        <div class="modal-header">
+            <h2><i class="ri-settings-3-line"></i> Paramètres du Projet</h2>
+            <button class="modal-close-btn" onclick="projectSettings.close()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="general">
+                    <i class="ri-information-line"></i> Général
+                </button>
+                <button class="settings-tab" data-tab="window">
+                    <i class="ri-window-line"></i> Fenêtre
+                </button>
+                <button class="settings-tab" data-tab="runtime">
+                    <i class="ri-play-line"></i> Runtime
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="settings-content">
+                <!-- General Tab -->
+                <div class="settings-tab-content active" data-tab="general">
+                    <div class="settings-section">
+                        <h3>Informations de l'application</h3>
+
+                        <div class="setting-field">
+                            <label for="appName">Nom de l'application</label>
+                            <input type="text" id="appName" placeholder="Mon Jeu">
+                        </div>
+
+                        <div class="setting-field">
+                            <label for="appVersion">Version</label>
+                            <input type="text" id="appVersion" placeholder="1.0.0">
+                        </div>
+
+                        <div class="setting-field">
+                            <label for="appAuthor">Auteur</label>
+                            <input type="text" id="appAuthor" placeholder="Nom de l'auteur">
+                        </div>
+
+                        <div class="setting-field">
+                            <label for="appCompany">Compagnie</label>
+                            <input type="text" id="appCompany" placeholder="Nom de la compagnie">
+                        </div>
+
+                        <div class="setting-field">
+                            <label for="appPackage">Package</label>
+                            <input type="text" id="appPackage" placeholder="com.company.game">
+                            <small>Identifiant unique de l'application (format: com.company.name)</small>
+                        </div>
+
+                        <div class="setting-field">
+                            <label for="appIcon">Icône</label>
+                            <input type="text" id="appIcon" placeholder="favicon.png">
+                            <small>Chemin vers l'icône de l'application</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Window Tab -->
+                <div class="settings-tab-content" data-tab="window">
+                    <div class="settings-section">
+                        <h3>Paramètres de fenêtre</h3>
+
+                        <div class="setting-field-group">
+                            <div class="setting-field">
+                                <label for="appWidth">Largeur</label>
+                                <input type="number" id="appWidth" min="320" max="3840" value="640">
+                            </div>
+
+                            <div class="setting-field">
+                                <label for="appHeight">Hauteur</label>
+                                <input type="number" id="appHeight" min="240" max="2160" value="480">
+                            </div>
+                        </div>
+
+                        <div class="setting-field checkbox-field">
+                            <input type="checkbox" id="appFullscreen">
+                            <label for="appFullscreen">Démarrer en plein écran</label>
+                        </div>
+
+                        <div class="setting-field checkbox-field">
+                            <input type="checkbox" id="appResizable" checked>
+                            <label for="appResizable">Fenêtre redimensionnable</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Runtime Tab -->
+                <div class="settings-tab-content" data-tab="runtime">
+                    <div class="settings-section">
+                        <h3>Configuration du Runtime</h3>
+
+                        <div class="setting-field">
+                            <label for="appMainScene">Scène Principale</label>
+                            <div class="input-with-button">
+                                <input type="text" id="appMainScene" placeholder="scenes/main.scn" readonly>
+                                <button onclick="projectSettings.selectMainScene()" class="btn-select-scene">
+                                    <i class="ri-file-search-line"></i> Sélectionner
+                                </button>
+                            </div>
+                            <small>Scène lancée au démarrage de l'application (point d'entrée)</small>
+                        </div>
+
+                        <div class="setting-field">
+                            <label for="appTargetFPS">FPS Cible</label>
+                            <input type="number" id="appTargetFPS" min="30" max="144" value="60">
+                            <small>Nombre d'images par seconde cible (30-144)</small>
+                        </div>
+
+                        <div class="setting-info">
+                            <i class="ri-information-line"></i>
+                            <div>
+                                <strong>Mode de lecture</strong>
+                                <p>• <strong>Play Scene</strong> : Lance uniquement la scène courante</p>
+                                <p>• <strong>Play from Main</strong> : Lance l'application depuis la scène principale</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="projectSettings.close()">
+                Annuler
+            </button>
+            <button class="btn-primary" onclick="projectSettings.save()">
+                <i class="ri-save-line"></i> Enregistrer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Scene Selector Modal -->
+<div id="sceneSelectorModal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) projectSettings.closeSceneSelector()">
+    <div class="modal-container scene-selector-modal">
+        <div class="modal-header">
+            <h2><i class="ri-file-search-line"></i> Sélectionner la Scène Principale</h2>
+            <button class="modal-close-btn" onclick="projectSettings.closeSceneSelector()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <div class="scene-search">
+                <input type="text" id="sceneSearchInput" placeholder="Rechercher une scène..." onkeyup="projectSettings.filterScenes()">
+            </div>
+
+            <div class="scene-count" id="sceneCount">0 scène(s) trouvée(s)</div>
+
+            <ul class="scene-list" id="sceneList">
+                <!-- Scene items will be populated here -->
+            </ul>
+
+            <div id="noScenesMessage" class="no-scenes-message" style="display: none;">
+                <i class="ri-film-line"></i>
+                <p>Aucune scène ne correspond à votre recherche</p>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="projectSettings.closeSceneSelector()">
+                Annuler
+            </button>
+            <button class="btn-primary" onclick="projectSettings.confirmSceneSelection()">
+                <i class="ri-check-line"></i> Sélectionner
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-container {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+    color: var(--text-primary);
+}
+
+.modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.settings-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 20px 20px 0 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.settings-tab {
+    background: transparent;
+    border: none;
+    padding: 10px 16px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.settings-tab:hover {
+    color: var(--text-primary);
+}
+
+.settings-tab.active {
+    color: var(--secondary);
+    border-bottom-color: var(--secondary);
+}
+
+.settings-content {
+    padding: 20px;
+}
+
+.settings-tab-content {
+    display: none;
+}
+
+.settings-tab-content.active {
+    display: block;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+}
+
+.settings-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.setting-field {
+    margin-bottom: 16px;
+}
+
+.setting-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.setting-field input[type="text"],
+.setting-field input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.setting-field input:focus {
+    outline: none;
+    border-color: var(--secondary);
+}
+
+.setting-field small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.setting-field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-field input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkbox-field label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.input-with-button input {
+    flex: 1;
+}
+
+.btn-select-scene {
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.btn-select-scene:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--secondary);
+}
+
+.setting-info {
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--secondary);
+    padding: 12px;
+    border-radius: 4px;
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.setting-info i {
+    color: var(--secondary);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.setting-info strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.setting-info p {
+    margin: 2px 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--secondary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--secondary-hover);
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-tertiary);
+}
+
+/* Scene Selector Modal */
+.scene-selector-modal {
+    max-width: 600px;
+}
+
+.scene-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+}
+
+.scene-list-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+}
+
+.scene-list-item:last-child {
+    border-bottom: none;
+}
+
+.scene-list-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.scene-list-item.selected {
+    background: var(--secondary);
+    color: white;
+}
+
+.scene-list-item i {
+    font-size: 18px;
+    color: var(--secondary);
+    flex-shrink: 0;
+}
+
+.scene-list-item.selected i {
+    color: white;
+}
+
+.scene-list-item .scene-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.scene-search {
+    margin-bottom: 12px;
+}
+
+.scene-search input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.scene-search input:focus {
+    outline: none;
+    border-color: var(--secondary);
+}
+
+.scene-count {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.no-scenes-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+.no-scenes-message i {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.no-scenes-message p {
+    margin: 0;
+    font-size: 13px;
+}
+</style>

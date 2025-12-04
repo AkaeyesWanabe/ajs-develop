@@ -1,0 +1,283 @@
+{
+    "extension": "com.ajs.text",
+    "extensionName": "Text",
+    "extensionIcon": "texticon.png",
+    "description": "Display text with customizable style",
+    "category": "UI Elements",
+    "hierarchyPreview": "preview",
+    "propertiesTabs": [
+        {
+            "name": "Object",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Transform",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Display",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Scripts",
+            "icon-type": "icon",
+            "icon": "pip"
+        }
+    ],
+    "propertiesVariables": [
+        {
+            "name": "name",
+            "tab": 0,
+            "label": "Object Name",
+            "type": "text",
+            "description": "Name of the object."
+        },
+        {
+            "name": "visible",
+            "tab": 0,
+            "label": "Object Visibility",
+            "type": "checkbox",
+            "checkbox-label": "visible",
+            "description": "Visibility of the object."
+        },
+        {
+            "name": "x",
+            "tab": 1,
+            "label": "Object X",
+            "type": "number",
+            "description": "X position of object.",
+            "singleObject": true
+        },
+        {
+            "name": "y",
+            "tab": 1,
+            "label": "Object Y",
+            "type": "number",
+            "description": "Y position of object",
+            "singleObject": true
+        },
+        {
+            "name": "width",
+            "tab": 1,
+            "label": "Width",
+            "type": "number",
+            "description": "Width of the text box."
+        },
+        {
+            "name": "height",
+            "tab": 1,
+            "label": "Height",
+            "type": "number",
+            "description": "Height of the text box."
+        },
+        {
+            "name": "angle",
+            "tab": 1,
+            "label": "Rotation",
+            "type": "number",
+            "description": "Rotation angle of the object."
+        },
+        {
+            "name": "text",
+            "tab": 2,
+            "label": "Text",
+            "type": "textarea",
+            "description": "Text content to display."
+        },
+        {
+            "name": "fontSize",
+            "tab": 2,
+            "label": "Font Size",
+            "type": "number",
+            "description": "Size of the font."
+        },
+        {
+            "name": "fontFamily",
+            "tab": 2,
+            "label": "Font Family",
+            "type": "text",
+            "description": "Font family (e.g., Arial, Times New Roman)."
+        },
+        {
+            "name": "color",
+            "tab": 2,
+            "label": "Text Color",
+            "type": "color",
+            "description": "Color of the text."
+        },
+        {
+            "name": "textAlign",
+            "tab": 2,
+            "label": "Text Align",
+            "type": "dropdown",
+            "description": "Horizontal text alignment.",
+            "dropdown-values": [
+                {"name": "Left", "value": "left"},
+                {"name": "Center", "value": "center"},
+                {"name": "Right", "value": "right"}
+            ]
+        },
+        {
+            "name": "verticalAlign",
+            "tab": 2,
+            "label": "Vertical Align",
+            "type": "dropdown",
+            "description": "Vertical text alignment.",
+            "dropdown-values": [
+                {"name": "Top", "value": "top"},
+                {"name": "Middle", "value": "middle"},
+                {"name": "Bottom", "value": "bottom"}
+            ]
+        },
+        {
+            "name": "fontWeight",
+            "tab": 2,
+            "label": "Font Weight",
+            "type": "dropdown",
+            "description": "Font weight (boldness).",
+            "dropdown-values": [
+                {"name": "Normal", "value": "normal"},
+                {"name": "Bold", "value": "bold"}
+            ]
+        },
+        {
+            "name": "fontStyle",
+            "tab": 2,
+            "label": "Font Style",
+            "type": "dropdown",
+            "description": "Font style.",
+            "dropdown-values": [
+                {"name": "Normal", "value": "normal"},
+                {"name": "Italic", "value": "italic"}
+            ]
+        },
+        {
+            "name": "lineHeight",
+            "tab": 2,
+            "label": "Line Height",
+            "type": "number",
+            "description": "Line height multiplier (e.g., 1.5 for 150%)."
+        },
+        {
+            "name": "strokeWidth",
+            "tab": 2,
+            "label": "Stroke Width",
+            "type": "number",
+            "description": "Width of text outline (0 for no outline)."
+        },
+        {
+            "name": "strokeColor",
+            "tab": 2,
+            "label": "Stroke Color",
+            "type": "color",
+            "description": "Color of text outline."
+        },
+        {
+            "name": "textDecoration",
+            "tab": 2,
+            "label": "Text Decoration",
+            "type": "dropdown",
+            "description": "Text decoration style.",
+            "dropdown-values": [
+                {"name": "None", "value": "none"},
+                {"name": "Underline", "value": "underline"},
+                {"name": "Line Through", "value": "line-through"},
+                {"name": "Overline", "value": "overline"}
+            ]
+        },
+        {
+            "name": "textTransform",
+            "tab": 2,
+            "label": "Text Transform",
+            "type": "dropdown",
+            "description": "Text transformation.",
+            "dropdown-values": [
+                {"name": "None", "value": "none"},
+                {"name": "Uppercase", "value": "uppercase"},
+                {"name": "Lowercase", "value": "lowercase"},
+                {"name": "Capitalize", "value": "capitalize"}
+            ]
+        },
+        {
+            "name": "letterSpacing",
+            "tab": 2,
+            "label": "Letter Spacing",
+            "type": "number",
+            "description": "Space between letters in pixels."
+        },
+        {
+            "name": "wordSpacing",
+            "tab": 2,
+            "label": "Word Spacing",
+            "type": "number",
+            "description": "Space between words in pixels."
+        },
+        {
+            "name": "textShadowX",
+            "tab": 2,
+            "label": "Shadow Offset X",
+            "type": "number",
+            "description": "Horizontal shadow offset in pixels."
+        },
+        {
+            "name": "textShadowY",
+            "tab": 2,
+            "label": "Shadow Offset Y",
+            "type": "number",
+            "description": "Vertical shadow offset in pixels."
+        },
+        {
+            "name": "textShadowBlur",
+            "tab": 2,
+            "label": "Shadow Blur",
+            "type": "number",
+            "description": "Shadow blur radius in pixels."
+        },
+        {
+            "name": "textShadowColor",
+            "tab": 2,
+            "label": "Shadow Color",
+            "type": "color",
+            "description": "Color of the text shadow."
+        },
+        {
+            "name": "script",
+            "tab": 3,
+            "label": "Script",
+            "type": "script",
+            "description": "JavaScript script to attach to this object."
+        }
+    ],
+    "properties": {
+        "name": "New Text",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 200,
+        "height": 50,
+        "angle": 0,
+        "text": "Hello World",
+        "fontSize": 24,
+        "fontFamily": "Arial",
+        "color": "#000000",
+        "textAlign": "left",
+        "verticalAlign": "top",
+        "fontWeight": "normal",
+        "fontStyle": "normal",
+        "lineHeight": 1.2,
+        "strokeWidth": 0,
+        "strokeColor": "#000000",
+        "textDecoration": "none",
+        "textTransform": "none",
+        "letterSpacing": 0,
+        "wordSpacing": 0,
+        "textShadowX": 0,
+        "textShadowY": 0,
+        "textShadowBlur": 0,
+        "textShadowColor": "rgba(0,0,0,0.5)",
+        "script": ""
+    }
+}

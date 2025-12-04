@@ -102,41 +102,57 @@ class ContextMenu {
         const submenus = this.menuContainer.querySelectorAll('.context-menu-submenu');
 
         submenus.forEach(submenu => {
-            submenu.addEventListener('mouseenter', () => {
-                const submenuContent = submenu.querySelector('.context-menu-submenu-content');
-                if (!submenuContent) return;
+            const submenuContent = submenu.querySelector('.context-menu-submenu-content');
+            if (!submenuContent) return;
 
-                // Reset position to default (right side)
-                submenuContent.style.left = '100%';
-                submenuContent.style.right = 'auto';
-                submenuContent.style.top = 'calc(var(--space-1) * -1)';
+            const positionSubmenu = () => {
+                // Get parent item position
+                const parentRect = submenu.getBoundingClientRect();
+                const padding = 8;
+                const gap = 4; // Gap between parent and submenu
 
-                // Wait for display
-                setTimeout(() => {
-                    const rect = submenuContent.getBoundingClientRect();
-                    const parentRect = submenu.getBoundingClientRect();
-                    const padding = 8;
+                // Calculate initial position (right side of parent)
+                let left = parentRect.right + gap;
+                let top = parentRect.top;
 
-                    // Check if submenu goes off right edge
-                    if (rect.right > window.innerWidth - padding) {
-                        // Position on left side instead
-                        submenuContent.style.left = 'auto';
-                        submenuContent.style.right = '100%';
+                // Show submenu temporarily to get its dimensions
+                const originalDisplay = submenuContent.style.display;
+                submenuContent.style.visibility = 'hidden';
+                submenuContent.style.display = 'block';
+
+                const submenuRect = submenuContent.getBoundingClientRect();
+
+                // Check if submenu goes off right edge
+                if (submenuRect.right > window.innerWidth - padding) {
+                    // Position on left side instead
+                    left = parentRect.left - submenuRect.width - gap;
+
+                    // If still off screen on left, clamp to padding
+                    if (left < padding) {
+                        left = padding;
                     }
+                }
 
-                    // Check if submenu goes off bottom edge
-                    if (rect.bottom > window.innerHeight - padding) {
-                        const overflow = rect.bottom - (window.innerHeight - padding);
-                        const currentTop = parseInt(getComputedStyle(submenuContent).top) || 0;
-                        submenuContent.style.top = (currentTop - overflow) + 'px';
-                    }
+                // Check if submenu goes off bottom edge
+                if (submenuRect.bottom > window.innerHeight - padding) {
+                    // Align bottom of submenu with bottom of viewport
+                    top = window.innerHeight - submenuRect.height - padding;
+                }
 
-                    // Check if submenu goes off top edge
-                    if (rect.top < padding) {
-                        submenuContent.style.top = (padding - parentRect.top) + 'px';
-                    }
-                }, 0);
-            });
+                // Check if submenu goes off top edge
+                if (top < padding) {
+                    top = padding;
+                }
+
+                // Apply final position
+                submenuContent.style.left = left + 'px';
+                submenuContent.style.top = top + 'px';
+                submenuContent.style.visibility = 'visible';
+                submenuContent.style.display = originalDisplay;
+            };
+
+            // Position on mouseenter
+            submenu.addEventListener('mouseenter', positionSubmenu);
         });
     }
 

@@ -30,7 +30,6 @@ module.exports = {
                 this.undoStack.shift();
             }
 
-            console.log('[COMMAND] Executed:', command.name || 'Unknown');
             return true;
         } catch (error) {
             console.error('[COMMAND] Execution failed:', error);
@@ -44,7 +43,6 @@ module.exports = {
      */
     undo() {
         if (this.undoStack.length === 0) {
-            console.log('[COMMAND] Nothing to undo');
             notifications.info('Nothing to undo');
             return false;
         }
@@ -61,7 +59,6 @@ module.exports = {
             command.undo();
             this.redoStack.push(command);
 
-            console.log('[COMMAND] Undone:', command.name || 'Unknown');
             notifications.success(`Undone: ${command.name || 'action'}`);
             return true;
         } catch (error) {
@@ -76,7 +73,6 @@ module.exports = {
      */
     redo() {
         if (this.redoStack.length === 0) {
-            console.log('[COMMAND] Nothing to redo');
             notifications.info('Nothing to redo');
             return false;
         }
@@ -87,7 +83,6 @@ module.exports = {
             command.execute();
             this.undoStack.push(command);
 
-            console.log('[COMMAND] Redone:', command.name || 'Unknown');
             notifications.success(`Redone: ${command.name || 'action'}`);
             return true;
         } catch (error) {
@@ -103,7 +98,6 @@ module.exports = {
     clear() {
         this.undoStack = [];
         this.redoStack = [];
-        console.log('[COMMAND] History cleared');
     },
 
     /**

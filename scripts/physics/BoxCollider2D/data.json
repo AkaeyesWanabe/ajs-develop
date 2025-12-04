@@ -1,0 +1,50 @@
+{
+  "id": "internal.physics.boxcollider2d",
+  "name": "Box Collider 2D",
+  "description": "Rectangular collision shape for 2D physics detection",
+  "version": "1.0.0",
+  "author": "AJS Engine",
+  "icon": "ri-checkbox-blank-line",
+  "color": "#22d3ee",
+  "category": "physics",
+  "categoryName": "Physics",
+  "categoryIcon": "ri-speed-line",
+  "categoryColor": "#4ade80",
+  "file": "BoxCollider2D.js",
+  "singleton": false,
+  "dependencies": [],
+  "properties": {
+    "showInEditor": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show collider visualization in scene editor"
+    },
+    "offsetX": {
+      "type": "number",
+      "default": 0,
+      "description": "X offset from object position"
+    },
+    "offsetY": {
+      "type": "number",
+      "default": 0,
+      "description": "Y offset from object position"
+    },
+    "width": {
+      "type": "number",
+      "default": 64,
+      "min": 1,
+      "description": "Width of the collision box"
+    },
+    "height": {
+      "type": "number",
+      "default": 64,
+      "min": 1,
+      "description": "Height of the collision box"
+    },
+    "isTrigger": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, collisions won't push objects apart"
+    }
+  }
+}

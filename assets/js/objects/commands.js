@@ -464,6 +464,93 @@ class UngroupObjectsCommand {
 }
 
 /**
+ * Command to reorder an object in the scene
+ */
+class ReorderObjectCommand {
+    constructor(sceneEditor, objectData, oldIndex, newIndex) {
+        this.name = 'Reorder Object';
+        this.sceneEditor = sceneEditor;
+        this.objectData = objectData;
+        this.oldIndex = oldIndex;
+        this.newIndex = newIndex;
+    }
+
+    execute() {
+        // Remove object from old position
+        this.sceneEditor.sceneData.objects.splice(this.oldIndex, 1);
+        // Insert at new position
+        this.sceneEditor.sceneData.objects.splice(this.newIndex, 0, this.objectData);
+
+        // Rebuild the DOM in correct order
+        this.rebuildLayerDOM();
+
+        // Refresh UI
+        if (this.sceneEditor.refreshSceneUI) {
+            this.sceneEditor.refreshSceneUI();
+        }
+
+        this.sceneEditor.markAsModified();
+    }
+
+    undo() {
+        // Remove object from new position
+        this.sceneEditor.sceneData.objects.splice(this.newIndex, 1);
+        // Insert back at old position
+        this.sceneEditor.sceneData.objects.splice(this.oldIndex, 0, this.objectData);
+
+        // Rebuild the DOM in correct order
+        this.rebuildLayerDOM();
+
+        // Refresh UI
+        if (this.sceneEditor.refreshSceneUI) {
+            this.sceneEditor.refreshSceneUI();
+        }
+
+        this.sceneEditor.markAsModified();
+    }
+
+    rebuildLayerDOM() {
+        // Get the layer for this object
+        const layerNum = this.objectData.layer;
+        const layerElement = document.querySelector(`.__ajs_scene_layer[data-layer-number="${layerNum}"]`);
+
+        if (!layerElement) {
+            console.warn(`Layer ${layerNum} not found for reordering`);
+            return;
+        }
+
+        // Get all objects in this layer, sorted by their order in sceneData.objects
+        const objectsInLayer = this.sceneEditor.sceneData.objects
+            .filter(obj => obj.layer === layerNum);
+
+        // Collect existing DOM elements
+        const existingElements = new Map();
+        layerElement.querySelectorAll('.__ajs_scene_object').forEach(elem => {
+            const oid = elem.getAttribute('__ajs_object_ID');
+            if (oid) {
+                existingElements.set(oid, elem);
+            }
+        });
+
+        // Clear the layer
+        layerElement.innerHTML = '';
+
+        // Re-add objects in correct order based on sceneData
+        objectsInLayer.forEach(objData => {
+            const objectElement = existingElements.get(objData.oid);
+            if (objectElement) {
+                layerElement.appendChild(objectElement);
+            } else {
+                console.warn(`Object element not found for OID: ${objData.oid}`);
+            }
+        });
+
+        // Refresh the scene visually
+        this.sceneEditor.refreshSceneObjects(objectsInLayer);
+    }
+}
+
+/**
  * Command for batch operations (multiple commands at once)
  */
 class BatchCommand {
@@ -496,5 +583,6 @@ module.exports = {
     ChangeLayerCommand,
     GroupObjectsCommand,
     UngroupObjectsCommand,
+    ReorderObjectCommand,
     BatchCommand
 };

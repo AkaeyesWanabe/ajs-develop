@@ -8,7 +8,13 @@
       "Bash(npx stylelint:*)",
       "Bash(npm start)",
       "Bash(test:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(dir:*)",
+      "Bash(for file in hierarchy.js commands.js contextMenu.js runtimeManager.js projectCache.js GameObject.js scriptEditor.js transformControls.js grid.js rectangleSelection.js dropdownPositioning.js application.js projectSettings.js)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(for file in Rigidbody2D.js BoxCollider2D.js CircleCollider2D.js PhysicsManager.js internal-scripts-registry.json)",
+      "Bash(do cp \"assets/js/runtime/physics/$file\" \"scripts/physics/$file\")"
     ],
     "deny": [],
     "ask": []

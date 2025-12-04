@@ -1,19 +1,16 @@
 const $ = require('jquery');
 const fs = nw.require('fs');
-const globals = require('./assets/js/common/globals');
-//
-const sceneEditor = nw.require('./assets/js/objects/sceneEditor');
-const properties = nw.require('./assets/js/objects/properties');
-const animator = nw.require('./assets/js/objects/animator');
-const objectCreator = nw.require('./assets/js/objects/objectCreator');
-const notifications = nw.require('./assets/js/objects/notifications');
-//
-// Make modules globally accessible to ensure all parts use the same instance
-if (typeof window !== 'undefined') {
-    window.sceneEditor = sceneEditor;
-    window.properties = properties;
-    window.objectCreator = objectCreator;
-}
+
+// Load modules as global variables (avoid redeclaration errors on hot reload)
+window.globals = window.globals || require('./assets/js/common/globals');
+window.sceneEditor = window.sceneEditor || nw.require('./assets/js/objects/sceneEditor');
+window.properties = window.properties || nw.require('./assets/js/objects/properties');
+window.animator = window.animator || nw.require('./assets/js/objects/animator');
+window.objectCreator = window.objectCreator || nw.require('./assets/js/objects/objectCreator');
+window.notifications = window.notifications || nw.require('./assets/js/objects/notifications');
+window.player = window.player || nw.require('./assets/js/objects/player');
+
+// Verify sceneEditor is loaded correctly
 //
 //load window frame
 const win = nw.Window.get();
@@ -28,13 +25,40 @@ const project = {
     //load all views
     this.loadAppFrames();
 
-    //preloader animation
-    this.preload = setInterval(function () {
-      let value = $("#preloaderLoadingBar div")[0].getAttribute("value") - (-1 / 7.5);
-      $("#preloaderLoadingBar div")[0].setAttribute("value", value);
-      //
-      $("#preloaderLoadingBar div").css("width", value + "%");
-    }, 1);
+    //preloader animation with percentage and loading text
+    let progress = 0;
+    const loadingTexts = [
+      'Initializing workspace...',
+      'Loading modules...',
+      'Preparing scene editor...',
+      'Loading extensions...',
+      'Almost ready...'
+    ];
+    let currentTextIndex = 0;
+
+    this.preload = setInterval(() => {
+      progress += 0.5; // Increment by 0.5% each tick
+
+      if (progress <= 100) {
+        // Update progress bar
+        $('.loading-bar-fill').css('width', progress + '%');
+        $('.loading-bar-glow').css('width', progress + '%');
+
+        // Update percentage display
+        $('.loading-percentage').text(Math.floor(progress) + '%');
+
+        // Update loading text at certain milestones
+        const textProgress = Math.floor(progress / 20);
+        if (textProgress !== currentTextIndex && textProgress < loadingTexts.length) {
+          currentTextIndex = textProgress;
+          $('.loading-text').fadeOut(200, function () {
+            $(this).text(loadingTexts[currentTextIndex]).fadeIn(200);
+          });
+        }
+      } else {
+        clearInterval(this.preload);
+      }
+    }, 10); // Update every 10ms for smoother animation
 
     //on app ready
     $(document).ready(() => {
@@ -47,8 +71,20 @@ const project = {
     //on window resize
     $(window).resize(() => {
       this.refreshApp();
-      sceneEditor.refreshEditor();
-      animator.refreshEditor();
+      if (window.sceneEditor && typeof window.sceneEditor.refreshEditor === 'function') {
+        window.sceneEditor.refreshEditor();
+      }
+      if (window.animator && typeof window.animator.refreshEditor === 'function') {
+        window.animator.refreshEditor();
+      }
+    });
+
+    // Save cache before closing application
+    window.addEventListener('beforeunload', () => {
+      const projectCache = nw.require('./assets/js/objects/projectCache');
+      if (projectCache && projectCache.autoSave) {
+        projectCache.autoSave();
+      }
     });
 
     this.draggableWindow();
@@ -56,11 +92,11 @@ const project = {
 
     $(document).keydown(function (e) {
       //ctrl
-      globals.keysIsPressed.ctrl = e.ctrlKey;
+      window.globals.keysIsPressed.ctrl = e.ctrlKey;
       //shift
-      globals.keysIsPressed.shift = e.shiftKey;
+      window.globals.keysIsPressed.shift = e.shiftKey;
       //alt
-      globals.keysIsPressed.alt = e.altKey;
+      window.globals.keysIsPressed.alt = e.altKey;
 
       // Add visual indicator when Alt is pressed
       if (e.altKey) {
@@ -75,11 +111,11 @@ const project = {
 
     $(document).keyup(function (e) {
       //ctrl
-      globals.keysIsPressed.ctrl = e.ctrlKey;
+      window.globals.keysIsPressed.ctrl = e.ctrlKey;
       //shift
-      globals.keysIsPressed.shift = e.shiftKey;
+      window.globals.keysIsPressed.shift = e.shiftKey;
       //alt
-      globals.keysIsPressed.alt = e.altKey;
+      window.globals.keysIsPressed.alt = e.altKey;
 
       // Remove visual indicator when Alt is released
       if (!e.altKey) {
@@ -125,38 +161,33 @@ const project = {
   },
 
   setupKeyboardShortcuts() {
-    console.log('[KEYBOARD] Setting up keyboard shortcuts...');
 
     // Use window.addEventListener for maximum compatibility
-    window.addEventListener('keydown', function(e) {
-      console.log('[KEYBOARD] Key pressed:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Shift:', e.shiftKey, 'Tab:', globals.app.tabName);
+    window.addEventListener('keydown', function (e) {
 
       // PRIORITY 1: Check if animator is visible/open (highest priority - overrides everything)
       const isAnimatorVisible = $('#animatorEditorBack').length > 0 && $('#animatorEditorBack').css('display') !== 'none';
 
       if (isAnimatorVisible) {
-        console.log('[KEYBOARD] Animator is visible - routing to animator');
-        const animator = nw.require('./assets/js/objects/animator');
+        const animatorModule = window.animator;
 
         // Ctrl+Z - Undo in animator
         if (e.ctrlKey && !e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('[KEYBOARD] Ctrl+Z in animator - undo');
-          if (animator && typeof animator.undo === 'function') {
-            animator.undo();
+          if (animatorModule && typeof animatorModule.undo === 'function') {
+            animatorModule.undo();
           }
           return false;
         }
 
         // Ctrl+Y - Redo in animator
         if ((e.ctrlKey && !e.shiftKey && (e.key === 'y' || e.key === 'Y')) ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'z' || e.key === 'Z'))) {
+          (e.ctrlKey && e.shiftKey && (e.key === 'z' || e.key === 'Z'))) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('[KEYBOARD] Ctrl+Y in animator - redo');
-          if (animator && typeof animator.redo === 'function') {
-            animator.redo();
+          if (animatorModule && typeof animatorModule.redo === 'function') {
+            animatorModule.redo();
           }
           return false;
         }
@@ -165,16 +196,14 @@ const project = {
         if (e.ctrlKey && !e.shiftKey && (e.key === 's' || e.key === 'S')) {
           e.preventDefault();
           e.stopPropagation();
-          console.log('[KEYBOARD] Ctrl+S in animator - save');
-          if (animator && typeof animator.saveAnimator === 'function') {
-            animator.saveAnimator();
+          if (animatorModule && typeof animatorModule.saveAnimator === 'function') {
+            animatorModule.saveAnimator();
           }
           return false;
         }
 
         // Block all other shortcuts when animator is visible
         // This prevents scene shortcuts from interfering
-        console.log('[KEYBOARD] Animator is visible - blocking other shortcuts');
         return;
       }
 
@@ -183,7 +212,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+Z detected - undo');
         const commandManager = nw.require('./assets/js/objects/commandManager');
         if (commandManager) {
           commandManager.undo();
@@ -194,11 +222,10 @@ const project = {
 
       // Ctrl+Y - Redo (also Ctrl+Shift+Z) (for scene editor and others)
       if ((e.ctrlKey && !e.shiftKey && (e.key === 'y' || e.key === 'Y')) ||
-          (e.ctrlKey && e.shiftKey && (e.key === 'z' || e.key === 'Z'))) {
+        (e.ctrlKey && e.shiftKey && (e.key === 'z' || e.key === 'Z'))) {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+Y detected - redo');
         const commandManager = nw.require('./assets/js/objects/commandManager');
         if (commandManager) {
           commandManager.redo();
@@ -210,11 +237,10 @@ const project = {
       // Ctrl+C - Copy
       if (e.ctrlKey && !e.shiftKey && (e.key === 'c' || e.key === 'C')) {
         // Only handle in scene editor, let default behavior in script editor
-        if (globals.app.tabName === 'sceneEditor') {
+        if (window.globals.app.tabName === 'sceneEditor') {
           e.preventDefault();
           e.stopPropagation();
 
-          console.log('[KEYBOARD] Ctrl+C detected - copy');
           const clipboard = nw.require('./assets/js/objects/clipboard');
           if (clipboard) {
             clipboard.copy();
@@ -227,11 +253,10 @@ const project = {
       // Ctrl+X - Cut
       if (e.ctrlKey && !e.shiftKey && (e.key === 'x' || e.key === 'X')) {
         // Only handle in scene editor, let default behavior in script editor
-        if (globals.app.tabName === 'sceneEditor') {
+        if (window.globals.app.tabName === 'sceneEditor') {
           e.preventDefault();
           e.stopPropagation();
 
-          console.log('[KEYBOARD] Ctrl+X detected - cut');
           const clipboard = nw.require('./assets/js/objects/clipboard');
           if (clipboard) {
             clipboard.cut();
@@ -244,11 +269,10 @@ const project = {
       // Ctrl+V - Paste
       if (e.ctrlKey && !e.shiftKey && (e.key === 'v' || e.key === 'V')) {
         // Only handle in scene editor, let default behavior in script editor
-        if (globals.app.tabName === 'sceneEditor') {
+        if (window.globals.app.tabName === 'sceneEditor') {
           e.preventDefault();
           e.stopPropagation();
 
-          console.log('[KEYBOARD] Ctrl+V detected - paste');
           const clipboard = nw.require('./assets/js/objects/clipboard');
           if (clipboard) {
             clipboard.paste();
@@ -263,26 +287,22 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[SAVE] Ctrl+Shift+S detected - attempting to save project');
-        console.log('[SAVE] globals.project.dir:', globals.project.dir);
 
-        if (!globals.project.dir) {
+        if (!window.globals.project.dir) {
           console.warn('[SAVE] No project loaded');
-          if (notifications) {
-            notifications.warning('No project is open');
+          if (window.notifications) {
+            window.notifications.warning('No project is open');
           }
           return false;
         }
 
-        console.log('[SAVE] Calling saveProject()...');
         const header = nw.require('./assets/js/objects/header');
         const result = header.saveProject();
-        console.log('[SAVE] Save project result:', result);
 
-        if (result && notifications) {
-          notifications.success('Project saved successfully');
-        } else if (notifications) {
-          notifications.error('Failed to save project');
+        if (result && window.notifications) {
+          window.notifications.success('Project saved successfully');
+        } else if (window.notifications) {
+          window.notifications.error('Failed to save project');
         }
 
         return false;
@@ -294,56 +314,46 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[SAVE] Ctrl+S detected - current tab:', globals.app.tabName);
 
         // Save script if script editor is active
-        if (globals.app.tabName === 'scriptEditor') {
-          console.log('[SAVE] Saving script...');
+        if (window.globals.app.tabName === 'scriptEditor') {
           const scriptEditor = nw.require('./assets/js/objects/scriptEditor');
           if (scriptEditor && typeof scriptEditor.saveCurrentFile === 'function') {
             const result = scriptEditor.saveCurrentFile();
-            console.log('[SAVE] Script save result:', result);
             // Notification is handled inside saveCurrentFile
           } else {
             console.error('[SAVE] Script editor not available or saveCurrentFile not a function');
-            if (notifications) {
-              notifications.error('Script editor not available');
+            if (window.notifications) {
+              window.notifications.error('Script editor not available');
             }
           }
           return false;
         }
 
         // Save scene (default or when scene editor is active)
-        console.log('[SAVE] Saving scene...');
-        console.log('[SAVE] sceneEditor exists:', !!sceneEditor);
-        console.log('[SAVE] sceneData exists:', !!sceneEditor.sceneData);
-        console.log('[SAVE] sceneData.objects:', sceneEditor.sceneData?.objects?.length);
-        console.log('[SAVE] sceneFilePath:', sceneEditor.cache?.sceneFilePath);
 
-        if (!sceneEditor.sceneData) {
+        if (!window.sceneEditor.sceneData) {
           console.warn('[SAVE] No scene data to save');
-          if (notifications) {
-            notifications.warning('No scene is open');
+          if (window.notifications) {
+            window.notifications.warning('No scene is open');
           }
           return false;
         }
 
-        if (!sceneEditor.cache.sceneFilePath) {
+        if (!window.sceneEditor.cache.sceneFilePath) {
           console.warn('[SAVE] No scene file path');
-          if (notifications) {
-            notifications.warning('No scene file path');
+          if (window.notifications) {
+            window.notifications.warning('No scene file path');
           }
           return false;
         }
 
-        console.log('[SAVE] Calling saveScene()...');
-        const result = sceneEditor.saveScene();
-        console.log('[SAVE] Save result:', result);
+        const result = window.sceneEditor.saveScene();
 
-        if (result && notifications) {
-          notifications.success('Scene saved successfully');
-        } else if (notifications) {
-          notifications.error('Failed to save scene');
+        if (result && window.notifications) {
+          window.notifications.success('Scene saved successfully');
+        } else if (window.notifications) {
+          window.notifications.error('Failed to save scene');
         }
 
         return false;
@@ -354,7 +364,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+Shift+A detected - opening Align & Distribute toolbar');
         const alignTools = nw.require('./assets/js/objects/alignTools');
         if (alignTools) {
           alignTools.showToolbar();
@@ -368,7 +377,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+G detected - grouping selected objects');
         const groupManager = nw.require('./assets/js/objects/groupManager');
         if (groupManager) {
           groupManager.groupObjects();
@@ -382,7 +390,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+Shift+G detected - ungrouping selected objects');
         const groupManager = nw.require('./assets/js/objects/groupManager');
         if (groupManager) {
           groupManager.ungroupObjects();
@@ -391,17 +398,65 @@ const project = {
         return false;
       }
 
+      // Ctrl+] - Bring to front
+      if (e.ctrlKey && !e.shiftKey && e.key === ']') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.sceneEditor && window.sceneEditor.bringToFront) {
+          window.sceneEditor.bringToFront();
+        }
+
+        return false;
+      }
+
+      // ] - Move forward
+      if (!e.ctrlKey && !e.shiftKey && e.key === ']') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.sceneEditor && window.sceneEditor.moveForward) {
+          window.sceneEditor.moveForward();
+        }
+
+        return false;
+      }
+
+      // [ - Move backward
+      if (!e.ctrlKey && !e.shiftKey && e.key === '[') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.sceneEditor && window.sceneEditor.moveBackward) {
+          window.sceneEditor.moveBackward();
+        }
+
+        return false;
+      }
+
+      // Ctrl+[ - Send to back
+      if (e.ctrlKey && !e.shiftKey && e.key === '[') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (window.sceneEditor && window.sceneEditor.sendToBack) {
+          window.sceneEditor.sendToBack();
+        }
+
+        return false;
+      }
+
       // Delete key - Delete selected objects
       if (e.key === 'Delete' && !e.ctrlKey && !e.shiftKey && !e.altKey) {
         const selectedElements = document.querySelectorAll('.clickable_selected');
-        if (selectedElements.length > 0 && sceneEditor.sceneData) {
+        if (selectedElements.length > 0 && window.sceneEditor.sceneData) {
           e.preventDefault();
 
           // Get object data for each selected element
           const objectsToDelete = [];
           selectedElements.forEach(elem => {
             const oid = elem.getAttribute('__ajs_object_ID');
-            const objectData = sceneEditor.sceneData.objects?.find(obj => obj.oid === oid);
+            const objectData = window.sceneEditor.sceneData.objects?.find(obj => obj.oid === oid);
             if (objectData) {
               objectsToDelete.push(objectData);
             }
@@ -413,15 +468,15 @@ const project = {
               ? `Are you sure you want to delete "${objectsToDelete[0].properties.name}"?`
               : `Are you sure you want to delete ${objectsToDelete.length} objects?`;
 
-            notifications.confirm('Delete Object' + (objectsToDelete.length > 1 ? 's' : ''), message, {
+            window.notifications.confirm('Delete Object' + (objectsToDelete.length > 1 ? 's' : ''), message, {
               confirmText: 'Delete',
               danger: true
             }).then(confirmed => {
               if (confirmed) {
                 objectsToDelete.forEach(obj => {
-                  sceneEditor.destroyObject(obj);
+                  window.sceneEditor.destroyObject(obj);
                 });
-                notifications.success(`Deleted ${objectsToDelete.length} object${objectsToDelete.length > 1 ? 's' : ''}`);
+                window.notifications.success(`Deleted ${objectsToDelete.length} object${objectsToDelete.length > 1 ? 's' : ''}`);
               }
             });
           }
@@ -433,7 +488,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl++ detected - zoom in');
         if (window.zoom) {
           window.zoom.zoomIn();
         }
@@ -446,7 +500,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+- detected - zoom out');
         if (window.zoom) {
           window.zoom.zoomOut();
         }
@@ -459,7 +512,6 @@ const project = {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('[KEYBOARD] Ctrl+0 detected - reset zoom');
         if (window.zoom) {
           window.zoom.resetZoom();
         }
@@ -468,7 +520,6 @@ const project = {
       }
     }, true); // Use capture phase to ensure it runs early
 
-    console.log('[KEYBOARD] Keyboard shortcuts setup complete');
   },
 
   init() {
@@ -479,13 +530,21 @@ const project = {
     win.setMinimumSize(1200, 700);
     win.setPosition("center");
     //
-    //show the app
+    //show the app with smooth transition
     clearInterval(this.preload);
-    $("#preloader").fadeOut(300);
+
+    // Ensure loading bar reaches 100%
+    $('.loading-bar-fill, .loading-bar-glow').css('width', '100%');
+    $('.loading-percentage').text('100%');
+    $('.loading-text').text('Ready!');
+    //
+    $("#preloader").addClass('fade-out');
     $("#app").css("display", "flex");
+    //hide the preloader and show the app
+    $("#preloader").remove();
     //
     // Initialize object creator modal
-    objectCreator.init();
+    window.objectCreator.init();
     //
     //for all workspaceItemCheck
     let objs = $(".workspaceSubMenu div[check]");
@@ -526,13 +585,13 @@ const project = {
 
     //Editor Tabs click event
     $("#editorTabs span").click(function () {
-      globals.app.tabName = this.getAttribute("for");
+      window.globals.app.tabName = this.getAttribute("for");
       //
       let frames = document.querySelectorAll(".workFrame");
       frames.forEach(function (frame) {
         frame.classList.remove("active");
       });
-      document.querySelector("#" + globals.app.tabName).classList.add("active");
+      document.querySelector("#" + window.globals.app.tabName).classList.add("active");
       //
       let tabs = document.querySelectorAll("#editorTabs span");
       tabs.forEach(function (tab) {
@@ -540,17 +599,18 @@ const project = {
       });
       this.classList.add("active");
       //
+      const footer = nw.require('./assets/js/objects/footer');
       footer.refreshStatusDetails();
       //
       // Update status bar values based on active tab
       if (this.id == "sceneEditorTab") {
-        sceneEditor.refreshEditor();
+        window.sceneEditor.refreshEditor();
         // Update scene editor status
         const sceneBox = document.getElementById('scnSceneBox');
         const screenWidth = sceneBox ? parseInt(sceneBox.style.width) || 640 : 640;
         const screenHeight = sceneBox ? parseInt(sceneBox.style.height) || 480 : 480;
         footer.updateSceneEditorStatus({
-          selectedCount: sceneEditor.selectedObjects ? sceneEditor.selectedObjects.length : 0,
+          selectedCount: window.sceneEditor.selectedObjects ? window.sceneEditor.selectedObjects.length : 0,
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           mouseX: 0,
@@ -558,6 +618,7 @@ const project = {
         });
       } else if (this.id == "scriptEditorTab") {
         // Update script editor status and force Monaco layout
+        const scriptEditor = nw.require('./assets/js/objects/scriptEditor');
         if (scriptEditor) {
           if (scriptEditor.editor) {
             // Force Monaco to recalculate its layout when tab becomes visible
@@ -606,18 +667,96 @@ const project = {
     /*************
      EDITOR
     *************/
-    $("#sceneEditor").load("./views/sceneEditor.html");
-    $("#scriptEditor").load("./views/scriptEditor.html", function() {
-        // Initialize Monaco Editor after the view is loaded
-        console.log('[APP] Script Editor view loaded, initializing Monaco...');
-        const scriptEditor = nw.require('./assets/js/objects/scriptEditor');
-        if (scriptEditor && typeof scriptEditor.init === 'function') {
-            scriptEditor.init();
-        } else {
-            console.error('[APP] scriptEditor module not found or init not available');
-        }
+    $("#sceneEditorView").load("./views/sceneEditor.html");
+    $("#scriptEditorView").load("./views/scriptEditor.html", function () {
+      // Initialize Monaco Editor after the view is loaded
+      const scriptEditor = nw.require('./assets/js/objects/scriptEditor');
+      if (scriptEditor && typeof scriptEditor.init === 'function') {
+        scriptEditor.init();
+      } else {
+        console.error('[APP] scriptEditor module not found or init not available');
+      }
     });
-    $("#runner").load("./views/player.html");
+    $("#playerView").load("./views/player.html", function () {
+      // Trigger player initialization after HTML is loaded
+
+      // Get loading elements
+      const loadingOverlay = document.getElementById('playerLoadingOverlay');
+      const loadingBarFill = document.getElementById('playerLoadingBarFill');
+      const loadingStatus = document.getElementById('playerLoadingStatus');
+
+      // Update progress bar
+      const updateProgress = (percent, status) => {
+        if (loadingBarFill) loadingBarFill.style.width = percent + '%';
+        if (loadingStatus) loadingStatus.textContent = status;
+      };
+
+      // Step 1: Check canvas (20%)
+      updateProgress(20, 'Checking canvas...');
+      const canvas = document.getElementById('playerCanvas');
+      if (!canvas) {
+        console.error('[APP] Player canvas not found!');
+        if (loadingStatus) loadingStatus.textContent = 'Error: Canvas not found';
+        return;
+      }
+
+      // Step 2: Check player module (40%)
+      updateProgress(40, 'Loading player module...');
+      if (!window.player) {
+        console.error('[APP] Player module not loaded!');
+        if (loadingStatus) loadingStatus.textContent = 'Error: Player module not loaded';
+        return;
+      }
+
+      try {
+        // Step 3: Initialize player (60%)
+        updateProgress(60, 'Initializing player...');
+
+        if (window.player) {
+
+          // Check if it's the correct module
+        }
+
+        // Try to reload player module if it's not correct
+        if (!window.player || typeof window.player.init !== 'function') {
+          const playerModule = nw.require('./assets/js/objects/player');
+
+          // Assign it directly
+          window.player = playerModule;
+        }
+
+        if (typeof window.player.init === 'function') {
+          window.player.init();
+        } else {
+          console.error('[APP] window.player.init is STILL not a function!');
+          console.error('[APP] Final window.player:', window.player);
+          if (loadingStatus) loadingStatus.textContent = 'Error: player.init is not a function';
+          return;
+        }
+
+        // Step 4: Initialize event handlers (80%)
+        updateProgress(80, 'Setting up event handlers...');
+        if (typeof window.initPlayerHandlers === 'function') {
+          window.initPlayerHandlers();
+        } else {
+          console.warn('[APP] initPlayerHandlers not found - will be called when playerView.js loads');
+        }
+
+        // Step 5: Complete (100%)
+        updateProgress(100, 'Player ready!');
+
+        // Hide loading overlay after a short delay
+        setTimeout(() => {
+          if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+          }
+        }, 500);
+
+      } catch (err) {
+        console.error('[APP] Failed to initialize player:', err);
+        if (loadingStatus) loadingStatus.textContent = 'Error: ' + err.message;
+      }
+    });
     //
     /*************
      CONSOLE
@@ -641,19 +780,19 @@ const project = {
       //load the user theme
       let themeLink = document.createElement("link");
       themeLink.rel = "stylesheet";
-      themeLink.href = "./assets/themes/" + globals.user.theme + "/index.css";
+      themeLink.href = "./assets/themes/" + window.globals.user.theme + "/index.css";
       document.head.appendChild(themeLink);
       //load the user files icons theme
-      fs.readFile("./assets/files-icons-themes/" + globals.user.fileIconTheme.theme + "/data.json", 'utf8', function (err, txt) {
+      fs.readFile("./assets/files-icons-themes/" + window.globals.user.fileIconTheme.theme + "/data.json", 'utf8', function (err, txt) {
         if (err) {
           alert(err);
           return;
         }
         //project file exist
         //
-        globals.user.fileIconTheme.data = JSON.parse(txt);
+        window.globals.user.fileIconTheme.data = JSON.parse(txt);
         //get projectName
-        $("#appTitle")[0].innerHTML = globals.app.name + " " + globals.app.versionName;
+        $("#appTitle")[0].innerHTML = window.globals.app.name + " " + window.globals.app.versionName;
       });
     }, 100);
   },

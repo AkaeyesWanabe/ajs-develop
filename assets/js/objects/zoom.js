@@ -23,7 +23,6 @@ module.exports = {
 
         this.sceneEditorElement = sceneEditorElement;
 
-        console.log('[ZOOM] Initialized with zoom:', this.currentZoom + '%');
     },
 
     /**
@@ -58,7 +57,6 @@ module.exports = {
             centerX = scrollLeft + viewportWidth / 2;
             centerY = scrollTop + viewportHeight / 2;
 
-            console.log('[ZOOM] Before zoom - Scroll:', scrollLeft, scrollTop, 'Viewport:', viewportWidth, 'x', viewportHeight, 'Center:', centerX, centerY);
         }
 
         this.currentZoom = zoomLevel;
@@ -74,7 +72,6 @@ module.exports = {
             zoomWrapper.style.transform = `scale(${scale})`;
             zoomWrapper.style.transformOrigin = '0 0';
 
-            console.log('[ZOOM] ✓ Zoom applied to entire scene:', zoomLevel + '%', 'Scale:', scale);
         } else {
             console.warn('[ZOOM] ⚠ Zoom wrapper element not found!');
         }
@@ -96,7 +93,6 @@ module.exports = {
             sceneEditor.scrollLeft = newScrollLeft;
             sceneEditor.scrollTop = newScrollTop;
 
-            console.log('[ZOOM] After zoom - New scroll:', newScrollLeft, newScrollTop, 'Zoom ratio:', zoomRatio);
         }
 
         // Grid is now inside zoom wrapper, so it scales automatically with the content
@@ -122,7 +118,6 @@ module.exports = {
      * Zoom in
      */
     zoomIn() {
-        console.log('[ZOOM] Zoom in');
         return this.setZoom(this.currentZoom + this.zoomStep);
     },
 
@@ -130,7 +125,6 @@ module.exports = {
      * Zoom out
      */
     zoomOut() {
-        console.log('[ZOOM] Zoom out');
         return this.setZoom(this.currentZoom - this.zoomStep);
     },
 
@@ -138,7 +132,6 @@ module.exports = {
      * Reset zoom to 100%
      */
     resetZoom() {
-        console.log('[ZOOM] Reset zoom');
         return this.setZoom(100);
     },
 
@@ -167,7 +160,6 @@ module.exports = {
         const zoomY = (viewportHeight * 0.9) / sceneHeight * 100;
         const zoomLevel = Math.floor(Math.min(zoomX, zoomY));
 
-        console.log('[ZOOM] Zoom to fit:', zoomLevel + '%');
         return this.setZoom(zoomLevel);
     },
 

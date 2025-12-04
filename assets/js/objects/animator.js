@@ -216,27 +216,6 @@ module.exports = {
         };
     },
 
-    /**
-     * Interpolate collider points between two frames
-     * @param {array} fromCollider - Start collider points
-     * @param {array} toCollider - End collider points
-     * @param {number} progress - Progress between 0 and 1
-     * @param {string} easingType - Name of easing function
-     * @returns {array} Interpolated collider points
-     */
-    interpolateCollider(fromCollider, toCollider, progress, easingType = 'linear') {
-        const minLength = Math.min(fromCollider.length, toCollider.length);
-        const interpolated = [];
-
-        for (let i = 0; i < minLength; i++) {
-            interpolated.push({
-                x: this.interpolateValue(fromCollider[i].x, toCollider[i].x, progress, easingType),
-                y: this.interpolateValue(fromCollider[i].y, toCollider[i].y, progress, easingType)
-            });
-        }
-
-        return interpolated;
-    },
 
     /**
      * Generate tween frames between two frames
@@ -244,7 +223,7 @@ module.exports = {
      * @param {number} toFrameIndex - Index of end frame
      * @param {number} tweenCount - Number of frames to generate between
      * @param {string} easingType - Name of easing function
-     * @param {object} options - Options for what to interpolate {points: bool, collider: bool}
+     * @param {object} options - Options for what to interpolate {points: bool}
      * @returns {array} Array of generated tween frames
      */
     generateTweenFrames(fromFrameIndex, toFrameIndex, tweenCount, easingType = 'linear', options = {}) {
@@ -263,7 +242,6 @@ module.exports = {
         }
 
         const interpolatePoints = options.points !== false; // Default true
-        const interpolateCollider = options.collider !== false; // Default true
 
         const tweenFrames = [];
 
@@ -275,7 +253,6 @@ module.exports = {
                 width: fromFrame.width,
                 height: fromFrame.height,
                 points: [],
-                collider: [],
                 isTweened: true, // Mark as tweened for identification
                 tweenData: {
                     fromIndex: fromFrameIndex,
@@ -298,23 +275,9 @@ module.exports = {
                 newFrame.points = JSON.parse(JSON.stringify(fromFrame.points || []));
             }
 
-            // Interpolate collider
-            if (interpolateCollider && fromFrame.collider && toFrame.collider) {
-                newFrame.collider = this.interpolateCollider(
-                    fromFrame.collider,
-                    toFrame.collider,
-                    progress,
-                    easingType
-                );
-            } else {
-                // Copy collider from fromFrame if not interpolating
-                newFrame.collider = JSON.parse(JSON.stringify(fromFrame.collider || []));
-            }
-
             tweenFrames.push(newFrame);
         }
 
-        console.log(`[Animator] Generated ${tweenFrames.length} tween frames between ${fromFrameIndex} and ${toFrameIndex}`);
         return tweenFrames;
     },
 
@@ -364,17 +327,10 @@ module.exports = {
     },
 
     openAnimator(path, filename, data) {
-        console.log('[Animator] ========================================');
-        console.log('[Animator] OPENING ANIMATOR FILE');
-        console.log('[Animator] ========================================');
-        console.log('[Animator] File path:', path);
-        console.log('[Animator] File name:', filename);
 
         try {
             // ALWAYS reload the file from disk to ensure fresh data
-            console.log('[Animator] Reloading file from disk...');
             const freshData = fs.readFileSync(path, 'utf8');
-            console.log('[Animator] File loaded, size:', freshData.length, 'characters');
 
             // Store path
             this.cache.animatorPath = path;
@@ -383,22 +339,17 @@ module.exports = {
             $("#animatorEditorFileName").text(filename);
 
             // Parse the fresh data
-            console.log('[Animator] Parsing JSON data...');
             this.animatorData = JSON.parse(freshData);
-            console.log('[Animator] Parsed successfully, animations count:', this.animatorData.animations.length);
 
             // Clear undo/redo history when opening a file
             this.clearHistory();
-            console.log('[Animator] Cleared undo/redo history');
 
             // Mark as clean (no unsaved changes)
             this.isDirty = false;
-            console.log('[Animator] Marked as clean (isDirty = false)');
 
             // Reset cache to ensure clean state
             this.cache.curAnimationId = -2;
             this.cache.curFrameId = -2;
-            console.log('[Animator] Reset animation and frame IDs');
 
             // Show the animator editor
             $("#animatorEditorBack").css("display", "flex");
@@ -407,9 +358,6 @@ module.exports = {
             this.refreshEditor();
             this.loadAnimator();
 
-            console.log('[Animator] ========================================');
-            console.log('[Animator] ANIMATOR OPENED SUCCESSFULLY');
-            console.log('[Animator] ========================================');
 
         } catch (err) {
             console.error('[Animator] ========================================');
@@ -760,21 +708,15 @@ module.exports = {
     loadCurrentAnimationImage() {
         let aibImg = $('#aibImg')[0];
         let aibp = $('#aibPoints')[0];
-        let aibc = $('#aibCollider')[0];
-        let aibcc = $('#aibColliderCanvas')[0];
         //
         if (this.animatorData.animations[this.cache.curAnimationId].frames.length == 0) {
             aibImg.style.display = "none";
             aibp.style.display = "none";
-            aibc.style.display = "none";
-            aibcc.style.display = "none";
             return;
         }
         //
         aibImg.style.display = "block";
         aibp.style.display = "block";
-        aibc.style.display = "block";
-        aibcc.style.display = "block";
         //
         aibImg.src = application.getFilePathFromResources(this.animatorData.animations[this.cache.curAnimationId].frames[this.cache.curFrameId].path);
         //
@@ -788,7 +730,6 @@ module.exports = {
         //
         //load frame points
         this.loadCurrentFramePoints();
-        this.loadCurrentFrameCollider();
 
         // Update onion skinning
         this.updateOnionSkinning();
@@ -829,7 +770,6 @@ module.exports = {
             return;
         }
 
-        console.log('[Animator] Attaching point input handlers (once)');
 
         // Handle Enter key on all point inputs
         afpbPoints.addEventListener('keydown', function(event) {
@@ -1135,7 +1075,6 @@ module.exports = {
         }, false);
 
         this._pointInputHandlersAttached = true;
-        console.log('[Animator] Point input handlers attached successfully');
     },
 
     loadCurrentFramePoints() {
@@ -1245,7 +1184,6 @@ module.exports = {
                 elem.classList.add('dragging');
                 event.preventDefault();
                 event.stopPropagation();
-                console.log('[Animator] Point drag started:', index);
             }
 
             function onMouseMove(event) {
@@ -1278,7 +1216,6 @@ module.exports = {
                 if (isDragging) {
                     isDragging = false;
                     elem.classList.remove('dragging');
-                    console.log('[Animator] Point drag ended:', index);
 
                     // Create undo command if position changed
                     const endX = point.x;
@@ -1302,7 +1239,6 @@ module.exports = {
                             endY: endY,
 
                             execute() {
-                                console.log('[Animator] MOVE POINT EXECUTE - Point:', this.pointName, 'to:', this.endX, this.endY);
                                 const frame = $self.animatorData.animations[this.animationIndex].frames[this.frameIndex];
 
                                 // Find point by name
@@ -1331,7 +1267,6 @@ module.exports = {
                                 }
                             },
                             undo() {
-                                console.log('[Animator] MOVE POINT UNDO - Point:', this.pointName, 'to:', this.startX, this.startY);
                                 const frame = $self.animatorData.animations[this.animationIndex].frames[this.frameIndex];
 
                                 // Find point by name
@@ -1362,14 +1297,12 @@ module.exports = {
                         };
 
                         // Add to undo stack without re-executing (already applied during drag)
-                        console.log('[Animator] Adding move point command to undo stack');
                         $self.commandHistory.undoStack.push(command);
                         $self.commandHistory.redoStack = [];
                         if ($self.commandHistory.undoStack.length > $self.commandHistory.maxHistorySize) {
                             $self.commandHistory.undoStack.shift();
                         }
                         $self.updateUndoRedoButtons();
-                        console.log('[Animator] Move point command recorded. Stack size:', $self.commandHistory.undoStack.length);
                     }
                 }
             }
@@ -1399,157 +1332,6 @@ module.exports = {
         });
     },
 
-    loadCurrentFrameCollider() {
-        // Cleanup old event listeners to prevent memory leaks
-        this._cleanupEventListeners();
-
-        let aibc = $('#aibCollider')[0];
-        // Remove all children
-        while (aibc.firstChild) {
-            aibc.removeChild(aibc.firstChild);
-        }
-        //
-        let colliderPoints = this.animatorData.animations[this.cache.curAnimationId].frames[this.cache.curFrameId].collider;
-        let zoomValue = $("#animatorZoom")[0].value;
-        let zoom = this.calculateZoom(zoomValue);
-        this.drawCollider(colliderPoints, zoom);
-        //
-        colliderPoints.forEach((point, index) => {
-            //init each point
-            let elem = document.createElement("DIV");
-            elem.className = "aibColliderPoint";
-            aibc.appendChild(elem);
-            //
-            elem.style.left = (point.x * zoom) + "px";
-            elem.style.top = (point.y * zoom) + "px";
-            elem.setAttribute("selected", false);
-            elem.setAttribute("__ajs_collider_point_id", index);
-            //
-            const draggableElement = elem;
-            let offsetX, offsetY, isDragging = false;
-            let $self = this;
-            let startX, startY; // Store original position for undo
-
-            // Function to handle mouse down event
-            function onMouseDown(event) {
-                isDragging = true;
-                // Store original position for undo
-                startX = point.x;
-                startY = point.y;
-
-                const rect = draggableElement.getBoundingClientRect();
-                const container = aibc.getBoundingClientRect();
-                offsetX = event.clientX - container.left - parseInt(draggableElement.style.left);
-                offsetY = event.clientY - container.top - parseInt(draggableElement.style.top);
-                draggableElement.classList.add('dragging');
-                event.stopPropagation();
-            }
-
-            // Function to handle mouse move event
-            function onMouseMove(event) {
-                if (!isDragging) return;
-
-                const container = aibc.getBoundingClientRect();
-                let x = event.clientX - container.left - offsetX;
-                let y = event.clientY - container.top - offsetY;
-
-                draggableElement.style.left = x + "px";
-                draggableElement.style.top = y + "px";
-
-                // Update data (convert back from zoomed coordinates)
-                const currentZoom = $self.calculateZoom($("#animatorZoom")[0].value);
-                point.x = x / currentZoom;
-                point.y = y / currentZoom;
-
-                // Redraw the collider polygon
-                $self.showCollider(currentZoom);
-                event.stopPropagation();
-            }
-
-            // Function to handle mouse up event
-            function onMouseUp() {
-                if (isDragging) {
-                    isDragging = false;
-                    draggableElement.classList.remove('dragging');
-
-                    // Create undo command if position changed
-                    const endX = point.x;
-                    const endY = point.y;
-                    if (startX !== endX || startY !== endY) {
-                        // Save indices instead of direct references
-                        const animIndex = $self.cache.curAnimationId;
-                        const frmIndex = $self.cache.curFrameId;
-                        const colIndex = index;
-
-                        const command = {
-                            name: 'Move Collider Point',
-                            animationIndex: animIndex,
-                            frameIndex: frmIndex,
-                            colliderIndex: colIndex,
-                            startX: startX,
-                            startY: startY,
-                            endX: endX,
-                            endY: endY,
-
-                            execute() {
-                                console.log('[Animator] MOVE COLLIDER EXECUTE - Point:', this.colliderIndex, 'to:', this.endX, this.endY);
-                                const frame = $self.animatorData.animations[this.animationIndex].frames[this.frameIndex];
-
-                                // Validate collider index
-                                if (!frame.collider || this.colliderIndex >= frame.collider.length) {
-                                    console.error('[Animator] Collider point index out of bounds:', this.colliderIndex);
-                                    throw new Error(`Collider point ${this.colliderIndex} not found in frame`);
-                                }
-
-                                const pt = frame.collider[this.colliderIndex];
-                                pt.x = this.endX;
-                                pt.y = this.endY;
-
-                                // Only reload if we're on the same frame
-                                if ($self.cache.curAnimationId === this.animationIndex && $self.cache.curFrameId === this.frameIndex) {
-                                    $self.loadCurrentFrameCollider();
-                                }
-                            },
-                            undo() {
-                                console.log('[Animator] MOVE COLLIDER UNDO - Point:', this.colliderIndex, 'to:', this.startX, this.startY);
-                                const frame = $self.animatorData.animations[this.animationIndex].frames[this.frameIndex];
-
-                                // Validate collider index
-                                if (!frame.collider || this.colliderIndex >= frame.collider.length) {
-                                    console.error('[Animator] Collider point index out of bounds:', this.colliderIndex);
-                                    throw new Error(`Collider point ${this.colliderIndex} not found in frame`);
-                                }
-
-                                const pt = frame.collider[this.colliderIndex];
-                                pt.x = this.startX;
-                                pt.y = this.startY;
-
-                                // Only reload if we're on the same frame
-                                if ($self.cache.curAnimationId === this.animationIndex && $self.cache.curFrameId === this.frameIndex) {
-                                    $self.loadCurrentFrameCollider();
-                                }
-                            }
-                        };
-
-                        // Add to undo stack without re-executing (already applied during drag)
-                        console.log('[Animator] Adding move collider command to undo stack');
-                        $self.commandHistory.undoStack.push(command);
-                        $self.commandHistory.redoStack = [];
-                        if ($self.commandHistory.undoStack.length > $self.commandHistory.maxHistorySize) {
-                            $self.commandHistory.undoStack.shift();
-                        }
-                        $self.updateUndoRedoButtons();
-                        console.log('[Animator] Move collider command recorded. Stack size:', $self.commandHistory.undoStack.length);
-                    }
-                }
-            }
-
-            // Attach event listeners with tracking for cleanup
-            this._addTrackedListener(draggableElement, 'mousedown', onMouseDown);
-            this._addTrackedListener(document, 'mousemove', onMouseMove);
-            this._addTrackedListener(document, 'mouseup', onMouseUp);
-        });
-    },
 
     zoomIn() {
         let input = $("#animatorZoom")[0];
@@ -1571,7 +1353,6 @@ module.exports = {
     applyImageZoom(zoomValue) {
         let aibImg = $('#aibImg')[0];
         let aiBox = $('#animatorImageBox')[0];
-        let aibcc = $('#aibColliderCanvas')[0];
 
         // Calculate zoom using helper method
         const zoom = this.calculateZoom(zoomValue);
@@ -1582,10 +1363,6 @@ module.exports = {
 
         aibImg.style.width = aibImg.naturalWidth * zoom + "px";
         aibImg.style.height = aibImg.naturalHeight * zoom + "px";
-
-        // Update collider canvas size
-        aibcc.width = aibImg.naturalWidth * zoom;
-        aibcc.height = aibImg.naturalHeight * zoom;
 
         // Center image if smaller than container
         if (aiBox.clientWidth < aiBox.parentElement.clientWidth) {
@@ -1605,51 +1382,28 @@ module.exports = {
             }
         }
 
-        // Apply zoom to collider points and frame points
-        this.showCollider(zoom);
+        // Apply zoom to frame points
         this.showFramePoints(zoom);
     },
 
-    showCollider(zoom) {
-        let collider = document.querySelectorAll(".aibColliderPoint");
-        let colliderPoints = this.animatorData.animations[this.cache.curAnimationId].frames[this.cache.curFrameId].collider;
-        collider.forEach((point, index) => {
-            let x = colliderPoints[point.getAttribute("__ajs_collider_point_id") - 0].x;
-            let y = colliderPoints[point.getAttribute("__ajs_collider_point_id") - 0].y;
-            point.style.left = x * zoom + "px";
-            point.style.top = y * zoom + "px";
-        });
-        //
-        this.drawCollider(colliderPoints, zoom);
-    },
 
-    drawCollider(colliderPoints, zoom) {
-        // Get the canvas element and its 2d drawing context
-        let canvas = $('#aibColliderCanvas')[0];
-        let ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // colors
-        ctx.strokeStyle = "#f80";
-        ctx.fillStyle = "#f802";
-        // Function to draw the polygon
-        function drawPolygon(points) {
-            if (points.length < 3) {
-                return; // Not enough points to draw a shape
+    findAssetsFolderInTree(files) {
+        if (!files || !Array.isArray(files)) return null;
+
+        for (let file of files) {
+            // Check if this is the assets folder
+            if (file.type === 'dir' && file.name === 'assets') {
+                return file;
             }
-            //
-            ctx.beginPath();
-            ctx.moveTo(points[0].x * zoom, points[0].y * zoom);
-            //
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].x * zoom, points[i].y * zoom);
+
+            // Recursively search in children if it's a directory
+            if (file.type === 'dir' && file.children) {
+                const found = this.findAssetsFolderInTree(file.children);
+                if (found) return found;
             }
-            //
-            ctx.closePath(); // Close the path to connect the last point to the first
-            ctx.stroke(); // Stroke the path (outline)
-            ctx.fill();
         }
-        // Call the drawPolygon function with your array of points
-        drawPolygon(colliderPoints);
+
+        return null;
     },
 
     loadImagePicker() {
@@ -1659,7 +1413,11 @@ module.exports = {
             aipBody.removeChild(aipBody.firstChild);
         }
         //
-        this.loadAssetsImages(globals.project.files);
+        // Find and load only assets folder
+        const assetsFolder = this.findAssetsFolderInTree(globals.project.files);
+        if (assetsFolder) {
+            this.loadAssetsImages(assetsFolder.children, 'assets', '', 0);
+        }
         //
         setTimeout(() => {
             let $self = this;
@@ -1687,6 +1445,16 @@ module.exports = {
                 }
 
                 $self.cache.imagePickerPath = imagePath;
+
+                // Update selection counter
+                $self.updateSelectionCounter();
+            });
+
+            // Button to add all selected images
+            $('#aipAddSelectedBtn').off('click').on('click', function() {
+                if ($self.cache.selectedImages.length > 0) {
+                    $self.addMultipleFrames($self.cache.selectedImages);
+                }
             });
 
             // Double-click to add frames
@@ -1714,27 +1482,111 @@ module.exports = {
         }, 100);
     },
 
+    /**
+     * Update the selection counter display
+     */
+    updateSelectionCounter() {
+        const count = this.cache.selectedImages.length;
+        const footer = document.getElementById('animatorImagePickerFooter');
+        const countSpan = document.getElementById('aipSelectionCount');
+
+        if (count > 0) {
+            // Show footer and update count
+            footer.style.display = 'flex';
+            countSpan.textContent = `${count} image${count > 1 ? 's' : ''} selected`;
+        } else {
+            // Hide footer when no selection
+            footer.style.display = 'none';
+        }
+    },
+
     // ////////////
     // IMAGE PICKER
     // ////////////
-    loadAssetsImages(files) {
-        //parse all files and folders
-        files.forEach((file) => {
-            //if it's a folder
-            if (file.type == "dir") {
-                let dir = file;
-                this.loadAssetsImages(dir.children);
-                return;
+    loadAssetsImages(files, folderName = null, parentPath = '', depth = 0) {
+        let aipBody = document.querySelector("#animatorImagePickerBody");
+        let targetContainer = aipBody;
+
+        // If we have a parent path, find the parent folder content
+        if (parentPath) {
+            const parentId = parentPath.replace(/[^a-zA-Z0-9]/g, '_');
+            const parentFolder = document.getElementById(parentId);
+            if (parentFolder) {
+                targetContainer = parentFolder;
             }
-            //if it's a file
-            this.createImageItem(file);
+        }
+
+        // Separate folders and files
+        const folders = [];
+        const imageFiles = [];
+
+        files.forEach((file) => {
+            if (file.type == "dir") {
+                folders.push(file);
+            } else {
+                imageFiles.push(file);
+            }
+        });
+
+        // Create folder sections first
+        folders.forEach((folder) => {
+            const fullPath = parentPath ? `${parentPath}/${folder.name}` : folder.name;
+            const folderId = fullPath.replace(/[^a-zA-Z0-9]/g, '_');
+            const indentStyle = `style='padding-left: ${depth * 16}px;'`;
+
+            const folderSection = `
+                <div class='aipFolderSection' data-folder='${folderId}' data-depth='${depth}'>
+                    <div class='aipFolderHeader' onclick='animator.toggleFolder("${folderId}")' ${indentStyle}>
+                        <i class='ri-folder-3-fill' style='color: #ffa500; margin-right: 8px;'></i>
+                        <span class='aipFolderName'>${folder.name}</span>
+                        <i class='ri-arrow-down-s-line aipFolderToggle'></i>
+                    </div>
+                    <div class='aipFolderContent' id='${folderId}' style='display: block;'>
+                    </div>
+                </div>
+            `;
+            targetContainer.innerHTML += folderSection.trim();
+
+            // Recursively load children
+            this.loadAssetsImages(folder.children, folder.name, fullPath, depth + 1);
+        });
+
+        // Then add image files
+        imageFiles.forEach((file) => {
+            this.createImageItem(file, folderName, parentPath, depth);
         });
     },
 
-    createImageItem(file) {
+    toggleFolder(folderId) {
+        const folderContent = document.getElementById(folderId);
+        const folderSection = folderContent.closest('.aipFolderSection');
+        const toggleIcon = folderSection.querySelector('.aipFolderToggle');
+
+        if (folderContent.style.display === 'none') {
+            folderContent.style.display = 'block';
+            toggleIcon.classList.remove('ri-arrow-right-s-line');
+            toggleIcon.classList.add('ri-arrow-down-s-line');
+        } else {
+            folderContent.style.display = 'none';
+            toggleIcon.classList.remove('ri-arrow-down-s-line');
+            toggleIcon.classList.add('ri-arrow-right-s-line');
+        }
+    },
+
+    createImageItem(file, folderName = null, parentPath = '', depth = 0) {
         const label = file.name.toLowerCase();
-        //
         let aipBody = document.querySelector("#animatorImagePickerBody");
+
+        // Determine target container (folder or root)
+        let targetContainer = aipBody;
+        if (parentPath) {
+            const folderId = parentPath.replace(/[^a-zA-Z0-9]/g, '_');
+            const folderContent = document.getElementById(folderId);
+            if (folderContent) {
+                targetContainer = folderContent;
+            }
+        }
+
         let elem = "";
         //
         if (label.endsWith(".jpg") || label.endsWith(".jpeg") || label.endsWith(".png") || label.endsWith(".webp") || label.endsWith(".bmp")) {
@@ -1746,8 +1598,8 @@ module.exports = {
                 </center>
             </div>`;
         }
-        //show the file
-        aipBody.innerHTML = aipBody.innerHTML + elem.trim();
+        //show the file in the appropriate container
+        targetContainer.innerHTML = targetContainer.innerHTML + elem.trim();
     },
 
     // ////////////
@@ -1761,7 +1613,6 @@ module.exports = {
             return; // No frame selected
         }
 
-        console.log('[Animator] Syncing frame points to data...');
         const frame = this.animatorData.animations[this.cache.curAnimationId].frames[this.cache.curFrameId];
 
         // Sync all point inputs
@@ -1786,7 +1637,6 @@ module.exports = {
                     frame.points[pointId].y = parseFloat(yInput.value) || 0;
                 }
 
-                console.log(`[Animator] Synced point ${pointId}:`, frame.points[pointId]);
             }
         });
     },
@@ -1799,7 +1649,6 @@ module.exports = {
             return; // No animation selected
         }
 
-        console.log('[Animator] Syncing animation properties to data...');
         const animation = this.animatorData.animations[this.cache.curAnimationId];
 
         // Sync animation name
@@ -1825,28 +1674,8 @@ module.exports = {
         if (startLoopFrameInput) {
             animation.startLoopFrame = parseInt(startLoopFrameInput.value) || 0;
         }
-
-        console.log('[Animator] Synced animation properties:', {
-            name: animation.name,
-            frameRate: animation.frameRate,
-            loop: animation.loop,
-            startLoopFrame: animation.startLoopFrame
-        });
     },
 
-    /**
-     * Synchronize current frame collider from visual points to animatorData
-     * Note: Collider points are already synced during drag, but this ensures consistency
-     */
-    syncCurrentFrameColliderToData() {
-        if (this.cache.curAnimationId < 0 || this.cache.curFrameId < 0) {
-            return; // No frame selected
-        }
-
-        console.log('[Animator] Collider already synced during editing');
-        // Collider points are updated in real-time during drag operations
-        // No additional sync needed
-    },
 
     /**
      * Synchronize animation events from UI to animatorData
@@ -1856,7 +1685,6 @@ module.exports = {
             return; // No animation selected
         }
 
-        console.log('[Animator] Syncing animation events to data...');
         const animation = this.animatorData.animations[this.cache.curAnimationId];
 
         // Events are managed through add/delete commands
@@ -1867,13 +1695,11 @@ module.exports = {
      * Master sync function - synchronizes ALL UI state to animatorData
      */
     syncAllUIToData() {
-        console.log('[Animator] === STARTING FULL UI TO DATA SYNC ===');
 
         try {
             // Force blur on any focused input to trigger its change event
             const activeElement = document.activeElement;
             if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
-                console.log('[Animator] Blurring active input:', activeElement);
                 activeElement.blur();
                 // Wait a tiny bit for the blur event to process
                 // Note: This is synchronous, but the event handlers should update data immediately
@@ -1882,10 +1708,8 @@ module.exports = {
             // Sync all sections
             this.syncCurrentAnimationPropertiesToData();
             this.syncCurrentFramePointsToData();
-            this.syncCurrentFrameColliderToData();
             this.syncCurrentAnimationEventsToData();
 
-            console.log('[Animator] === FULL UI TO DATA SYNC COMPLETED ===');
             return true;
         } catch (err) {
             console.error('[Animator] Error during UI sync:', err);
@@ -1897,9 +1721,6 @@ module.exports = {
      * Save animator data to file
      */
     saveAnimator() {
-        console.log('[Animator] ========================================');
-        console.log('[Animator] SAVE PROCESS INITIATED');
-        console.log('[Animator] ========================================');
 
         // Check if we have a path
         if (!this.cache.animatorPath) {
@@ -1930,34 +1751,24 @@ module.exports = {
 
         try {
             // CRITICAL: Sync ALL UI state to animatorData before saving
-            console.log('[Animator] Step 1: Syncing UI to data...');
             if (!this.syncAllUIToData()) {
                 throw new Error('Failed to sync UI to data');
             }
 
             // Validate data structure
-            console.log('[Animator] Step 2: Validating data structure...');
             if (!Array.isArray(this.animatorData.animations)) {
                 throw new Error('Invalid data structure: animations is not an array');
             }
 
             // Log what we're about to save
-            console.log('[Animator] Step 3: Data ready for save');
-            console.log('[Animator] - File path:', this.cache.animatorPath);
-            console.log('[Animator] - Number of animations:', this.animatorData.animations.length);
             if (this.cache.curAnimationId >= 0) {
                 const curAnim = this.animatorData.animations[this.cache.curAnimationId];
-                console.log('[Animator] - Current animation:', curAnim.name);
-                console.log('[Animator] - Number of frames:', curAnim.frames.length);
                 if (this.cache.curFrameId >= 0) {
                     const curFrame = curAnim.frames[this.cache.curFrameId];
-                    console.log('[Animator] - Current frame points:', curFrame.points.length);
-                    console.log('[Animator] - Current frame collider points:', curFrame.collider.length);
                 }
             }
 
             // Serialize data with proper formatting
-            console.log('[Animator] Step 4: Serializing data to JSON...');
             const jsonData = JSON.stringify(this.animatorData, null, 2);
 
             // Verify serialization didn't fail
@@ -1965,12 +1776,10 @@ module.exports = {
                 throw new Error('Serialization produced empty or invalid JSON');
             }
 
-            console.log('[Animator] Step 5: JSON size:', jsonData.length, 'characters');
 
             // Create backup of existing file (if it exists)
             if (fs.existsSync(this.cache.animatorPath)) {
                 const backupPath = this.cache.animatorPath + '.backup';
-                console.log('[Animator] Step 6: Creating backup at:', backupPath);
                 try {
                     fs.copyFileSync(this.cache.animatorPath, backupPath);
                 } catch (backupErr) {
@@ -1980,21 +1789,16 @@ module.exports = {
             }
 
             // Write to file
-            console.log('[Animator] Step 7: Writing to file...');
             fs.writeFileSync(this.cache.animatorPath, jsonData, 'utf8');
 
             // Verify the file was written
-            console.log('[Animator] Step 8: Verifying file write...');
             if (!fs.existsSync(this.cache.animatorPath)) {
                 throw new Error('File was not created');
             }
 
             const fileStats = fs.statSync(this.cache.animatorPath);
-            console.log('[Animator] Step 9: File written successfully');
-            console.log('[Animator] - File size:', fileStats.size, 'bytes');
 
             // Verify we can read it back
-            console.log('[Animator] Step 10: Verifying file integrity...');
             const readBack = fs.readFileSync(this.cache.animatorPath, 'utf8');
             const parsedBack = JSON.parse(readBack);
 
@@ -2002,9 +1806,6 @@ module.exports = {
                 throw new Error('File verification failed: data mismatch');
             }
 
-            console.log('[Animator] ========================================');
-            console.log('[Animator] SAVE COMPLETED SUCCESSFULLY');
-            console.log('[Animator] ========================================');
 
             // Mark as clean (no unsaved changes)
             this.isDirty = false;
@@ -2044,7 +1845,6 @@ module.exports = {
             this.refreshEditor();
             this.loadAnimator();
 
-            console.log('[Animator] Changes cancelled');
             if (typeof notifications !== 'undefined') {
                 notifications.info('Changes cancelled');
             }
@@ -2060,11 +1860,9 @@ module.exports = {
      * Close the animator with unsaved changes check
      */
     closeAnimator() {
-        console.log('[Animator] Close requested, isDirty:', this.isDirty);
 
         // Check if there are unsaved changes
         if (this.isDirty) {
-            console.log('[Animator] Unsaved changes detected, asking for confirmation...');
 
             if (typeof notifications !== 'undefined') {
                 // First ask if they want to save
@@ -2079,36 +1877,30 @@ module.exports = {
                 ).then(shouldSave => {
                     if (shouldSave) {
                         // Save and close
-                        console.log('[Animator] User chose to save before closing');
                         if (this.saveAnimator()) {
                             this._performCloseAnimator();
                         }
                     } else {
                         // Close without saving
-                        console.log('[Animator] User chose to close without saving');
                         this._performCloseAnimator();
                     }
                 }).catch(() => {
                     // User cancelled
-                    console.log('[Animator] User cancelled close operation');
                 });
             } else {
                 // Fallback to native confirm dialog
                 const choice = confirm('You have unsaved changes. Save before closing?\n\nOK = Save & Close\nCancel = Close Without Saving');
 
                 if (choice) {
-                    console.log('[Animator] User chose to save before closing');
                     if (this.saveAnimator()) {
                         this._performCloseAnimator();
                     }
                 } else {
-                    console.log('[Animator] User chose to close without saving');
                     this._performCloseAnimator();
                 }
             }
         } else {
             // No unsaved changes, close directly
-            console.log('[Animator] No unsaved changes, closing directly');
             this._performCloseAnimator();
         }
     },
@@ -2117,7 +1909,6 @@ module.exports = {
      * Actually perform the close operation
      */
     _performCloseAnimator() {
-        console.log('[Animator] Performing close operation...');
 
         $("#animatorEditorBack").css("display", "none");
         this.cache.animatorPath = "";
@@ -2135,7 +1926,6 @@ module.exports = {
         this._pointInputHandlersAttached = false;
         this._pointInputOriginalValues = {};
 
-        console.log('[Animator] Animator closed successfully');
     },
 
     // ////////////
@@ -2267,6 +2057,8 @@ module.exports = {
             return;
         }
 
+        const $self = this;
+
         // Convert full paths to asset paths and get image dimensions
         const frameDataArray = [];
 
@@ -2277,9 +2069,8 @@ module.exports = {
         imagePaths.forEach((fullPath, index) => {
             const img = new Image();
             img.onload = function() {
-                // Find the corresponding aipBodyItem to get the assetsPath
-                const $item = $(`.aipBodyItem[path="${fullPath}"]`);
-                const assetsPath = $item.attr('assetsPath');
+                // Convert absolute path to relative path using application method
+                const assetsPath = application.getResourcesPathFromFile(fullPath);
 
                 frameDataArray.push({
                     path: assetsPath,
@@ -2314,8 +2105,6 @@ module.exports = {
             };
             img.src = fullPath;
         });
-
-        const $self = this;
     },
 
     /**
@@ -2346,7 +2135,6 @@ module.exports = {
         });
         this.clipboard.type = 'frames';
 
-        console.log('[Animator] Copied', this.clipboard.frames.length, 'frame(s) to clipboard');
 
         if (typeof notifications !== 'undefined') {
             notifications.success(`${this.clipboard.frames.length} frame(s) copied`);
@@ -2512,7 +2300,6 @@ module.exports = {
         // Start smooth animation loop with requestAnimationFrame
         this._startSmoothAnimationLoop();
 
-        console.log('[Animator] Started smooth animation preview at', frameRate, 'fps');
     },
 
     /**
@@ -2584,10 +2371,9 @@ module.exports = {
                         aibImg.src = application.getFilePathFromResources(frame.path);
                     }
 
-                    // Update collider and points for current frame
+                    // Update points for current frame
                     $self.cache.curFrameId = $self.playbackState.currentFrame;
                     $self.loadCurrentFramePoints();
-                    $self.loadCurrentFrameCollider();
 
                     // Highlight current frame in the timeline
                     $('.afBodyItem').removeClass('selected');
@@ -2628,7 +2414,6 @@ module.exports = {
         // Update button text
         $("#animatorFramesActionsBody button:contains('Stop animation')").text('Play animation');
 
-        console.log('[Animator] Stopped animation preview');
     },
 
     // ////////////
@@ -3042,7 +2827,6 @@ module.exports = {
         const eventsToTrigger = animation.events.filter(event => event.frame === frame);
 
         eventsToTrigger.forEach(event => {
-            console.log(`[Animator] Triggered event "${event.name}" at frame ${frame}`);
 
             // Parse params if they exist
             let params = {};
@@ -3087,13 +2871,10 @@ module.exports = {
             return;
         }
 
-        console.log('[Animator] Executing command:', command.name);
-        console.log('[Animator] Undo stack size before:', this.commandHistory.undoStack.length);
 
         // Execute the command
         try {
             command.execute();
-            console.log('[Animator] Command execution successful');
         } catch (error) {
             console.error('[Animator] Command execution failed:', error);
             if (typeof notifications !== 'undefined') {
@@ -3104,17 +2885,14 @@ module.exports = {
 
         // Add to undo stack
         this.commandHistory.undoStack.push(command);
-        console.log('[Animator] Command added to undo stack. New size:', this.commandHistory.undoStack.length);
 
         // Limit history size
         if (this.commandHistory.undoStack.length > this.commandHistory.maxHistorySize) {
             this.commandHistory.undoStack.shift();
-            console.log('[Animator] Undo stack trimmed to max size');
         }
 
         // Clear redo stack (can't redo after new action)
         this.commandHistory.redoStack = [];
-        console.log('[Animator] Redo stack cleared');
 
         // Mark as dirty (unsaved changes)
         this.isDirty = true;
@@ -3128,7 +2906,6 @@ module.exports = {
      */
     undo() {
         if (this.commandHistory.undoStack.length === 0) {
-            console.log('[Animator] Nothing to undo');
             if (typeof notifications !== 'undefined') {
                 notifications.warning('Nothing to undo');
             }
@@ -3136,8 +2913,6 @@ module.exports = {
         }
 
         const command = this.commandHistory.undoStack[this.commandHistory.undoStack.length - 1];
-        console.log('[Animator] Undoing command:', command.name);
-        console.log('[Animator] Undo stack size before:', this.commandHistory.undoStack.length);
 
         this.commandHistory.isExecuting = true;
 
@@ -3145,9 +2920,6 @@ module.exports = {
             this.commandHistory.undoStack.pop();
             command.undo();
             this.commandHistory.redoStack.push(command);
-            console.log('[Animator] Undo successful');
-            console.log('[Animator] Undo stack size after:', this.commandHistory.undoStack.length);
-            console.log('[Animator] Redo stack size after:', this.commandHistory.redoStack.length);
         } catch (error) {
             console.error('[Animator] Undo failed:', error);
             // Restore to undo stack if undo failed
@@ -3174,7 +2946,6 @@ module.exports = {
      */
     redo() {
         if (this.commandHistory.redoStack.length === 0) {
-            console.log('[Animator] Nothing to redo');
             if (typeof notifications !== 'undefined') {
                 notifications.warning('Nothing to redo');
             }
@@ -3182,8 +2953,6 @@ module.exports = {
         }
 
         const command = this.commandHistory.redoStack[this.commandHistory.redoStack.length - 1];
-        console.log('[Animator] Redoing command:', command.name);
-        console.log('[Animator] Redo stack size before:', this.commandHistory.redoStack.length);
 
         this.commandHistory.isExecuting = true;
 
@@ -3191,9 +2960,6 @@ module.exports = {
             this.commandHistory.redoStack.pop();
             command.execute();
             this.commandHistory.undoStack.push(command);
-            console.log('[Animator] Redo successful');
-            console.log('[Animator] Undo stack size after:', this.commandHistory.undoStack.length);
-            console.log('[Animator] Redo stack size after:', this.commandHistory.redoStack.length);
         } catch (error) {
             console.error('[Animator] Redo failed:', error);
             // Restore to redo stack if redo failed
@@ -3379,7 +3145,6 @@ module.exports = {
 
         // Create deep copy of frame data
         const frame = JSON.parse(JSON.stringify(animation.frames[frameIndex]));
-        console.log('[Animator] Created delete frame command for frame:', frameIndex, 'Data saved:', frame);
 
         return {
             name: 'Delete Frame',
@@ -3388,33 +3153,24 @@ module.exports = {
             frameData: frame,
 
             execute() {
-                console.log('[Animator] DELETE FRAME EXECUTE - Animation:', this.animationIndex, 'Frame:', this.frameIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before delete:', animation.frames.length);
 
                 // Delete the frame
                 animation.frames.splice(this.frameIndex, 1);
-                console.log('[Animator] Frames after delete:', animation.frames.length);
-                console.log('[Animator] Frame removed from animatorData successfully');
 
                 // Calculate target frame ID (but don't set curFrameId yet - let loadCurrentAnimationFrames do it)
                 let targetFrameId;
                 if (animation.frames.length === 0) {
                     targetFrameId = -2;
-                    console.log('[Animator] No frames left, target frame ID: -2');
                 } else if (this.frameIndex === $self.cache.curFrameId) {
                     targetFrameId = Math.max(0, this.frameIndex - 1);
-                    console.log('[Animator] Deleted current frame, target frame ID:', targetFrameId);
                 } else if (this.frameIndex < $self.cache.curFrameId) {
                     targetFrameId = $self.cache.curFrameId - 1;
-                    console.log('[Animator] Deleted frame before current, target frame ID:', targetFrameId);
                 } else {
                     targetFrameId = $self.cache.curFrameId;
-                    console.log('[Animator] Deleted frame after current, target frame ID unchanged:', targetFrameId);
                 }
 
                 // Reload UI - this will update curFrameId, timeline, and all UI elements
-                console.log('[Animator] Reloading frames UI with target frame ID:', targetFrameId);
 
                 // Special handling for empty animation
                 if (animation.frames.length === 0) {
@@ -3435,17 +3191,12 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] DELETE FRAME UNDO - Animation:', this.animationIndex, 'Frame:', this.frameIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before restore:', animation.frames.length);
 
                 // Restore the frame
                 animation.frames.splice(this.frameIndex, 0, this.frameData);
-                console.log('[Animator] Frames after restore:', animation.frames.length);
-                console.log('[Animator] Frame restored to animatorData at index:', this.frameIndex);
 
                 // Force reload by temporarily setting curFrameId to a different value
-                console.log('[Animator] Reloading frames UI and selecting restored frame:', this.frameIndex);
                 $self.cache.curFrameId = -999; // Temporary invalid value to force refresh
                 $self.loadCurrentAnimationFrames(this.frameIndex);
                 $self.loadTimeline(); // Reload timeline after frame restoration
@@ -3483,7 +3234,6 @@ module.exports = {
             };
         });
 
-        console.log('[Animator] Created delete multiple frames command. Count:', framesData.length);
 
         return {
             name: `Delete ${framesData.length} Frame(s)`,
@@ -3491,16 +3241,13 @@ module.exports = {
             framesData: framesData,
 
             execute() {
-                console.log('[Animator] DELETE MULTIPLE FRAMES EXECUTE - Count:', this.framesData.length);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before delete:', animation.frames.length);
 
                 // Delete frames in descending order
                 this.framesData.forEach(frameInfo => {
                     animation.frames.splice(frameInfo.index, 1);
                 });
 
-                console.log('[Animator] Frames after delete:', animation.frames.length);
 
                 // Clear selection
                 $self.cache.selectedFrames = [];
@@ -3533,9 +3280,7 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] DELETE MULTIPLE FRAMES UNDO - Count:', this.framesData.length);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before restore:', animation.frames.length);
 
                 // Restore frames in ascending order (reverse of delete)
                 const ascendingFrames = [...this.framesData].reverse();
@@ -3543,7 +3288,6 @@ module.exports = {
                     animation.frames.splice(frameInfo.index, 0, frameInfo.data);
                 });
 
-                console.log('[Animator] Frames after restore:', animation.frames.length);
 
                 // Clear selection
                 $self.cache.selectedFrames = [];
@@ -3574,7 +3318,6 @@ module.exports = {
         const frames = JSON.parse(JSON.stringify(framesToPaste));
         const frameCount = frames.length;
 
-        console.log('[Animator] Created paste frames command. Count:', frameCount, 'Insert at:', insertIndex);
 
         return {
             name: `Paste ${frameCount} Frame(s)`,
@@ -3584,13 +3327,11 @@ module.exports = {
             frameCount: frameCount,
 
             execute() {
-                console.log('[Animator] PASTE FRAMES EXECUTE - Count:', this.frameCount, 'at index:', this.insertIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
 
                 // Insert frames
                 animation.frames.splice(this.insertIndex, 0, ...this.frames);
 
-                console.log('[Animator] Frames pasted. Total frames:', animation.frames.length);
 
                 // Select first pasted frame
                 const targetFrameId = this.insertIndex;
@@ -3607,13 +3348,11 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] PASTE FRAMES UNDO - Removing', this.frameCount, 'frames from index:', this.insertIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
 
                 // Remove pasted frames
                 animation.frames.splice(this.insertIndex, this.frameCount);
 
-                console.log('[Animator] Pasted frames removed. Total frames:', animation.frames.length);
 
                 // Clear selection
                 $self.cache.selectedFrames = [];
@@ -3667,28 +3406,9 @@ module.exports = {
                     "x": width / 2,
                     "y": height / 2
                 }
-            ],
-            "collider": [
-                {
-                    "x": 0,
-                    "y": 0
-                },
-                {
-                    "x": width,
-                    "y": 0
-                },
-                {
-                    "x": width,
-                    "y": height
-                },
-                {
-                    "x": 0,
-                    "y": height
-                }
             ]
         };
 
-        console.log('[Animator] Created add frame command at index:', frameIndex, 'Image:', imagePath);
 
         return {
             name: 'Add Frame',
@@ -3697,17 +3417,12 @@ module.exports = {
             frameData: frameData,
 
             execute() {
-                console.log('[Animator] ADD FRAME EXECUTE - Animation:', this.animationIndex, 'Frame index:', this.frameIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before add:', animation.frames.length);
 
                 // Add the frame
                 animation.frames.splice(this.frameIndex, 0, this.frameData);
-                console.log('[Animator] Frames after add:', animation.frames.length);
-                console.log('[Animator] Frame added to animatorData successfully');
 
                 // Update current frame to the newly added frame
-                console.log('[Animator] Setting curFrameId to new frame:', this.frameIndex);
 
                 // Force reload by setting curFrameId to invalid value
                 $self.cache.curFrameId = -999;
@@ -3716,29 +3431,21 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] ADD FRAME UNDO - Animation:', this.animationIndex, 'Frame index:', this.frameIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before undo:', animation.frames.length);
 
                 // Remove the frame
                 animation.frames.splice(this.frameIndex, 1);
-                console.log('[Animator] Frames after undo:', animation.frames.length);
-                console.log('[Animator] Frame removed from animatorData successfully');
 
                 // Adjust current frame selection
                 let targetFrameId;
                 if ($self.cache.curFrameId === this.frameIndex) {
                     targetFrameId = Math.max(0, this.frameIndex - 1);
-                    console.log('[Animator] Removed current frame, target frame ID:', targetFrameId);
                 } else if ($self.cache.curFrameId > this.frameIndex) {
                     targetFrameId = $self.cache.curFrameId - 1;
-                    console.log('[Animator] Removed frame before current, target frame ID:', targetFrameId);
                 } else {
                     targetFrameId = $self.cache.curFrameId;
-                    console.log('[Animator] Removed frame after current, target frame ID:', targetFrameId);
                 }
 
-                console.log('[Animator] Force reloading frames UI with target frame ID:', targetFrameId);
                 // Force reload by setting curFrameId to invalid value
                 $self.cache.curFrameId = -999;
                 $self.loadCurrentAnimationFrames(targetFrameId);
@@ -3771,29 +3478,10 @@ module.exports = {
                     "x": data.width / 2,
                     "y": data.height / 2
                 }
-            ],
-            "collider": [
-                {
-                    "x": 0,
-                    "y": 0
-                },
-                {
-                    "x": data.width,
-                    "y": 0
-                },
-                {
-                    "x": data.width,
-                    "y": data.height
-                },
-                {
-                    "x": 0,
-                    "y": data.height
-                }
             ]
         }));
 
         const frameCount = frames.length;
-        console.log('[Animator] Created add multiple frames command. Count:', frameCount, 'Insert at:', insertIndex);
 
         return {
             name: `Add ${frameCount} Frame(s)`,
@@ -3803,13 +3491,11 @@ module.exports = {
             frameCount: frameCount,
 
             execute() {
-                console.log('[Animator] ADD MULTIPLE FRAMES EXECUTE - Count:', this.frameCount, 'at index:', this.insertIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
 
                 // Insert frames
                 animation.frames.splice(this.insertIndex, 0, ...this.frames);
 
-                console.log('[Animator] Frames added. Total frames:', animation.frames.length);
 
                 // Select first added frame
                 const targetFrameId = this.insertIndex;
@@ -3829,13 +3515,11 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] ADD MULTIPLE FRAMES UNDO - Removing', this.frameCount, 'frames from index:', this.insertIndex);
                 const animation = $self.animatorData.animations[this.animationIndex];
 
                 // Remove added frames
                 animation.frames.splice(this.insertIndex, this.frameCount);
 
-                console.log('[Animator] Added frames removed. Total frames:', animation.frames.length);
 
                 // Clear selection
                 $self.cache.selectedFrames = [];
@@ -3910,16 +3594,12 @@ module.exports = {
             tweenCount: tweenFrames.length,
 
             execute() {
-                console.log('[Animator] INSERT TWEEN FRAMES EXECUTE - After frame:', this.afterFrameIndex, 'Count:', this.tweenCount);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before insert:', animation.frames.length);
 
                 // Insert all tween frames after the specified frame
                 const insertIndex = this.afterFrameIndex + 1;
                 animation.frames.splice(insertIndex, 0, ...this.tweenFrames);
 
-                console.log('[Animator] Frames after insert:', animation.frames.length);
-                console.log('[Animator] Inserted', this.tweenCount, 'tween frames at index:', insertIndex);
 
                 // Select the first inserted tween frame
                 $self.cache.curFrameId = -999; // Force reload
@@ -3928,16 +3608,12 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] INSERT TWEEN FRAMES UNDO - After frame:', this.afterFrameIndex, 'Count:', this.tweenCount);
                 const animation = $self.animatorData.animations[this.animationIndex];
-                console.log('[Animator] Frames before undo:', animation.frames.length);
 
                 // Remove all the inserted tween frames
                 const insertIndex = this.afterFrameIndex + 1;
                 animation.frames.splice(insertIndex, this.tweenCount);
 
-                console.log('[Animator] Frames after undo:', animation.frames.length);
-                console.log('[Animator] Removed', this.tweenCount, 'tween frames from index:', insertIndex);
 
                 // Select the frame that was before the tweens
                 $self.cache.curFrameId = -999; // Force reload
@@ -3995,7 +3671,6 @@ module.exports = {
             newValue: newValue,
 
             execute() {
-                console.log('[Animator] CHANGE POINT PROPERTY EXECUTE - Point:', this.pointName, 'Property:', this.propertyName, 'New value:', this.newValue);
                 const frame = $self.animatorData.animations[this.animationIndex].frames[this.frameIndex];
 
                 // Find point by name (or index if name changed)
@@ -4050,7 +3725,6 @@ module.exports = {
             },
 
             undo() {
-                console.log('[Animator] CHANGE POINT PROPERTY UNDO - Point:', this.pointName, 'Property:', this.propertyName, 'Old value:', this.oldValue);
                 const frame = $self.animatorData.animations[this.animationIndex].frames[this.frameIndex];
 
                 // Find point by name

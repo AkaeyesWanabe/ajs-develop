@@ -24,9 +24,6 @@ module.exports = {
      * Start placing an object - shows ghost preview
      */
     startPlacing(extensionId, layer = null) {
-        console.log('[ObjectPlacer] ====== Starting placement ======');
-        console.log('[ObjectPlacer] Extension ID:', extensionId);
-        console.log('[ObjectPlacer] Layer:', layer);
 
         if (!sceneEditor.sceneData) {
             console.error('[ObjectPlacer] No scene loaded!');
@@ -40,7 +37,6 @@ module.exports = {
         this.placingLayer = layer !== null ? layer : layerManager.selectedLayer;
         this.sceneEditorElement = document.getElementById('scnEditor');
 
-        console.log('[ObjectPlacer] scnEditor element found:', !!this.sceneEditorElement);
 
         if (!this.sceneEditorElement) {
             console.error('[ObjectPlacer] scnEditor element not found!');
@@ -55,7 +51,6 @@ module.exports = {
 
         // Change cursor
         this.sceneEditorElement.style.cursor = 'crosshair';
-        console.log('[ObjectPlacer] Cursor changed to crosshair');
 
         // Create ghost preview
         this.createGhostPreview(extensionId);
@@ -66,19 +61,16 @@ module.exports = {
         // Add mouse move listener for ghost preview
         this.sceneEditorElement.addEventListener('mousemove', this._boundOnMouseMove);
         this.sceneEditorElement.addEventListener('click', this._boundOnMouseClick);
-        console.log('[ObjectPlacer] Event listeners added');
 
         // ESC to cancel
         document.addEventListener('keydown', this._boundOnKeyDown);
 
-        console.log('[ObjectPlacer] Placement mode active. isPlacing:', this.isPlacing);
     },
 
     /**
      * Create ghost preview of the object
      */
     createGhostPreview(extensionId) {
-        console.log('[ObjectPlacer] Creating ghost preview for:', extensionId);
 
         const extension = objectFactory.availableExtensions.find(ext => ext.id === extensionId);
         if (!extension) {
@@ -86,7 +78,6 @@ module.exports = {
             return;
         }
 
-        console.log('[ObjectPlacer] Extension found:', extension.name);
 
         // Create ghost element
         this.ghostObject = document.createElement('div');
@@ -106,7 +97,6 @@ module.exports = {
         this.ghostObject.style.width = defaultWidth + 'px';
         this.ghostObject.style.height = defaultHeight + 'px';
 
-        console.log('[ObjectPlacer] Ghost size:', defaultWidth, 'x', defaultHeight);
 
         // Add icon or label
         const label = document.createElement('div');
@@ -123,11 +113,9 @@ module.exports = {
 
         // Add to scene
         const scnVirtualBox = document.getElementById('scnVirtualBox');
-        console.log('[ObjectPlacer] scnVirtualBox found:', !!scnVirtualBox);
 
         if (scnVirtualBox) {
             scnVirtualBox.appendChild(this.ghostObject);
-            console.log('[ObjectPlacer] Ghost added to scnVirtualBox');
         } else {
             console.error('[ObjectPlacer] scnVirtualBox not found!');
         }
@@ -162,8 +150,6 @@ module.exports = {
      * Mouse click handler - place object
      */
     onMouseClick(e) {
-        console.log('[ObjectPlacer] ====== Mouse click detected ======');
-        console.log('[ObjectPlacer] isPlacing:', this.isPlacing);
 
         if (!this.isPlacing) {
             console.warn('[ObjectPlacer] Click ignored - not in placing mode');
@@ -181,7 +167,6 @@ module.exports = {
         let x = e.clientX - editorRect.left + scrollX;
         let y = e.clientY - editorRect.top + scrollY;
 
-        console.log('[ObjectPlacer] Raw click position (relative to scnEditor):', x, y);
 
         // Get scnSceneBox to calculate offset (objects are positioned relative to scnSceneBox)
         const sceneBox = document.getElementById('scnSceneBox');
@@ -193,13 +178,11 @@ module.exports = {
             const offsetX = sceneBoxRect.left - virtualBoxRect.left;
             const offsetY = sceneBoxRect.top - virtualBoxRect.top;
 
-            console.log('[ObjectPlacer] scnSceneBox offset:', offsetX, offsetY);
 
             // Adjust position to be relative to scnSceneBox
             x = x - offsetX;
             y = y - offsetY;
 
-            console.log('[ObjectPlacer] Adjusted position (relative to scnSceneBox):', x, y);
         } else {
             console.warn('[ObjectPlacer] scnSceneBox not found - using raw position');
         }
@@ -212,9 +195,6 @@ module.exports = {
      * Place object at specific coordinates
      */
     placeObjectAt(x, y) {
-        console.log('[ObjectPlacer] ====== Placing object ======');
-        console.log('[ObjectPlacer] Position:', x, y);
-        console.log('[ObjectPlacer] Extension ID:', this.placingExtensionId);
 
         if (!this.placingExtensionId) {
             console.error('[ObjectPlacer] No extension ID!');
@@ -223,7 +203,6 @@ module.exports = {
 
         try {
             // Create object data
-            console.log('[ObjectPlacer] Creating object data...');
             const objectData = objectFactory.createObject(this.placingExtensionId, this.placingLayer);
 
             if (!objectData) {
@@ -233,7 +212,6 @@ module.exports = {
                 return;
             }
 
-            console.log('[ObjectPlacer] Object data created:', objectData);
 
             // Set position
             const ghostWidth = parseInt(this.ghostObject.style.width);
@@ -241,10 +219,8 @@ module.exports = {
             objectData.properties.x = x - ghostWidth / 2;
             objectData.properties.y = y - ghostHeight / 2;
 
-            console.log('[ObjectPlacer] Final position:', objectData.properties.x, objectData.properties.y);
 
             // Create command for undo/redo support
-            console.log('[ObjectPlacer] Creating command for undo/redo...');
             const commands = nw.require('./assets/js/objects/commands');
             const commandManager = nw.require('./assets/js/objects/commandManager');
 
@@ -254,9 +230,7 @@ module.exports = {
             // Execute the command (this will add the object to the scene)
             commandManager.execute(createCommand);
 
-            console.log('[ObjectPlacer] Object created with undo/redo support');
 
-            console.log('[ObjectPlacer] Object created:', objectData.properties.name, 'on Layer', this.placingLayer);
             notifications.success(`${objectData.properties.name} placed in scene`);
 
             // Clean up

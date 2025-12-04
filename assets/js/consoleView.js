@@ -23,8 +23,6 @@ $(document).ready(function () {
 
     // Log a welcome message
     setTimeout(() => {
-        console.log('AJS Develop Console initialized');
-        console.log('All console.log/warn/error messages will appear here');
     }, 100);
 });
 

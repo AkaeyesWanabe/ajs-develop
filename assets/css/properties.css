@@ -10,20 +10,19 @@
 }
 
 .propertiesExtensionInfo[shown=true] {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
 }
 
 .propertiesExtensionInfo img {
     float: left;
     width: var(--icon-lg);
     height: var(--icon-lg);
-    margin-top: var(--space-1);
-    margin-right: var(--space-1);
 }
 
 .propertiesExtensionInfo label {
     float: left;
-    margin-right: var(--space-1);
+    margin-left: 4px;
 }
 
 /* ==================== PROPERTIES BOX ==================== */
@@ -116,6 +115,8 @@
 /* ==================== PROPERTIES ITEM ==================== */
 
 .propertiesItem {
+    display: flex;
+    align-items: center;
     float: left;
     padding: var(--space-2);
     width: 100%;
@@ -164,6 +165,41 @@
     border-color: var(--border-focus);
     background-color: var(--primary-650);
     box-shadow: 0 0 0 3px rgba(94, 205, 187, 0.15);
+}
+
+/* ==================== SELECT DROPDOWN ==================== */
+
+.propertiesItemSelect {
+    float: right;
+    width: calc(100% - 128px);
+    background-color: var(--primary-700);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    height: var(--input-md);
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    transition: all var(--transition-normal);
+    outline: none;
+    cursor: pointer;
+}
+
+.propertiesItemSelect:hover {
+    border-color: var(--border-default);
+    background-color: var(--bg-hover);
+}
+
+.propertiesItemSelect:focus {
+    border-color: var(--border-focus);
+    background-color: var(--primary-650);
+    box-shadow: 0 0 0 3px rgba(94, 205, 187, 0.15);
+}
+
+.propertiesItemSelect option {
+    background-color: var(--primary-700);
+    color: var(--text-primary);
+    padding: var(--space-2);
 }
 
 /* ==================== CUSTOM NUMBER INPUT ==================== */
@@ -379,8 +415,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 #filePicker {
@@ -398,6 +439,7 @@
         opacity: 0;
         transform: translateY(30px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -523,12 +565,12 @@
     width: calc(100% - 128px);
     height: var(--input-md);
     display: flex;
-    align-items: stretch;
-    gap: var(--space-1-5);
+    justify-content: end;
+    gap: var(--space-1);
     background-color: var(--primary-700);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: var(--space-1);
+    padding: 4px;
     transition: all var(--transition-normal);
 }
 
@@ -544,44 +586,10 @@
 }
 
 /* Color Preview - shows current color */
-.colorPreview {
-    width: 32px;
-    min-width: 32px;
-    height: 100%;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-subtle);
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    background-image:
-        linear-gradient(45deg, #2a2a2a 25%, transparent 25%, transparent 75%, #2a2a2a 75%),
-        linear-gradient(45deg, #2a2a2a 25%, transparent 25%, transparent 75%, #2a2a2a 75%);
-    background-size: 8px 8px;
-    background-position: 0 0, 4px 4px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-.colorPreview::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-color: inherit;
-    border-radius: inherit;
-}
-
-.colorPreview:hover {
-    transform: scale(1.05);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 8px rgba(94, 205, 187, 0.3);
-}
-
-.colorPreview:active {
-    transform: scale(0.95);
-}
-
-/* Text Input - for hex value */
-.colorInput {
+.colorLabel {
+    float: right;
+    max-width: max-content;
     flex: 1;
-    min-width: 0;
     background-color: transparent;
     border: none;
     color: var(--text-primary);
@@ -589,27 +597,21 @@
     font-family: 'Courier New', monospace;
     font-weight: var(--font-medium);
     text-transform: uppercase;
-    padding: 0 var(--space-1);
     outline: none;
     letter-spacing: 0.5px;
+    margin-top: 1px;
 }
 
-.colorInput::placeholder {
-    color: var(--text-tertiary);
-    opacity: 0.5;
-}
-
-/* Native Color Picker - hidden but functional */
+/* Color Picker */
 .colorPicker {
-    width: 28px;
-    min-width: 28px;
-    height: 100%;
+    float: right;
+    width: 24px;
+    height: 18px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition-normal);
     background-color: var(--primary-650);
-    padding: 0;
 }
 
 .colorPicker::-webkit-color-swatch-wrapper {

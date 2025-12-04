@@ -31,7 +31,6 @@ module.exports = {
      * Initialize the object creator modal
      */
     init() {
-        console.log('[ObjectCreator] Initializing Object Creator Modal');
 
         // Load modal HTML into the app
         this.loadModalHTML();
@@ -55,14 +54,11 @@ module.exports = {
             const modalPath = './views/objectCreator.html';
             const modalHTML = fs.readFileSync(modalPath, 'utf8');
 
-            console.log('[ObjectCreator] Modal HTML loaded, length:', modalHTML.length);
 
             // Inject modal into body if not already present
             if (!document.getElementById('objectCreatorModal')) {
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
-                console.log('[ObjectCreator] Modal HTML injected into DOM');
             } else {
-                console.log('[ObjectCreator] Modal already exists in DOM');
             }
         } catch (err) {
             console.error('[ObjectCreator] Failed to load modal HTML:', err);
@@ -246,7 +242,6 @@ module.exports = {
      * Open the modal
      */
     open() {
-        console.log('[ObjectCreator] ====== Opening modal ======');
 
         // Check if modal exists in DOM
         const modalElement = document.getElementById('objectCreatorModal');
@@ -261,15 +256,11 @@ module.exports = {
                 return;
             }
         }
-        console.log('[ObjectCreator] Modal element found:', !!modalElement);
 
         // Load available extensions
-        console.log('[ObjectCreator] Loading extensions...');
         this.loadExtensions();
-        console.log('[ObjectCreator] Extensions loaded:', this.allExtensions.length);
 
         // Show modal (use css to set display: flex instead of fadeIn's default block)
-        console.log('[ObjectCreator] Showing modal with fadeIn...');
         $('#objectCreatorModal').css('display', 'flex').hide().fadeIn(200);
         this.isOpen = true;
 
@@ -282,13 +273,11 @@ module.exports = {
         $('#objectCreatorSearchClear').hide();
         $('#objectCreatorCreate').prop('disabled', true);
 
-        console.log('[ObjectCreator] Populating UI...');
         // Populate UI
         this.populateCategories();
         this.filterAndRenderObjects();
         this.updateObjectCount();
 
-        console.log('[ObjectCreator] Modal opened successfully');
 
         // Focus search input
         setTimeout(() => {
@@ -300,7 +289,6 @@ module.exports = {
      * Close the modal
      */
     close() {
-        console.log('[ObjectCreator] Closing modal');
 
         $('#objectCreatorModal').fadeOut(200);
         this.isOpen = false;
@@ -337,9 +325,7 @@ module.exports = {
 
             // Debug icon paths
             if (ext.icon) {
-                console.log('[ObjectCreator] Extension:', ext.name, 'Icon:', ext.icon);
             } else {
-                console.log('[ObjectCreator] Extension:', ext.name, 'No icon - will use default');
             }
 
             // Collect unique categories
@@ -356,7 +342,6 @@ module.exports = {
             return a.localeCompare(b);
         });
 
-        console.log('[ObjectCreator] Loaded', this.allExtensions.length, 'extensions in', this.categories.length, 'categories');
     },
 
     /**
@@ -539,7 +524,6 @@ module.exports = {
                 iconHTML = `<img src="${functions.escapeAttr(ext.icon)}"
                                  alt="${functions.escapeAttr(ext.name)}"
                                  onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'${defaultIcon}\\'></i>';" />`;
-                console.log('[ObjectCreator] Rendering icon for', ext.name, '- path:', ext.icon);
             } else {
                 // Use default icon based on category
                 const defaultIcon = this.getDefaultIcon(ext.category);
@@ -598,7 +582,6 @@ module.exports = {
      * Select an extension
      */
     selectExtension(extensionId) {
-        console.log('[ObjectCreator] Selected extension:', extensionId);
 
         this.selectedExtension = extensionId;
 
@@ -620,8 +603,6 @@ module.exports = {
      * Create the selected object
      */
     createObject() {
-        console.log('[ObjectCreator] ====== Create button clicked ======');
-        console.log('[ObjectCreator] selectedExtension:', this.selectedExtension);
 
         if (!this.selectedExtension) {
             console.warn('[ObjectCreator] No extension selected!');
@@ -632,24 +613,19 @@ module.exports = {
         // IMPORTANT: Save extension ID before closing modal (close() resets selectedExtension to null)
         const extensionId = this.selectedExtension;
 
-        console.log('[ObjectCreator] Creating object:', extensionId);
 
         // Check if objectPlacer is available
-        console.log('[ObjectCreator] objectPlacer available:', typeof objectPlacer !== 'undefined');
-        console.log('[ObjectCreator] layerManager available:', typeof layerManager !== 'undefined');
 
         // Add to recently used
         this.addToRecentlyUsed(extensionId);
 
         // Get current selected layer
         const currentLayer = layerManager.selectedLayer || 0;
-        console.log('[ObjectCreator] Current layer:', currentLayer);
 
         // Close modal (this resets this.selectedExtension to null)
         this.close();
 
         // Start placement mode with objectPlacer (use saved extensionId)
-        console.log('[ObjectCreator] Calling objectPlacer.startPlacing with:', extensionId, currentLayer);
         objectPlacer.startPlacing(extensionId, currentLayer);
     }
 };

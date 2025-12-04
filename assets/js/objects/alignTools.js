@@ -478,7 +478,6 @@ module.exports = {
         const selected = this.getSelectedObjects();
         const selectedCount = selected.length;
 
-        console.log('[AlignTools] Updating toolbar state, selected count:', selectedCount);
 
         // Update align buttons (require at least 1 object)
         const alignButtons = toolbar.querySelectorAll('.align-btn[data-action^="align"]');
@@ -595,7 +594,6 @@ module.exports = {
             toolbar.style.display = 'none';
         });
 
-        console.log('Align toolbar created and displayed');
 
         // Update button states based on current selection
         this.updateToolbarState();

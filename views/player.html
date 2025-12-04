@@ -2,9 +2,26 @@
     <!-- Player Controls -->
     <div id="playerControls">
         <div class="playerControlsLeft">
-            <button id="playBtn" class="playerBtn" title="Play (F5)">
-                <i class="ri-play-fill"></i>
-            </button>
+            <div class="playerBtnGroup">
+                <button id="playBtn" class="playerBtn" title="Play Scene (F5)">
+                    <i class="ri-play-fill"></i>
+                </button>
+                <button id="playDropdownBtn" class="playerBtn playerDropdownBtn" title="Play Options">
+                    <i class="ri-arrow-down-s-line"></i>
+                </button>
+                <div id="playDropdownMenu" class="playerDropdownMenu" style="display: none;">
+                    <div id="playSceneBtn" class="playerDropdownItem">
+                        <i class="ri-play-fill"></i>
+                        <span>Play Scene</span>
+                        <span class="playerDropdownKey">F5</span>
+                    </div>
+                    <div id="playFromMainBtn" class="playerDropdownItem">
+                        <i class="ri-play-circle-fill"></i>
+                        <span>Play from Main Scene</span>
+                        <span class="playerDropdownKey">Shift+F5</span>
+                    </div>
+                </div>
+            </div>
             <button id="pauseBtn" class="playerBtn" title="Pause" style="display: none;">
                 <i class="ri-pause-fill"></i>
             </button>
@@ -30,14 +47,40 @@
     <div id="playerCanvasContainer">
         <canvas id="playerCanvas"></canvas>
 
+        <!-- Player Loading Overlay -->
+        <div id="playerLoadingOverlay" style="display: flex;">
+            <div class="playerLoadingContent">
+                <div class="playerLoadingSpinner"></div>
+                <h3>Initializing Player...</h3>
+                <div class="playerLoadingBar">
+                    <div class="playerLoadingBarFill" id="playerLoadingBarFill"></div>
+                </div>
+                <p id="playerLoadingStatus">Loading modules...</p>
+            </div>
+        </div>
+
         <!-- Debug Overlay -->
         <div id="debugOverlay" style="display: none;">
             <div class="debugInfo">
                 <h4>Debug Info</h4>
-                <div id="debugFPS">FPS: 0</div>
-                <div id="debugFrameTime">Frame Time: 0ms</div>
-                <div id="debugObjects">Objects: 0</div>
-                <div id="debugMemory">Memory: 0 MB</div>
+                <div class="debugSection">
+                    <div class="debugLabel">Performance</div>
+                    <div id="debugTargetFPS">Target FPS: 60</div>
+                    <div id="debugActualFPS">Actual FPS: 0</div>
+                    <div id="debugFPSPercent">FPS: 0%</div>
+                    <div id="debugFrameTime">Frame Time: 0ms</div>
+                    <div id="debugDeltaTime">Delta Time: 0ms</div>
+                </div>
+                <div class="debugSection">
+                    <div class="debugLabel">Scene</div>
+                    <div id="debugObjects">Objects: 0</div>
+                    <div id="debugFrameCount">Frame: 0</div>
+                </div>
+                <div class="debugSection">
+                    <div class="debugLabel">Time</div>
+                    <div id="debugTimeScale">Time Scale: 1.00</div>
+                    <div id="debugTotalTime">Total Time: 0.00s</div>
+                </div>
             </div>
         </div>
 

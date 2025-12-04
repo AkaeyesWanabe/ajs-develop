@@ -1,0 +1,200 @@
+{
+    "extension": "internal/com.ajs.scene",
+    "cache": {
+        "sceneEditor": {
+            "scrollX": 447.20001220703125,
+            "scrollY": 456.79998779296875
+        }
+    },
+    "properties": {
+        "name": "level1",
+        "visible": true,
+        "width": 1920,
+        "height": 1080,
+        "virtualWidth": 2920,
+        "virtualHeight": 2080,
+        "backgroundColor": "white"
+    },
+    "groups": [],
+    "layers": [
+        {
+            "name": "Game",
+            "isRemovable": false,
+            "isRenomable": true,
+            "isLocked": false
+        },
+        {
+            "name": "Interface",
+            "isRemovable": true,
+            "isRenomable": true,
+            "isLocked": false
+        }
+    ],
+    "objects": [
+        {
+            "extension": "com.ajs.shape",
+            "oid": "__ajs_oid_184ab22fc2c",
+            "properties": {
+                "name": "Sky",
+                "visible": true,
+                "x": 0,
+                "y": 0,
+                "width": 1024,
+                "height": 384,
+                "angle": 0,
+                "shapeType": "rectangle",
+                "fillType": "linear",
+                "fillColor": "#47b1c2",
+                "fillColor2": "#f7f7f7",
+                "gradientAngle": 90,
+                "strokeEnabled": false,
+                "strokeColor": "#000000",
+                "strokeWidth": 0,
+                "opacity": 1,
+                "cornerRadius": 0,
+                "sides": 5,
+                "innerRadius": 0.5,
+                "script": "",
+                "scripts": []
+            },
+            "groups": "",
+            "layer": 0
+        },
+        {
+            "extension": "com.ajs.image",
+            "oid": "__ajs_oid_9bd1005321",
+            "properties": {
+                "name": "Star",
+                "visible": true,
+                "x": 400,
+                "y": 0,
+                "width": 224,
+                "height": 192,
+                "angle": 0,
+                "imagePath": ".\\assets\\images\\dust/Shine-PNG-Pic.png",
+                "scripts": [
+                    {
+                        "path": "scripts/RotateEffect.js",
+                        "enabled": true,
+                        "properties": {
+                            "rotationSpeed": 45,
+                            "clockwise": true
+                        }
+                    }
+                ]
+            },
+            "groups": "",
+            "layer": 0
+        },
+        {
+            "extension": "com.ajs.sprite",
+            "oid": "__ajs_oid_3fd7af9158",
+            "properties": {
+                "name": "Player",
+                "visible": true,
+                "x": 64,
+                "y": 240,
+                "width": 256,
+                "height": 240,
+                "angle": 0,
+                "animator": ".\\assets\\animations/player.anim",
+                "scripts": [
+                    {
+                        "path": "internal/physics/BoxCollider2D/BoxCollider2D.js",
+                        "enabled": true,
+                        "properties": {
+                            "showInEditor": true,
+                            "offsetX": 0,
+                            "offsetY": 56,
+                            "width": 48,
+                            "height": 48,
+                            "isTrigger": false
+                        }
+                    },
+                    {
+                        "path": "internal/physics/Rigidbody2D/Rigidbody2D.js",
+                        "enabled": true,
+                        "properties": {
+                            "mass": 1,
+                            "gravityScale": 1,
+                            "drag": 0,
+                            "angularDrag": 0.05,
+                            "isKinematic": false,
+                            "useGravity": true
+                        }
+                    }
+                ]
+            },
+            "groups": "",
+            "layer": 0
+        },
+        {
+            "extension": "com.ajs.button",
+            "oid": "__ajs_oid_8c41c4afe0",
+            "properties": {
+                "name": "Start btn",
+                "visible": true,
+                "x": 416,
+                "y": 560,
+                "width": 176,
+                "height": 48,
+                "angle": 0,
+                "text": "Start Game",
+                "bkgColor": "#d10000",
+                "fontSize": 13,
+                "borderRadius": 0,
+                "borderWidth": 1,
+                "borderColor": "#4d4c4c",
+                "hoverColor": "#db0000",
+                "pressedColor": "#c20000",
+                "textColor": "#030303",
+                "scripts": []
+            },
+            "groups": "",
+            "layer": 1,
+            "locked": false
+        },
+        {
+            "extension": "com.ajs.shape",
+            "oid": "__ajs_oid_110f31fa1a8",
+            "properties": {
+                "name": "Floor",
+                "visible": true,
+                "x": 0,
+                "y": 544,
+                "width": 1024,
+                "height": 96,
+                "angle": 0,
+                "shapeType": "rectangle",
+                "fillType": "solid",
+                "fillColor": "#0000de",
+                "fillColor2": "#FF6B9D",
+                "gradientAngle": 45,
+                "strokeEnabled": false,
+                "strokeColor": "#000000",
+                "strokeWidth": 2,
+                "opacity": 1,
+                "cornerRadius": 0,
+                "sides": 5,
+                "innerRadius": 0.5,
+                "script": "",
+                "scripts": [
+                    {
+                        "path": "internal/physics/BoxCollider2D/BoxCollider2D.js",
+                        "enabled": true,
+                        "properties": {
+                            "showInEditor": true,
+                            "offsetX": 0,
+                            "offsetY": 0,
+                            "width": 1024,
+                            "height": 96,
+                            "isTrigger": false
+                        }
+                    }
+                ]
+            },
+            "groups": "",
+            "layer": 0
+        }
+    ]
+}

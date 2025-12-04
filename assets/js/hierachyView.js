@@ -349,7 +349,6 @@ $(document).ready(function() {
 
                     // Manual save with Ctrl+S required
 
-                    console.log('Object layer changed via context menu:', objectData.properties.name, 'from Layer', oldLayer, 'to Layer', layer);
                     notifications.success(`Moved to Layer ${layer}`);
                 }
             }
@@ -362,7 +361,6 @@ $(document).ready(function() {
                 if (contextMenuTargetObject) {
                     const oid = contextMenuTargetObject.getAttribute('oid');
                     // TODO: Implement focus on object
-                    console.log('Focus on object:', oid);
                     notifications.info('Focus feature coming soon');
                 }
                 break;
@@ -371,7 +369,6 @@ $(document).ready(function() {
                 if (contextMenuTargetObject) {
                     const oid = contextMenuTargetObject.getAttribute('oid');
                     // TODO: Implement duplicate
-                    console.log('Duplicate object:', oid);
                     notifications.info('Duplicate feature coming soon');
                 }
                 break;
@@ -380,7 +377,6 @@ $(document).ready(function() {
                 if (contextMenuTargetObject) {
                     const oid = contextMenuTargetObject.getAttribute('oid');
                     // TODO: Implement copy
-                    console.log('Copy object:', oid);
                     notifications.info('Copy feature coming soon');
                 }
                 break;
@@ -392,7 +388,6 @@ $(document).ready(function() {
                     const objectData = editor.sceneData?.objects?.find(obj => obj.oid === oid);
                     if (objectData) {
                         // TODO: Implement rename dialog
-                        console.log('Rename object:', objectData.properties.name);
                         notifications.info('Rename feature coming soon');
                     }
                 }
@@ -420,12 +415,10 @@ $(document).ready(function() {
 
             case 'expand-all-hierarchy':
                 // TODO: Implement expand all
-                console.log('Expand all');
                 break;
 
             case 'collapse-all-hierarchy':
                 // TODO: Implement collapse all
-                console.log('Collapse all');
                 break;
         }
 

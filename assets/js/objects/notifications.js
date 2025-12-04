@@ -284,6 +284,94 @@ module.exports = {
     },
 
     /**
+     * Show prompt dialog for text input
+     * @param {string} title - Dialog title
+     * @param {string} message - Dialog message
+     * @param {string} defaultValue - Default input value
+     * @param {Object} options - Options {confirmText, cancelText}
+     * @returns {Promise<string|null>} Input value or null if cancelled
+     */
+    prompt(title, message, defaultValue = '', options = {}) {
+        return new Promise((resolve) => {
+            const {
+                confirmText = 'OK',
+                cancelText = 'Cancel'
+            } = options;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'confirm-overlay';
+            overlay.innerHTML = `
+                <div class="confirm-dialog">
+                    <div class="confirm-header">
+                        <h3>${this.escapeHtml(title)}</h3>
+                    </div>
+                    <div class="confirm-body">
+                        <p>${this.escapeHtml(message)}</p>
+                        <input type="text" class="prompt-input" value="${this.escapeHtml(defaultValue)}"
+                               style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid var(--border-subtle);
+                                      border-radius: 4px; background: var(--bg-primary); color: var(--text-primary);">
+                    </div>
+                    <div class="confirm-footer">
+                        <button class="btn btn-secondary confirm-cancel">${this.escapeHtml(cancelText)}</button>
+                        <button class="btn btn-primary confirm-ok">${this.escapeHtml(confirmText)}</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            const input = overlay.querySelector('.prompt-input');
+
+            // Animate in
+            setTimeout(() => {
+                overlay.classList.add('confirm-show');
+                input.focus();
+                input.select();
+            }, 10);
+
+            const hide = (result) => {
+                overlay.classList.remove('confirm-show');
+                setTimeout(() => {
+                    if (overlay.parentElement) {
+                        overlay.parentElement.removeChild(overlay);
+                    }
+                }, 300);
+                resolve(result);
+            };
+
+            // Event listeners
+            overlay.querySelector('.confirm-ok').addEventListener('click', () => {
+                hide(input.value);
+            });
+            overlay.querySelector('.confirm-cancel').addEventListener('click', () => hide(null));
+
+            // Enter to confirm
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    hide(input.value);
+                }
+            });
+
+            // Close on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    hide(null);
+                }
+            });
+
+            // ESC to cancel
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    document.removeEventListener('keydown', escHandler);
+                    hide(null);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        });
+    },
+
+    /**
      * Escape HTML to prevent XSS
      */
     escapeHtml(str) {

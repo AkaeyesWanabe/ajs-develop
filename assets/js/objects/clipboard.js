@@ -31,7 +31,6 @@ module.exports = {
         this.isCut = false;
 
         notifications.success(`Copied ${this.clipboardData.length} object${this.clipboardData.length > 1 ? 's' : ''}`);
-        console.log('[CLIPBOARD] Copied', this.clipboardData.length, 'objects');
         return true;
     },
 
@@ -57,7 +56,6 @@ module.exports = {
         this.cutObjectOIDs = sceneEditor.selectedObjects.map(sel => sel.data.oid);
 
         notifications.success(`Cut ${this.clipboardData.length} object${this.clipboardData.length > 1 ? 's' : ''}`);
-        console.log('[CLIPBOARD] Cut', this.clipboardData.length, 'objects');
         return true;
     },
 
@@ -65,12 +63,9 @@ module.exports = {
      * Paste objects from clipboard - activates placement mode
      */
     paste() {
-        console.log('[CLIPBOARD] ====== PASTE CALLED ======');
-        console.log('[CLIPBOARD] Clipboard data:', this.clipboardData ? this.clipboardData.length : 0, 'objects');
 
         if (!this.clipboardData || this.clipboardData.length === 0) {
             notifications.warning('Clipboard is empty');
-            console.log('[CLIPBOARD] Clipboard is empty');
             return false;
         }
 
@@ -78,11 +73,9 @@ module.exports = {
 
         if (!sceneEditor.sceneData) {
             notifications.error('No scene is open');
-            console.log('[CLIPBOARD] No scene is open');
             return false;
         }
 
-        console.log('[CLIPBOARD] Entering placement mode...');
         // Enter placement mode
         this.enterPlacementMode();
         return true;
@@ -209,8 +202,6 @@ module.exports = {
                 return;
             }
 
-            console.log('[CLIPBOARD] ====== PLACEMENT CLICK ======');
-            console.log('[CLIPBOARD] Click event:', e.type, 'button:', e.button);
 
             if (!this.placementMode) {
                 console.warn('[CLIPBOARD] Click ignored - not in placing mode');
@@ -235,7 +226,6 @@ module.exports = {
             let x = e.clientX - editorRect.left + scrollX;
             let y = e.clientY - editorRect.top + scrollY;
 
-            console.log('[CLIPBOARD] Raw click position (relative to scnEditor):', x, y);
 
             // Get scnSceneBox to calculate offset (objects are positioned relative to scnSceneBox)
             const sceneBox = document.getElementById('scnSceneBox');
@@ -247,13 +237,11 @@ module.exports = {
                 const offsetX = sceneBoxRect.left - virtualBoxRect.left;
                 const offsetY = sceneBoxRect.top - virtualBoxRect.top;
 
-                console.log('[CLIPBOARD] scnSceneBox offset:', offsetX, offsetY);
 
                 // Adjust position to be relative to scnSceneBox
                 x = x - offsetX;
                 y = y - offsetY;
 
-                console.log('[CLIPBOARD] Adjusted position (relative to scnSceneBox):', x, y);
             } else {
                 console.warn('[CLIPBOARD] scnSceneBox not found - using raw position');
             }
@@ -262,7 +250,6 @@ module.exports = {
             const baseX = x - groupWidth / 2;
             const baseY = y - groupHeight / 2;
 
-            console.log('[CLIPBOARD] Base position (centered):', baseX, baseY);
 
             // Apply snap to grid if enabled
             const grid = window.grid || nw.require('./assets/js/objects/grid');
@@ -273,11 +260,9 @@ module.exports = {
                 const snappedPos = grid.snapPoint(baseX, baseY);
                 finalX = snappedPos.x;
                 finalY = snappedPos.y;
-                console.log('[CLIPBOARD] Snapped position:', finalX, finalY);
             }
 
             // Place the objects
-            console.log('[CLIPBOARD] Calling placeObjectsAtPosition with:', finalX, finalY, minX, minY);
             this.placeObjectsAtPosition(finalX, finalY, minX, minY);
 
             // Exit placement mode
@@ -288,7 +273,6 @@ module.exports = {
         this.sceneEditorElement.addEventListener('mousemove', this.placementMouseHandler);
         this.sceneEditorElement.addEventListener('click', this.placementClickHandler);
 
-        console.log('[CLIPBOARD] Event listeners attached to sceneEditor');
 
         // ESC to cancel placement
         this.placementEscHandler = (e) => {
@@ -303,29 +287,21 @@ module.exports = {
         this.sceneEditorElement.style.cursor = 'crosshair';
 
         notifications.info('Click to place objects (ESC to cancel)');
-        console.log('[CLIPBOARD] Entered placement mode');
     },
 
     /**
      * Place objects at the specified position
      */
     placeObjectsAtPosition(baseX, baseY, originalMinX, originalMinY) {
-        console.log('[CLIPBOARD] ====== PLACING OBJECTS ======');
-        console.log('[CLIPBOARD] Position:', baseX, baseY);
-        console.log('[CLIPBOARD] Original min:', originalMinX, originalMinY);
-        console.log('[CLIPBOARD] Objects to paste:', this.clipboardData ? this.clipboardData.length : 0);
 
         const sceneEditor = window.sceneEditor || nw.require('./assets/js/objects/sceneEditor');
         const commands = nw.require('./assets/js/objects/commands');
         const commandManager = nw.require('./assets/js/objects/commandManager');
 
-        console.log('[CLIPBOARD] SceneEditor:', !!sceneEditor);
-        console.log('[CLIPBOARD] SceneData:', !!sceneEditor.sceneData);
 
         // Deselect all objects first
         if (sceneEditor.deselectAllObjects) {
             sceneEditor.deselectAllObjects();
-            console.log('[CLIPBOARD] Deselected all objects');
         }
 
         const pastedObjects = [];
@@ -344,11 +320,9 @@ module.exports = {
 
         // Prepare objects for pasting
         this.clipboardData.forEach((objData, index) => {
-            console.log('[CLIPBOARD] Processing object', index, '/', this.clipboardData.length);
 
             // Generate new OID
             const newOid = 'object_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '_' + index;
-            console.log('[CLIPBOARD] Generated new OID:', newOid);
 
             // Clone object data
             const newObjectData = JSON.parse(JSON.stringify(objData));
@@ -361,7 +335,6 @@ module.exports = {
             newObjectData.properties.x = baseX + relX;
             newObjectData.properties.y = baseY + relY;
 
-            console.log('[CLIPBOARD] New position:', newObjectData.properties.x, newObjectData.properties.y);
 
             // Update name to indicate it's a copy (unless it was cut)
             if (!this.isCut) {
@@ -369,7 +342,6 @@ module.exports = {
                 newObjectData.properties.name = `${baseName} (Copy)`;
             }
 
-            console.log('[CLIPBOARD] Object name:', newObjectData.properties.name);
 
             pastedObjects.push(newObjectData);
 
@@ -380,10 +352,8 @@ module.exports = {
 
         // Execute all create commands in a batch (for undo/redo support)
         if (createCommands.length > 0) {
-            console.log('[CLIPBOARD] Creating batch command with', createCommands.length, 'objects');
             const batchCommand = new commands.BatchCommand('Paste Objects', createCommands);
             commandManager.execute(batchCommand);
-            console.log('[CLIPBOARD] Batch command executed');
         }
 
         // If cut, clear clipboard after paste
@@ -401,7 +371,6 @@ module.exports = {
                     sceneEditor.selectedObjects = [];
                 }
                 sceneEditor.selectedObjects.push({ element: elem, data: newObjectData });
-                console.log('[CLIPBOARD] Selected object:', newObjectData.oid);
             } else {
                 console.warn('[CLIPBOARD] Could not find element for object:', newObjectData.oid);
             }
@@ -443,7 +412,6 @@ module.exports = {
         }
 
         notifications.success(`Pasted ${pastedObjects.length} object${pastedObjects.length > 1 ? 's' : ''}`);
-        console.log('[CLIPBOARD] ✓ Pasted', pastedObjects.length, 'objects at position', baseX, baseY);
     },
 
     /**
@@ -452,7 +420,6 @@ module.exports = {
     exitPlacementMode() {
         if (!this.placementMode) return;
 
-        console.log('[CLIPBOARD] Exiting placement mode...');
         this.placementMode = false;
 
         // Remove preview
@@ -481,7 +448,6 @@ module.exports = {
         this.placementEscHandler = null;
         this.sceneEditorElement = null;
 
-        console.log('[CLIPBOARD] ✓ Exited placement mode successfully');
     },
 
     /**
@@ -498,6 +464,5 @@ module.exports = {
         this.clipboardData = null;
         this.isCut = false;
         this.cutObjectOIDs = null;
-        console.log('[CLIPBOARD] Cleared');
     }
 };

@@ -1726,3 +1726,111 @@
         opacity: 1;
     }
 }
+
+/* ==================== IMAGE PICKER FOLDERS ==================== */
+
+.aipFolderSection {
+    width: 100%;
+    margin-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.aipFolderHeader {
+    display: flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    background: var(--primary-700);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.aipFolderHeader:hover {
+    background: var(--primary-600);
+}
+
+.aipFolderName {
+    flex: 1;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.aipFolderToggle {
+    font-size: var(--icon-md);
+    color: var(--text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.aipFolderContent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--bg-primary);
+}
+
+/* Adjust aipBodyItem to work within folders */
+.aipFolderContent .aipBodyItem {
+    margin: 0;
+}
+/* ==================== IMAGE PICKER FOOTER ==================== */
+
+#animatorImagePickerFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-750) 100%);
+    border-top: 1px solid var(--border-subtle);
+    min-height: 48px;
+    gap: var(--space-3);
+}
+
+#aipSelectionInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+#aipSelectionInfo i {
+    font-size: var(--icon-md);
+    color: var(--secondary);
+}
+
+#aipSelectionCount {
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+}
+
+#aipAddSelectedBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: linear-gradient(135deg, var(--secondary-600) 0%, var(--secondary-700) 100%);
+    border: 1px solid var(--secondary-500);
+    color: white;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    transition: all var(--transition-normal);
+}
+
+#aipAddSelectedBtn:hover {
+    background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(94, 205, 187, 0.4);
+}
+
+#aipAddSelectedBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#aipAddSelectedBtn i {
+    font-size: var(--icon-md);
+}

@@ -11,4 +11,3 @@
  */
 
 // No initialization needed here - everything is handled in scriptEditor.js
-console.log('[SCRIPT EDITOR VIEW] View script loaded (initialization in scriptEditor.js)');

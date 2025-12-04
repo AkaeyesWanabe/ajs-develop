@@ -24,7 +24,6 @@ module.exports = {
         `;
         document.body.appendChild(this.overlayElement);
 
-        console.log('[LOADING] Loading states system initialized');
     },
 
     /**

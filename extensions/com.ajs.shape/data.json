@@ -1,0 +1,229 @@
+{
+    "extension": "com.ajs.shape",
+    "extensionName": "Shape",
+    "extensionIcon": "shape64.png",
+    "description": "Draw geometric shapes with solid colors and gradients",
+    "category": "Game Objects",
+    "hierarchyPreview": "preview",
+    "propertiesTabs": [
+        {
+            "name": "Object",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Transform",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Shape",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Scripts",
+            "icon-type": "icon",
+            "icon": "pip"
+        }
+    ],
+    "propertiesVariables": [
+        {
+            "name": "name",
+            "tab": 0,
+            "label": "Object Name",
+            "type": "text",
+            "description": "Name of the object."
+        },
+        {
+            "name": "visible",
+            "tab": 0,
+            "label": "Object Visibility",
+            "type": "checkbox",
+            "checkbox-label": "visible",
+            "description": "Visibility of the object."
+        },
+        {
+            "name": "x",
+            "tab": 1,
+            "label": "Object X",
+            "type": "number",
+            "description": "X position of object.",
+            "singleObject": true
+        },
+        {
+            "name": "y",
+            "tab": 1,
+            "label": "Object Y",
+            "type": "number",
+            "description": "Y position of object",
+            "singleObject": true
+        },
+        {
+            "name": "width",
+            "tab": 1,
+            "label": "Width",
+            "type": "number",
+            "description": "Width of the shape."
+        },
+        {
+            "name": "height",
+            "tab": 1,
+            "label": "Height",
+            "type": "number",
+            "description": "Height of the shape."
+        },
+        {
+            "name": "angle",
+            "tab": 1,
+            "label": "Rotation",
+            "type": "number",
+            "description": "Rotation angle of the shape."
+        },
+        {
+            "name": "shapeType",
+            "tab": 2,
+            "label": "Shape Type",
+            "type": "select",
+            "description": "Type of shape to draw.",
+            "options": [
+                { "value": "rectangle", "label": "Rectangle" },
+                { "value": "circle", "label": "Circle" },
+                { "value": "ellipse", "label": "Ellipse" },
+                { "value": "triangle", "label": "Triangle" },
+                { "value": "polygon", "label": "Polygon" },
+                { "value": "star", "label": "Star" }
+            ]
+        },
+        {
+            "name": "fillType",
+            "tab": 2,
+            "label": "Fill Type",
+            "type": "select",
+            "description": "Type of fill to use.",
+            "options": [
+                { "value": "none", "label": "None" },
+                { "value": "solid", "label": "Solid Color" },
+                { "value": "linear", "label": "Linear Gradient" },
+                { "value": "radial", "label": "Radial Gradient" }
+            ]
+        },
+        {
+            "name": "fillColor",
+            "tab": 2,
+            "label": "Fill Color",
+            "type": "color",
+            "description": "Primary fill color."
+        },
+        {
+            "name": "fillColor2",
+            "tab": 2,
+            "label": "Gradient Color 2",
+            "type": "color",
+            "description": "Secondary color for gradients."
+        },
+        {
+            "name": "gradientAngle",
+            "tab": 2,
+            "label": "Gradient Angle",
+            "type": "number",
+            "description": "Angle of linear gradient (0-360 degrees).",
+            "min": 0,
+            "max": 360,
+            "step": 1
+        },
+        {
+            "name": "strokeEnabled",
+            "tab": 2,
+            "label": "Stroke",
+            "type": "checkbox",
+            "checkbox-label": "enabled",
+            "description": "Enable stroke/border."
+        },
+        {
+            "name": "strokeColor",
+            "tab": 2,
+            "label": "Stroke Color",
+            "type": "color",
+            "description": "Color of the stroke/border."
+        },
+        {
+            "name": "strokeWidth",
+            "tab": 2,
+            "label": "Stroke Width",
+            "type": "number",
+            "description": "Width of the stroke/border.",
+            "min": 1,
+            "max": 50,
+            "step": 1
+        },
+        {
+            "name": "opacity",
+            "tab": 2,
+            "label": "Opacity",
+            "type": "number",
+            "description": "Opacity of the shape (0-1).",
+            "min": 0,
+            "max": 1,
+            "step": 0.1
+        },
+        {
+            "name": "cornerRadius",
+            "tab": 2,
+            "label": "Corner Radius",
+            "type": "number",
+            "description": "Corner radius for rectangles.",
+            "min": 0,
+            "step": 1
+        },
+        {
+            "name": "sides",
+            "tab": 2,
+            "label": "Sides",
+            "type": "number",
+            "description": "Number of sides (polygon/star).",
+            "min": 3,
+            "max": 20,
+            "step": 1
+        },
+        {
+            "name": "innerRadius",
+            "tab": 2,
+            "label": "Inner Radius",
+            "type": "number",
+            "description": "Inner radius for stars (0.1-1.0).",
+            "min": 0.1,
+            "max": 1,
+            "step": 0.1
+        },
+        {
+            "name": "script",
+            "tab": 3,
+            "label": "Script",
+            "type": "script",
+            "description": "JavaScript script to attach to this object."
+        }
+    ],
+    "properties": {
+        "name": "New Shape",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100,
+        "angle": 0,
+        "shapeType": "rectangle",
+        "fillType": "solid",
+        "fillColor": "#5ECDDE",
+        "fillColor2": "#FF6B9D",
+        "gradientAngle": 45,
+        "strokeEnabled": false,
+        "strokeColor": "#000000",
+        "strokeWidth": 2,
+        "opacity": 1,
+        "cornerRadius": 0,
+        "sides": 5,
+        "innerRadius": 0.5,
+        "script": ""
+    }
+}

@@ -35,7 +35,7 @@ const script = {
             return;
         }
         const anim = animator.getFromResources(data.properties.animator);
-        if (anim.animations[0].frames.length == 0) {
+        if (!anim || !anim.animations || anim.animations.length == 0 || anim.animations[0].frames.length == 0) {
             this.drawNoImage(ctx, data);
             return;
         }
@@ -46,11 +46,38 @@ const script = {
             return;
         }
         //
+        // Get the first frame to extract reference origin point
+        const firstFrame = anim.animations[0].frames[0];
+
         //Start Drawing object
         const img = new Image();
         img.onload = function () {
-            // Draw the image on the canvas
-            ctx.drawImage(img, 0, 0, data.properties.width, data.properties.height);
+            // Récupérer l'origin de référence (première frame)
+            const referenceOriginPoint = firstFrame.points?.find(p => p.name === 'origin');
+            const referenceOriginX = referenceOriginPoint ? referenceOriginPoint.x : firstFrame.width / 2;
+            const referenceOriginY = referenceOriginPoint ? referenceOriginPoint.y : firstFrame.height / 2;
+
+            // Pour la première frame, on utilise toujours son origin comme référence
+            // Donc currentOrigin = referenceOrigin, et le dessin se fait à (0, 0)
+            const currentOriginPoint = firstFrame.points?.find(p => p.name === 'origin');
+            const currentOriginX = currentOriginPoint ? currentOriginPoint.x : firstFrame.width / 2;
+            const currentOriginY = currentOriginPoint ? currentOriginPoint.y : firstFrame.height / 2;
+
+            // Calculer l'échelle entre l'image originale et la taille affichée
+            const scaleX = data.properties.width / firstFrame.width;
+            const scaleY = data.properties.height / firstFrame.height;
+
+            // Calculer l'offset relatif à la première frame
+            // Pour la première frame: offset = (current - reference) = 0
+            // Pour les autres frames: offset = (currentOrigin - referenceOrigin)
+            const drawX = (currentOriginX - referenceOriginX) * scaleX;
+            const drawY = (currentOriginY - referenceOriginY) * scaleY;
+
+            // Clear canvas first
+            ctx.clearRect(0, 0, data.properties.width, data.properties.height);
+
+            // Draw the image with relative offset to first frame
+            ctx.drawImage(img, drawX, drawY, data.properties.width, data.properties.height);
         };
         let $self = this;
         img.onerror = function () {
@@ -62,7 +89,7 @@ const script = {
     },
 
     destroy(object) {
-        alert("The object has been destroyed from the editor!");
+        // Cleanup if necessary
     },
 
 

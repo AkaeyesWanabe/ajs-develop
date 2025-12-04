@@ -23,23 +23,23 @@ const script = {
         //
         let ctx = object.getContext('2d');
         //
-        //draw icon if object is invisible
-        if (!data.properties.visible || data.properties.visible == "false") {
-            //set size
-            sceneEditor.setObjectWidth(object, 32);
-            sceneEditor.setObjectHeight(object, 32);
-            //apply rotation
-            sceneEditor.setObjectAngle(object, 0);
-            //draw icon
-            const img = new Image();
-            img.onload = function () {
-                // Draw the icon on the canvas
-                ctx.drawImage(img, 0, 0, 32, 32);
-            };
-            img.src = application.getExtensionsDir() + "/" + data.extension + "/icon.png";
-            //end of drawing icon
-            return;
-        }
+        // //draw icon if object is invisible
+        // if (!data.properties.visible || data.properties.visible == "false") {
+        //     //set size
+        //     sceneEditor.setObjectWidth(object, 32);
+        //     sceneEditor.setObjectHeight(object, 32);
+        //     //apply rotation
+        //     sceneEditor.setObjectAngle(object, 0);
+        //     //draw icon
+        //     const img = new Image();
+        //     img.onload = function () {
+        //         // Draw the icon on the canvas
+        //         ctx.drawImage(img, 0, 0, 32, 32);
+        //     };
+        //     img.src = application.getExtensionsDir() + "/" + data.extension + "/icon.png";
+        //     //end of drawing icon
+        //     return;
+        // }
         //
         //set size
         sceneEditor.setObjectWidth(object, data.properties.width);

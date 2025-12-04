@@ -18,7 +18,6 @@ module.exports = {
      * Initialize layer manager
      */
     init() {
-        console.log('Initializing layer manager...');
         this.container = document.getElementById('layerManagerContainer');
 
         if (!this.container) {
@@ -26,27 +25,20 @@ module.exports = {
             return;
         }
 
-        console.log('Layer manager container found:', this.container);
-
         // Connect Add Layer button
         const addLayerBtn = document.getElementById('addLayerBtn');
         if (addLayerBtn) {
             addLayerBtn.onclick = () => this.addLayer();
-            console.log('Add Layer button connected');
-        } else {
-            console.warn('Add Layer button #addLayerBtn not found');
         }
 
         // Connect Refresh Layers button
         const refreshLayersBtn = document.getElementById('refreshLayersBtn');
         if (refreshLayersBtn) {
             refreshLayersBtn.onclick = () => this.refresh();
-            console.log('Refresh Layers button connected');
         }
 
         // Set initial selected layer
         this.selectedLayer = 0;
-        console.log('Initial selected layer:', this.selectedLayer);
 
         this.refresh();
     },
@@ -56,23 +48,19 @@ module.exports = {
      */
     refresh() {
         if (!this.container) {
-            console.warn('Layer manager container not found');
             return;
         }
 
         // Use global sceneEditor reference
         const editor = window.sceneEditor || sceneEditor;
-        console.log('Layer manager refresh called - sceneEditor.sceneData:', editor.sceneData);
 
         if (!editor.sceneData) {
-            console.warn('No scene data available for layer manager');
             this.container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No scene loaded</div>';
             return;
         }
 
         // Ensure layers array exists
         if (!editor.sceneData.layers || !Array.isArray(editor.sceneData.layers)) {
-            console.warn('No layers array in scene data, creating default layer');
             editor.sceneData.layers = [{
                 name: 'default',
                 isRemovable: false,
@@ -91,8 +79,6 @@ module.exports = {
             const layerIndex = editor.sceneData.layers.length - 1 - reverseIndex; // Get original index
             this.createLayerItem(layerIndex, layerData);
         });
-
-        console.log('Layer manager refreshed. Total layers:', editor.sceneData.layers.length);
     },
 
     /**
@@ -120,8 +106,6 @@ module.exports = {
         if (layerItem) {
             layerItem.classList.add('selected-layer');
         }
-
-        console.log(`Layer ${layerIndex} selected`);
     },
 
     /**
@@ -182,10 +166,7 @@ module.exports = {
 
         // Real double-click to rename (if allowed)
         if (layerData.isRenomable !== false) {
-            console.log('[LayerManager] Setting up double-click handler for layer:', layerIndex, 'name:', layerData.name);
-
             layerName.addEventListener('dblclick', (e) => {
-                console.log('[LayerManager] ====== DOUBLE CLICK EVENT ======');
                 e.stopPropagation();
                 e.preventDefault();
                 this.startRenameLayer(layerIndex, layerName);
@@ -194,7 +175,6 @@ module.exports = {
 
         // Click on layerInfo to select layer
         layerInfo.onclick = (e) => {
-            console.log('[LayerManager] Selecting layer from layerInfo:', layerIndex);
             this.selectLayer(layerIndex);
         };
 
@@ -204,7 +184,6 @@ module.exports = {
 
         // Rename button (only if renamable)
         if (layerData.isRenomable !== false) {
-            console.log('[LayerManager] Creating rename button for layer:', layerIndex);
             const renameBtn = document.createElement('button');
             renameBtn.className = 'layer-rename-btn';
             renameBtn.innerHTML = '<i class="ri-edit-line"></i>';
@@ -212,13 +191,9 @@ module.exports = {
             renameBtn.style.fontSize = '14px'; // Make icon larger
             renameBtn.onclick = (e) => {
                 e.stopPropagation();
-                console.log('[LayerManager] Rename button clicked for layer:', layerIndex);
                 this.startRenameLayer(layerIndex, layerName);
             };
             layerActions.appendChild(renameBtn);
-            console.log('[LayerManager] Rename button created and added');
-        } else {
-            console.log('[LayerManager] Layer is NOT renamable, no rename button created for layer:', layerIndex);
         }
 
         if (layerData.isRemovable !== false) {
@@ -305,7 +280,6 @@ module.exports = {
         // Click on preview to select layer
         preview.onclick = (e) => {
             e.stopPropagation();
-            console.log('[LayerManager] Selecting layer from preview:', layerIndex);
             this.selectLayer(layerIndex);
         };
 
@@ -480,8 +454,6 @@ module.exports = {
         if (notifications) {
             notifications.info(`Layer "${layerData.name}" ${layerData.isLocked ? 'locked' : 'unlocked'}`);
         }
-
-        console.log(`Layer ${layerData.name} ${layerData.isLocked ? 'locked' : 'unlocked'}`);
     },
 
     /**
@@ -536,9 +508,8 @@ module.exports = {
     /**
      * Show context menu for object
      */
-    showObjectContextMenu(e, objectData) {
+    showObjectContextMenu(e) {
         // This will be integrated with the existing context menu system
-        console.log('Object context menu', objectData);
     },
 
     /**
@@ -562,7 +533,6 @@ module.exports = {
 
         // Check if already on target layer
         if (oldLayer === newLayer) {
-            console.log('Object already on Layer', newLayer);
             return false;
         }
 
@@ -572,8 +542,6 @@ module.exports = {
 
         const changeLayerCmd = new commands.ChangeLayerCommand(editor, obj, oldLayer, newLayer);
         commandManager.execute(changeLayerCmd);
-
-        console.log(`Moved "${objectName}" from Layer ${oldLayer} to Layer ${newLayer}`);
 
         // Update selectedObjects if this object is selected
         if (editor.selectedObjects && editor.selectedObjects.length > 0) {
@@ -635,7 +603,6 @@ module.exports = {
         });
 
         if (changeLayerCommands.length === 0) {
-            console.log('No objects needed to be moved');
             return false;
         }
 
@@ -645,8 +612,6 @@ module.exports = {
 
         const batchCmd = new commands.BatchCommand('Move Objects to Layer', changeLayerCommands);
         commandManager.execute(batchCmd);
-
-        console.log(`Moved ${changeLayerCommands.length} object(s) to Layer ${newLayer}`);
 
         // Update selectedObjects with fresh data and elements after move
         if (editor.selectedObjects && editor.selectedObjects.length > 0) {
@@ -695,11 +660,8 @@ module.exports = {
         const layers = editor.sceneData.layers;
 
         if (fromIndex < 0 || fromIndex >= layers.length || toIndex < 0 || toIndex >= layers.length) {
-            console.error('Invalid layer indices:', fromIndex, toIndex);
             return false;
         }
-
-        console.log(`Reordering layer from index ${fromIndex} to ${toIndex}`);
 
         // Remove the layer from its original position
         const [movedLayer] = layers.splice(fromIndex, 1);
@@ -727,6 +689,9 @@ module.exports = {
             }
         });
 
+        // Recreate layer DOM elements in new order
+        this.recreateLayerDOMElements(editor);
+
         // Refresh all UI
         if (editor.refreshSceneUI) {
             editor.refreshSceneUI();
@@ -746,7 +711,6 @@ module.exports = {
         const notifications = nw.require('./assets/js/objects/notifications');
         notifications.success(`Layer "${movedLayer.name}" reordered`);
 
-        console.log('Layers reordered successfully');
         return true;
     },
 
@@ -754,31 +718,24 @@ module.exports = {
      * Start renaming a layer
      */
     startRenameLayer(layerIndex, layerNameElement) {
-        console.log('[LayerManager] startRenameLayer called for layer:', layerIndex);
-
         const editor = window.sceneEditor || sceneEditor;
         if (!editor.sceneData || !editor.sceneData.layers) {
-            console.error('[LayerManager] No sceneData or layers array');
             return;
         }
 
         const layerData = editor.sceneData.layers[layerIndex];
-        console.log('[LayerManager] Layer data:', layerData);
 
         if (!layerData) {
-            console.error('[LayerManager] Layer data not found for index:', layerIndex);
             return;
         }
 
         if (layerData.isRenomable === false) {
-            console.warn('[LayerManager] Layer cannot be renamed (isRenomable = false)');
             const notifications = nw.require('./assets/js/objects/notifications');
             notifications.warning('This layer cannot be renamed');
             return;
         }
 
         const currentName = layerData.name;
-        console.log('[LayerManager] Current layer name:', currentName);
 
         // Create input element
         const input = document.createElement('input');
@@ -804,11 +761,9 @@ module.exports = {
 
         const finishRename = () => {
             const newName = input.value.trim() || currentName;
-            console.log('[LayerManager] Finishing rename. New name:', newName);
 
             if (newName !== currentName) {
                 layerData.name = newName;
-                console.log(`[LayerManager] Layer ${layerIndex} renamed from "${currentName}" to "${newName}"`);
 
                 // Refresh hierarchy to show new layer name
                 if (editor.refreshSceneUI) {
@@ -861,22 +816,16 @@ module.exports = {
         const confirmDelete = () => {
             // Remove all objects on this layer (both from DOM and data)
             if (objectCount > 0) {
-                console.log('[LayerManager] Removing', objectCount, 'objects from layer', layerIndex);
-
                 // First, remove visual elements from DOM
                 objectsOnLayer.forEach(obj => {
                     const element = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${obj.oid}"]`);
                     if (element) {
-                        console.log('[LayerManager] Removing visual element for object:', obj.oid);
                         element.remove();
-                    } else {
-                        console.warn('[LayerManager] Could not find visual element for object:', obj.oid);
                     }
                 });
 
                 // Then, remove from scene data
                 editor.sceneData.objects = editor.sceneData.objects.filter(obj => (obj.layer || 0) !== layerIndex);
-                console.log('[LayerManager] ✓ Removed', objectCount, 'objects from data');
             }
 
             // Remove layer from array
@@ -895,8 +844,6 @@ module.exports = {
             } else if (this.selectedLayer > layerIndex) {
                 this.selectedLayer--;
             }
-
-            console.log(`Layer ${layerIndex} deleted (${objectCount} objects removed)`);
 
             // Refresh scene and UI
             if (editor.refreshSceneUI) {
@@ -1017,8 +964,6 @@ module.exports = {
 
         editor.sceneData.layers.push(newLayer);
 
-        console.log(`New layer added: ${newLayer.name}`);
-
         // Refresh UI
         this.refresh();
 
@@ -1041,18 +986,14 @@ module.exports = {
     getExtensionMetadata(extensionId) {
         try {
             const extensionPath = path.join(this.appPath, 'extensions', extensionId, 'data.json');
-            console.log('LayerManager: Attempting to load extension from:', extensionPath);
 
             if (fs.existsSync(extensionPath)) {
                 const data = fs.readFileSync(extensionPath, 'utf8');
                 const parsed = JSON.parse(data);
-                console.log('LayerManager: Successfully loaded extension data:', extensionId, parsed);
                 return parsed;
-            } else {
-                console.warn('LayerManager: Extension file does not exist:', extensionPath);
             }
         } catch (e) {
-            console.warn('LayerManager: Failed to load extension metadata:', extensionId, e);
+            console.error('Failed to load extension metadata:', extensionId, e);
         }
         return null;
     },
@@ -1068,29 +1009,67 @@ module.exports = {
 
         // Get app dimensions from project data
         const editor = window.sceneEditor || sceneEditor;
-        const projectData = window.globals?.projectData;
+        const globals = nw.require('./assets/js/common/globals');
+        const projectData = globals?.project?.data;
         const appWidth = projectData?.properties?.width || 640;
         const appHeight = projectData?.properties?.height || 480;
 
-        // Get scene background color
+        // Get scene dimensions and background color
         const sceneData = editor?.sceneData;
+        const sceneWidth = sceneData?.properties?.width || 1920;
+        const sceneHeight = sceneData?.properties?.height || 1080;
         const backgroundColor = sceneData?.properties?.backgroundColor || '#000000';
 
         // Layer viewport dimensions (16:9 ratio like a computer screen)
         const viewportWidth = 128;
         const viewportHeight = 96;
 
-        // Calculate scale to fit app dimensions in viewport
-        const scale = Math.min(viewportWidth / appWidth, viewportHeight / appHeight);
+        // Calculate scale to fit SCENE dimensions in viewport (not app dimensions)
+        const scale = Math.min(viewportWidth / sceneWidth, viewportHeight / sceneHeight);
+
+        // Calculate scaled scene dimensions
+        const scaledSceneWidth = sceneWidth * scale;
+        const scaledSceneHeight = sceneHeight * scale;
+
+        // Center the scene in the viewport
+        const offsetX = (viewportWidth - scaledSceneWidth) / 2;
+        const offsetY = (viewportHeight - scaledSceneHeight) / 2;
 
         // Clear and prepare preview element
         previewElement.innerHTML = '';
         previewElement.style.position = 'relative';
         previewElement.style.width = viewportWidth + 'px';
         previewElement.style.height = viewportHeight + 'px';
-        previewElement.style.backgroundColor = backgroundColor;
+        previewElement.style.backgroundColor = '#1a1a1a'; // Dark background outside scene
         previewElement.style.backgroundImage = 'none'; // Remove any grid/pattern
         previewElement.style.margin = '0 auto';
+
+        // Create scene container
+        const sceneContainer = document.createElement('div');
+        sceneContainer.className = 'layer-preview-scene';
+        sceneContainer.style.position = 'absolute';
+        sceneContainer.style.left = offsetX + 'px';
+        sceneContainer.style.top = offsetY + 'px';
+        sceneContainer.style.width = scaledSceneWidth + 'px';
+        sceneContainer.style.height = scaledSceneHeight + 'px';
+        sceneContainer.style.backgroundColor = backgroundColor;
+        sceneContainer.style.overflow = 'hidden';
+
+        // Add visible area indicator (app viewport)
+        const visibleArea = document.createElement('div');
+        visibleArea.className = 'layer-preview-visible-area';
+        visibleArea.style.position = 'absolute';
+        visibleArea.style.left = '0px'; // App viewport starts at scene origin
+        visibleArea.style.top = '0px';
+        visibleArea.style.width = (appWidth * scale) + 'px';
+        visibleArea.style.height = (appHeight * scale) + 'px';
+        visibleArea.style.border = '2px solid rgba(76, 175, 80, 0.8)'; // Green border
+        visibleArea.style.boxShadow = 'inset 0 0 0 1px rgba(76, 175, 80, 0.3)';
+        visibleArea.style.pointerEvents = 'none';
+        visibleArea.title = `Visible area (${appWidth}x${appHeight})`;
+
+        previewElement.appendChild(sceneContainer);
+        sceneContainer.appendChild(visibleArea);
 
         // Sort objects by layer order
         const sortedObjects = [...objects].sort((a, b) => {
@@ -1106,7 +1085,7 @@ module.exports = {
             const previewMode = extensionData?.hierarchyPreview || 'icon';
             const extensionIcon = extensionData?.extensionIcon;
 
-            // Calculate scaled position and dimensions for viewport
+            // Calculate scaled position and dimensions relative to scene
             const scaledX = (obj.properties.x || 0) * scale;
             const scaledY = (obj.properties.y || 0) * scale;
             const scaledWidth = (obj.properties.width || 50) * scale;
@@ -1161,7 +1140,6 @@ module.exports = {
                         extension.update(canvas, objectData);
                         return true;
                     } catch (e) {
-                        console.error('LayerManager: Failed to render object:', e);
                         return false;
                     }
                 };
@@ -1188,7 +1166,7 @@ module.exports = {
                 objContainer.style.border = '1px solid rgba(255, 255, 255, 0.3)';
             }
 
-            previewElement.appendChild(objContainer);
+            sceneContainer.appendChild(objContainer);
         });
     },
 
@@ -1201,28 +1179,31 @@ module.exports = {
         }
 
         if (!this.container) {
-            console.warn('Layer manager container not available, cannot refresh previews');
             return;
         }
 
-        console.log('Refreshing layer previews for', objectsData.length, 'objects');
-
-        // Get unique layers affected by these objects
+        // PERFORMANCE: Get unique layers affected by these objects
         const affectedLayers = new Set();
         objectsData.forEach(obj => {
             affectedLayers.add(obj.layer || 0);
         });
 
+        // PERFORMANCE: Batch DOM lookups - get all layer items at once
+        const layerItems = this.container.querySelectorAll('[data-layer]');
+        const layerMap = new Map();
+        layerItems.forEach(item => {
+            const layerNum = parseInt(item.getAttribute('data-layer'));
+            layerMap.set(layerNum, item);
+        });
+
         // Refresh preview for each affected layer
         affectedLayers.forEach(layerNum => {
-            const layerItem = this.container.querySelector(`[data-layer="${layerNum}"]`);
+            const layerItem = layerMap.get(layerNum);
             if (layerItem) {
                 const previewElement = layerItem.querySelector('.layer-preview');
                 if (previewElement) {
                     // Get all objects in this layer
                     const objects = this.getObjectsInLayer(layerNum);
-
-                    console.log(`Refreshing preview for layer ${layerNum} with ${objects.length} objects`);
 
                     // Re-render the preview
                     this.renderLayerPreview(previewElement, objects);
@@ -1244,5 +1225,59 @@ module.exports = {
         };
 
         return extensionColors[obj.extension] || '#a29bfe';
+    },
+
+    /**
+     * Recreate layer DOM elements in the correct order after layer reordering
+     */
+    recreateLayerDOMElements(editor) {
+        const scene = document.querySelector("#scnSceneBox");
+        if (!scene) {
+            console.error('Scene box not found');
+            return;
+        }
+
+        // Get all existing layer DOM elements
+        const existingLayerDivs = scene.querySelectorAll('.__ajs_scene_layer');
+
+        // Store all objects with their current DOM elements
+        const objectElements = new Map();
+        existingLayerDivs.forEach(layerDiv => {
+            const objects = layerDiv.querySelectorAll('.__ajs_scene_object');
+            objects.forEach(obj => {
+                const oid = obj.getAttribute('__ajs_object_ID');
+                if (oid) {
+                    objectElements.set(oid, obj);
+                }
+            });
+        });
+
+        // Remove all existing layer divs
+        existingLayerDivs.forEach(div => div.remove());
+
+        // Recreate layer divs in the new order (from editor.sceneData.layers)
+        if (editor.sceneData && editor.sceneData.layers) {
+            editor.sceneData.layers.forEach((layerData, layerNum) => {
+                const layerName = layerData.name || `Layer ${layerNum}`;
+                const layerDiv = document.createElement('div');
+                layerDiv.className = '__ajs_scene_layer';
+                layerDiv.setAttribute('__ajs_layer_name', layerName);
+                layerDiv.setAttribute('data-layer-number', layerNum);
+                scene.appendChild(layerDiv);
+            });
+        }
+
+        // Move each object to its correct layer
+        if (editor.sceneData && editor.sceneData.objects) {
+            editor.sceneData.objects.forEach(obj => {
+                const layerNum = obj.layer !== undefined ? obj.layer : 0;
+                const layerDiv = scene.querySelector(`.__ajs_scene_layer[data-layer-number="${layerNum}"]`);
+                const objectElement = objectElements.get(obj.oid);
+
+                if (layerDiv && objectElement) {
+                    layerDiv.appendChild(objectElement);
+                }
+            });
+        }
     }
 };

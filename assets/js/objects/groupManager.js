@@ -90,7 +90,6 @@ module.exports = {
         commandManager.execute(groupCmd);
 
         notifications.success(`Grouped ${selected.length} objects`);
-        console.log('[GROUP] Created group:', groupData);
     },
 
     /**
@@ -142,7 +141,6 @@ module.exports = {
                 totalUngrouped += groupObjects.length;
             }
 
-            console.log('[GROUP] Prepared ungroup for:', groupId);
         });
 
         // Execute all ungroup commands as batch
@@ -214,7 +212,6 @@ module.exports = {
             });
         }
 
-        console.log('[GROUP] Selected group:', groupId, 'with', selectedCount, 'objects');
     },
 
     /**
@@ -244,7 +241,6 @@ module.exports = {
             sceneEditor.refreshSceneUI();
         }
 
-        console.log('[GROUP] Toggled collapse for group:', groupId, 'collapsed:', group.collapsed);
     },
 
     /**
@@ -263,6 +259,5 @@ module.exports = {
             sceneEditor.markAsModified();
         }
 
-        console.log('[GROUP] Renamed group:', groupId, 'to:', newName);
     }
 };

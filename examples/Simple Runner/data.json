@@ -8,10 +8,14 @@
         "author": "Ouya Jean-Marc Olivier",
         "company": "Dev Consulting",
         "package": "ajs.devconsulting.simplerunner",
-        "width": 640,
-        "height": 480
+        "width": 1024,
+        "height": 640,
+        "fullscreen": false,
+        "resizable": true,
+        "mainScene": "scenes/level1.scn",
+        "targetFPS": 60
     },
     "cache": {
-        "lastScene": "scenes/game.scn"
+        "lastScene": "scenes/level1.scn"
     }
 }

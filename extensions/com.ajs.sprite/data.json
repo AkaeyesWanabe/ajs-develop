@@ -2,8 +2,8 @@
     "extension": "com.ajs.sprite",
     "extensionName": "Animated Sprite",
     "extensionIcon": "icon.png",
-    "description": "Animated sprite with multiple frames",
-    "category": "Game Objects",
+    "description": "Animated sprite with multiple frames using animator files",
+    "category": "Graphics",
     "hierarchyPreview": "preview",
     "propertiesTabs": [
         {
@@ -18,6 +18,11 @@
         },
         {
             "name": "Display",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Scripts",
             "icon-type": "icon",
             "icon": "pip"
         }
@@ -81,16 +86,24 @@
             "label": "Animations",
             "type": "animator",
             "description": "Sprite animation to show."
+        },
+        {
+            "name": "script",
+            "tab": 3,
+            "label": "Script",
+            "type": "script",
+            "description": "JavaScript script to attach to this object."
         }
     ],
     "properties": {
-        "name": "New Image",
+        "name": "New Sprite",
         "visible": true,
         "x": 0,
         "y": 0,
         "width": 320,
         "height": 240,
         "angle": 0,
-        "animator": ""
+        "animator": "",
+        "script": ""
     }
 }

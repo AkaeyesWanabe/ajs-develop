@@ -1,0 +1,11 @@
+{
+    "id": "com.ajs.input.keyboard",
+    "name": "Keyboard Input",
+    "version": "1.0.0",
+    "type": "system",
+    "internal": true,
+    "singleton": true,
+    "description": "System extension for keyboard input management",
+    "author": "AJS Develop",
+    "properties": {}
+}

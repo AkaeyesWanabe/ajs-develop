@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="./assets/css/projectFiles.css" />
   <link rel="stylesheet" href="./assets/css/projectFilesToolbar.css" />
   <link rel="stylesheet" href="./assets/css/properties.css" />
+  <link rel="stylesheet" href="./assets/css/scriptsList.css" />
   <link rel="stylesheet" href="./assets/css/sceneEditor.css" />
   <link rel="stylesheet" href="./assets/css/scriptEditor.css" />
   <link rel="stylesheet" href="./assets/css/player.css" />
@@ -52,22 +53,44 @@
 <body oncontextmenu="return false;" class="drag-off">
   <!-- preloader -->
   <section id="preloader" class="drag-off">
-    <div id="preloaderTop">
-      <center>
-        <img src="../assets/images/favicon.png" />
-        <h1>AJS Develop 1.0</h1>
-      </center>
+    <!-- Background animated particles -->
+    <div class="preloader-particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
     </div>
 
-    <div id="preloaderBottom">
-      <center>
-        <a>from</a>
-        <h1>Dev Consulting</h1>
-      </center>
+    <!-- Main content -->
+    <div id="preloaderContent">
+      <div id="preloaderLogo">
+        <div class="logo-ring"></div>
+        <div class="logo-ring logo-ring-2"></div>
+        <img src="./assets/images/favicon.png" alt="AJS Develop" />
+      </div>
+
+      <h1 class="preloader-title">AJS Develop</h1>
+      <p class="preloader-version">v1.0</p>
+
+      <!-- Loading bar with percentage -->
+      <div class="preloader-loading">
+        <div>
+          <span class="loading-percentage">0%</span>
+        </div>
+        <div class="loading-bar-container">
+          <div class="loading-bar">
+            <div class="loading-bar-fill"></div>
+            <div class="loading-bar-glow"></div>
+          </div>
+        </div>
+        <p class="loading-text">Initializing workspace...</p>
+      </div>
     </div>
 
-    <div id="preloaderLoadingBar" value="50">
-      <div></div>
+    <!-- Footer -->
+    <div id="preloaderFooter">
+      <p>from <strong>Dev Consulting</strong></p>
     </div>
   </section>
 
@@ -86,17 +109,17 @@
         <main id="editor">
           <div class="workspaceTitleBar" id="editorTabs">
             <div class="workspaceMenu">
-              <span id="sceneEditorTab" for="sceneEditor" class="active">
+              <span id="sceneEditorTab" for="sceneEditorView" class="active">
                 <i class="ri-window-fill"></i>
                 <b>Scene Editor</b>
               </span>
 
-              <span id="scriptEditorTab" for="scriptEditor">
+              <span id="scriptEditorTab" for="scriptEditorView">
                 <i class="ri-code-s-slash-fill"></i>
                 <b>Script Editor</b>
               </span>
 
-              <span id="playerTab" for="player">
+              <span id="playerTab" for="playerView">
                 <i class="bi ri-play-large-fill"></i>
                 <b>Player</b>
               </span>
@@ -118,9 +141,9 @@
           </div>
 
           <!-- editor body -->
-          <div id="sceneEditor" class="workFrame active"></div>
-          <div id="scriptEditor" class="workFrame"></div>
-          <div id="player" class="workFrame"></div>
+          <div id="sceneEditorView" class="workFrame active"></div>
+          <div id="scriptEditorView" class="workFrame"></div>
+          <div id="playerView" class="workFrame"></div>
         </main>
 
         <!-- properties -->
@@ -141,6 +164,8 @@
   <!-- animations editor -->
   <div id="animatorEditorBack" class="subWinBack"></div>
 
+  <!-- Project Settings Modal -->
+  <div id="projectSettingsContainer"></div>
 
   <!-- sub windows -->
   <input type="file" id="FileInput" />

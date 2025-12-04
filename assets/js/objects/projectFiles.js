@@ -162,6 +162,22 @@ module.exports = {
             else {
                 this.classList.add("selected");
             }
+
+            // If a .scn file is selected, show scene properties
+            const filename = this.getAttribute('filename');
+            if (filename && filename.endsWith('.scn')) {
+                const sceneEditor = window.sceneEditor || nw.require('./assets/js/objects/sceneEditor');
+
+                // If scene editor exists and showSceneProperties method exists
+                if (sceneEditor && sceneEditor.showSceneProperties) {
+                    // Get the clicked file path
+                    const filepath = this.getAttribute('path');
+
+                    // Show properties of the clicked scene file
+                    // Pass the file path so it loads from the actual file
+                    sceneEditor.showSceneProperties(filepath);
+                }
+            }
         });
 
         //
@@ -190,6 +206,29 @@ module.exports = {
             // Open file using unified method
             module.exports.openFileByPath(path, this.getAttribute("filename"));
         });
+
+        //
+        // Drag and drop for script files
+        $('.projectFilesItem').each(function() {
+            const filename = this.getAttribute('filename');
+            const filePath = this.getAttribute('path');
+
+            // Make .js files draggable
+            if (filename && filename.toLowerCase().endsWith('.js')) {
+                this.setAttribute('draggable', 'true');
+
+                this.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/script-path', filePath);
+                    e.dataTransfer.setData('text/script-name', filename);
+                    e.dataTransfer.effectAllowed = 'copy';
+                    this.style.opacity = '0.5';
+                });
+
+                this.addEventListener('dragend', function(e) {
+                    this.style.opacity = '1';
+                });
+            }
+        });
     },
 
     /**
@@ -198,15 +237,12 @@ module.exports = {
      * @param {string} fileName - Name of the file with extension
      */
     openFileByPath(filePath, fileName) {
-        console.log('[PROJECT FILES] Opening file:', fileName, 'at path:', filePath);
-
         // Extract file extension
         const fname = fileName.toLowerCase();
         const fext = fname.substring(fname.lastIndexOf("."), fname.length);
 
         // Check if file exists
         if (!fs.existsSync(filePath)) {
-            console.error('[PROJECT FILES] File not found:', filePath);
             if (notifications) {
                 notifications.error(`File not found: ${fileName}`);
             }
@@ -216,16 +252,12 @@ module.exports = {
         try {
             // Read file content asynchronously for better UX
             const data = fs.readFileSync(filePath, 'utf8');
-            console.log('[PROJECT FILES] File read successfully, length:', data.length);
 
             // Determine file type and open in appropriate editor
             const scriptExtensions = ['.js', '.jsx', '.mjs', '.cjs', '.json', '.html', '.htm', '.css', '.md', '.txt'];
             const isScriptFile = scriptExtensions.includes(fext);
 
             if (isScriptFile) {
-                // Open in Script Editor
-                console.log('[PROJECT FILES] Opening in Script Editor...');
-
                 // Create file info for script editor
                 const fitem = {
                     name: fname,
@@ -251,7 +283,6 @@ module.exports = {
             }
             else if (fext === '.scn') {
                 // Open in Scene Editor
-                console.log('[PROJECT FILES] Opening in Scene Editor...');
                 sceneEditor.openScene(filePath, fileName, data);
 
                 const sceneEditorTab = document.querySelector("#sceneEditorTab");
@@ -261,18 +292,16 @@ module.exports = {
             }
             else if (fext === '.anim') {
                 // Open in Animator
-                console.log('[PROJECT FILES] Opening in Animator...');
                 animator.openAnimator(filePath, fileName, data);
             }
             else {
                 // Unsupported file type
-                console.warn('[PROJECT FILES] Unsupported file type:', fext);
                 if (notifications) {
                     notifications.warning(`Cannot open ${fext} files in editor yet`);
                 }
             }
         } catch (err) {
-            console.error('[PROJECT FILES] Failed to open file:', filePath, err);
+            console.error('Failed to open file:', err);
             if (notifications) {
                 notifications.error(`Failed to open ${fileName}: ${err.message}`);
             }
@@ -413,7 +442,6 @@ module.exports = {
             $this.refreshFolderIcon();
         }, 100);
 
-        console.log(`Loaded ${rootFolders.length} root folders`);
     },
 
     /**
@@ -527,8 +555,6 @@ module.exports = {
                 this.applyFilterAndSearch();
             }
         }, 1);
-
-        console.log(`Loaded ${files.length} files from: ${dirPath}`);
     },
 
     /**
@@ -620,8 +646,6 @@ module.exports = {
                 clearBtn.style.display = 'none';
             });
         }
-
-        console.log('[ProjectFiles] Search initialized');
     },
 
     /**
@@ -641,12 +665,8 @@ module.exports = {
 
                 // Apply filter
                 this.applyFilterAndSearch();
-
-                console.log('[ProjectFiles] Filter changed to:', this.currentFilter);
             });
         });
-
-        console.log('[ProjectFiles] Filters initialized');
     },
 
     /**
@@ -657,8 +677,6 @@ module.exports = {
         if (!files || files.length === 0) return;
 
         const currentDir = globals.project.dir + globals.project.current.relativeFileParentPath.replace(/\./g, '');
-
-        console.log('[ProjectFiles] Importing', files.length, 'files to:', currentDir);
 
         let successCount = 0;
         let errorCount = 0;
@@ -671,7 +689,6 @@ module.exports = {
             try {
                 // Check if file already exists
                 if (fs.existsSync(destPath)) {
-                    console.warn('[ProjectFiles] File already exists:', file.name);
                     errorCount++;
                     continue;
                 }
@@ -679,10 +696,9 @@ module.exports = {
                 // Copy file
                 fs.copyFileSync(sourcePath, destPath);
                 successCount++;
-                console.log('[ProjectFiles] Copied:', file.name);
 
             } catch (err) {
-                console.error('[ProjectFiles] Error copying file:', file.name, err);
+                console.error('Error copying file:', file.name, err);
                 errorCount++;
             }
         }
@@ -698,8 +714,6 @@ module.exports = {
         if (errorCount > 0) {
             notifications.warning(`Failed to import ${errorCount} file${errorCount > 1 ? 's' : ''}`);
         }
-
-        console.log('[ProjectFiles] Import complete:', successCount, 'success,', errorCount, 'errors');
     },
 
     /**
@@ -725,8 +739,6 @@ module.exports = {
             // Reset input
             fileInput.value = '';
         });
-
-        console.log('[ProjectFiles] Bulk import initialized');
     },
 
     /**
@@ -780,8 +792,6 @@ module.exports = {
                 this.importFiles(files);
             }
         });
-
-        console.log('[ProjectFiles] Drag & drop initialized');
     },
 
     /**
@@ -792,7 +802,6 @@ module.exports = {
         this.initFilters();
         this.initBulkImport();
         this.initDragAndDrop();
-        console.log('[ProjectFiles] Toolbar initialized');
     },
 
     /**
@@ -800,6 +809,76 @@ module.exports = {
      * @param {string} filePath - Path to the file to delete
      * @returns {Promise<boolean>} Success status
      */
+    /**
+     * Create a new scene file
+     * @param {string} folderPath - Path to the folder where scene will be created
+     * @param {string} sceneName - Name of the scene (without .scn extension)
+     * @returns {Promise<boolean>} True if successful
+     */
+    async createNewScene(folderPath, sceneName) {
+        if (!folderPath || !sceneName) {
+            return false;
+        }
+
+        try {
+            // Ensure the scene name doesn't have .scn extension
+            sceneName = sceneName.replace(/\.scn$/i, '');
+
+            // Create the full file path
+            const sceneFilePath = path.join(folderPath, `${sceneName}.scn`);
+
+            // Check if file already exists
+            if (fs.existsSync(sceneFilePath)) {
+                if (typeof notifications !== 'undefined') {
+                    notifications.error(`Scene "${sceneName}" already exists`);
+                }
+                return false;
+            }
+
+            // Create a default scene structure
+            const defaultScene = {
+                "extension": "internal/com.ajs.scene",
+                "cache": {
+                    "sceneEditor": {
+                        "scrollX": 0,
+                        "scrollY": 0
+                    }
+                },
+                "properties": {
+                    "name": sceneName,
+                    "visible": true,
+                    "width": 1920,
+                    "height": 1080,
+                    "virtualWidth": 2920,  // width + 1000
+                    "virtualHeight": 2080, // height + 1000
+                    "backgroundColor": "white"
+                },
+                "groups": [],
+                "layers": [
+                    {
+                        "name": "default",
+                        "isRemovable": false,
+                        "isRenomable": true,
+                        "isLocked": false
+                    }
+                ],
+                "objects": []
+            };
+
+            // Write the scene file
+            fs.writeFileSync(sceneFilePath, JSON.stringify(defaultScene, null, 4), 'utf8');
+
+            // Refresh file list
+            this.getFileList(globals.project.dir);
+            this.loadFiles(globals.project.current.relativeFileParentPath);
+
+            return true;
+        } catch (err) {
+            console.error('[ProjectFiles] Error creating scene:', err);
+            return false;
+        }
+    },
+
     async deleteFile(filePath) {
         if (!filePath || !fs.existsSync(filePath)) {
             console.error('[ProjectFiles] File does not exist:', filePath);
@@ -813,11 +892,9 @@ module.exports = {
             if (stats.isDirectory()) {
                 // Delete directory recursively
                 fs.rmSync(filePath, { recursive: true, force: true });
-                console.log('[ProjectFiles] Deleted directory:', filePath);
             } else {
                 // Delete file
                 fs.unlinkSync(filePath);
-                console.log('[ProjectFiles] Deleted file:', filePath);
             }
 
             // Refresh file list
@@ -826,7 +903,7 @@ module.exports = {
 
             return true;
         } catch (err) {
-            console.error('[ProjectFiles] Error deleting file/folder:', err);
+            console.error('Error deleting file/folder:', err);
             return false;
         }
     },
@@ -860,7 +937,6 @@ module.exports = {
             this.getFileList(globals.project.dir);
             this.loadFolders();
             this.loadFiles(globals.project.current.relativeFileParentPath);
-            console.log('[ProjectFiles] Refreshed');
         }
     },
 
@@ -880,5 +956,88 @@ module.exports = {
         let lastSceneData = fs.readFileSync(lastSceneFPath);
         sceneEditor.openScene(lastSceneFPath, lastSceneFName, lastSceneData);
         document.querySelector("#sceneEditorTab").click();
+    },
+
+    /**
+     * Rename a file or folder
+     * @param {string} oldPath - Current path of the file/folder
+     * @param {string} newName - New name for the file/folder
+     * @returns {boolean} - Success status
+     */
+    async renameFile(oldPath, newName) {
+        try {
+            if (!fs.existsSync(oldPath)) {
+                return false;
+            }
+
+            const dirname = path.dirname(oldPath);
+            const newPath = path.join(dirname, newName);
+
+            // Check if new name already exists
+            if (fs.existsSync(newPath)) {
+                notifications.error(`A file or folder named "${newName}" already exists`);
+                return false;
+            }
+
+            // Rename the file/folder
+            fs.renameSync(oldPath, newPath);
+
+            // Refresh file list
+            this.refresh();
+
+            return true;
+        } catch (err) {
+            console.error('[ProjectFiles] Error renaming file:', err);
+            notifications.error('Failed to rename: ' + err.message);
+            return false;
+        }
+    },
+
+    /**
+     * Duplicate a file
+     * @param {string} filePath - Path of the file to duplicate
+     * @returns {boolean} - Success status
+     */
+    async duplicateFile(filePath) {
+        try {
+            if (!fs.existsSync(filePath)) {
+                return false;
+            }
+
+            const stat = fs.statSync(filePath);
+            if (stat.isDirectory()) {
+                notifications.error('Cannot duplicate folders');
+                return false;
+            }
+
+            const dirname = path.dirname(filePath);
+            const basename = path.basename(filePath);
+            const extname = path.extname(filePath);
+            const nameWithoutExt = basename.slice(0, -extname.length);
+
+            // Find a unique name for the duplicate
+            let copyName = `${nameWithoutExt}_copy${extname}`;
+            let copyPath = path.join(dirname, copyName);
+            let counter = 1;
+
+            while (fs.existsSync(copyPath)) {
+                copyName = `${nameWithoutExt}_copy_${counter}${extname}`;
+                copyPath = path.join(dirname, copyName);
+                counter++;
+            }
+
+            // Copy the file
+            fs.copyFileSync(filePath, copyPath);
+
+            // Refresh file list
+            this.refresh();
+
+            notifications.success(`File duplicated as "${copyName}"`);
+            return true;
+        } catch (err) {
+            console.error('[ProjectFiles] Error duplicating file:', err);
+            notifications.error('Failed to duplicate: ' + err.message);
+            return false;
+        }
     }
 }

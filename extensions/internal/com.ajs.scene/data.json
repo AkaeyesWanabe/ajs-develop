@@ -1,21 +1,80 @@
 {
     "extension": "internal/com.ajs.scene",
+    "extensionName": "Scene",
+    "extensionIcon": "icon.png",
     "propertiesTabs": [
         {
-            "name": "display",
+            "name": "Scene",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Dimensions",
             "icon-type": "icon",
             "icon": "pip"
         }
     ],
-    "propertiesVariables": {
-        "name": {
+    "propertiesVariables": [
+        {
+            "name": "name",
             "tab": 0,
             "label": "Scene Name",
             "type": "text",
             "defaultValue": "new_scene",
             "description": "Name of the scene."
+        },
+        {
+            "name": "visible",
+            "tab": 0,
+            "label": "Visible",
+            "type": "checkbox",
+            "checkbox-label": "visible",
+            "defaultValue": true,
+            "description": "Visibility of the scene."
+        },
+        {
+            "name": "backgroundColor",
+            "tab": 0,
+            "label": "Background Color",
+            "type": "color",
+            "defaultValue": "white",
+            "description": "Background color of the scene."
+        },
+        {
+            "name": "width",
+            "tab": 1,
+            "label": "Width",
+            "type": "number",
+            "defaultValue": 1920,
+            "description": "Width of the scene in pixels."
+        },
+        {
+            "name": "height",
+            "tab": 1,
+            "label": "Height",
+            "type": "number",
+            "defaultValue": 1080,
+            "description": "Height of the scene in pixels."
+        },
+        {
+            "name": "virtualWidth",
+            "tab": 1,
+            "label": "Virtual Width",
+            "type": "number",
+            "defaultValue": 2920,
+            "description": "Virtual width of the scene (automatically set to width + 1000).",
+            "readOnly": true
+        },
+        {
+            "name": "virtualHeight",
+            "tab": 1,
+            "label": "Virtual Height",
+            "type": "number",
+            "defaultValue": 2080,
+            "description": "Virtual height of the scene (automatically set to height + 1000).",
+            "readOnly": true
         }
-    },
+    ],
     "layers": [
         {
             "isRemovable": false,

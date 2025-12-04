@@ -1,0 +1,33 @@
+{
+    "id": "com.ajs.sound",
+    "name": "Sound System",
+    "version": "1.0.0",
+    "type": "system",
+    "internal": true,
+    "singleton": true,
+    "description": "System extension for sound and music management",
+    "author": "AJS Develop",
+    "properties": {
+        "masterVolume": {
+            "type": "number",
+            "default": 1,
+            "label": "Master Volume",
+            "min": 0,
+            "max": 1
+        },
+        "soundVolume": {
+            "type": "number",
+            "default": 1,
+            "label": "Sound FX Volume",
+            "min": 0,
+            "max": 1
+        },
+        "musicVolume": {
+            "type": "number",
+            "default": 1,
+            "label": "Music Volume",
+            "min": 0,
+            "max": 1
+        }
+    }
+}

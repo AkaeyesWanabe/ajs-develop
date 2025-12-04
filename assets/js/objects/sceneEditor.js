@@ -10,11 +10,15 @@ const rectangleSelection = nw.require('./assets/js/objects/rectangleSelection');
 
 module.exports = {
     sceneData: {},
+    showColliders: false, // Toggle for showing colliders in editor
 
     cache: {
         sceneFilePath: "",
         sceneFilename: "",
     },
+
+    // PERFORMANCE: Cache DOM elements by OID for O(1) lookup
+    objectElementsCache: new Map(),
 
     isInsideObject: false,
     canBeOutside: true,
@@ -30,7 +34,6 @@ module.exports = {
      */
     markAsModified() {
         if (!this.hasUnsavedChanges) {
-            console.log('[SCENE] Scene marked as modified');
             this.hasUnsavedChanges = true;
         }
     },
@@ -39,7 +42,6 @@ module.exports = {
         //
         if (path == this.cache.sceneFilePath) {
             // Même fichier déjà ouvert, mais on recharge la grille quand même pour éviter qu'elle ne s'affiche pas
-            console.log('[SCENE EDITOR] Same scene already open, reloading grid...');
             const grid = window.grid;
             if (grid) {
                 // Force recreation of grid canvas
@@ -63,12 +65,21 @@ module.exports = {
         //
         this.cache.sceneFilePath = path;
         this.cache.sceneFilename = filename;
+
+        // Update project cache with last opened scene
+        const projectCache = nw.require('./assets/js/objects/projectCache');
+        if (projectCache && path) {
+            const relativePath = projectCache.getRelativePath(path);
+            if (relativePath) {
+                projectCache.saveLastScene(relativePath);
+            }
+        }
+
         //
         try {
             this.sceneData = JSON.parse(data);
             // Reset unsaved changes flag when opening a scene
             this.hasUnsavedChanges = false;
-            console.log('Scene loaded:', filename, '- Objects:', this.sceneData.objects.length);
             //
             $("#scnEditor").attr("visible", "true");
             $("#scnEditorTabs").attr("visible", "true");
@@ -97,27 +108,11 @@ module.exports = {
      * Save current scene to file and project data
      */
     saveScene() {
-        console.log('=== SAVE SCENE START ===');
-        console.log('sceneFilePath:', this.cache.sceneFilePath);
-        console.log('sceneData exists:', !!this.sceneData);
-
         if (!this.cache.sceneFilePath || !this.sceneData) {
-            console.warn('[SAVE] No scene to save - missing path or data');
             return false;
         }
 
         try {
-            console.log('[SAVE] Scene has', this.sceneData.objects?.length || 0, 'objects');
-
-            // Log sample of object data to verify it's current
-            if (this.sceneData.objects && this.sceneData.objects.length > 0) {
-                console.log('[SAVE] Sample object data:', {
-                    name: this.sceneData.objects[0].properties?.name,
-                    x: this.sceneData.objects[0].properties?.x,
-                    y: this.sceneData.objects[0].properties?.y,
-                    layer: this.sceneData.objects[0].layer
-                });
-            }
 
             // Update cache with current scroll position
             const scnEditor = document.querySelector("#scnEditor");
@@ -132,33 +127,22 @@ module.exports = {
             }
 
             // Write scene to file
-            console.log('[SAVE] Stringifying sceneData...');
             const data = JSON.stringify(this.sceneData, null, 4);
-            console.log('[SAVE] Data size:', data.length, 'characters');
-
-            console.log('[SAVE] Writing to file:', this.cache.sceneFilePath);
             fs.writeFileSync(this.cache.sceneFilePath, data, 'utf8');
-
-            console.log('[SAVE] ✓ Scene saved successfully:', this.cache.sceneFilePath);
 
             // Mark as saved (no unsaved changes)
             this.hasUnsavedChanges = false;
-            console.log('[SAVE] Scene marked as saved (no unsaved changes)');
 
             // Also save project data (contains app dimensions)
             if (application && application.saveProject) {
-                console.log('[SAVE] Saving project data...');
                 application.saveProject();
             }
 
-            console.log('=== SAVE SCENE END (SUCCESS) ===');
             return true;
         }
         catch (err) {
-            console.error('[SAVE] ✗ Failed to save scene:', err);
-            console.error('[SAVE] Error stack:', err.stack);
+            console.error('Failed to save scene:', err);
             alert('Failed to save scene: ' + err.message);
-            console.log('=== SAVE SCENE END (FAILED) ===');
             return false;
         }
     },
@@ -171,45 +155,30 @@ module.exports = {
      * Refresh all scene-related UI components (hierarchy, layer manager, add object button)
      */
     refreshSceneUI() {
-        console.log('=== refreshSceneUI called ===');
-        console.log('sceneEditor.sceneData exists?', !!this.sceneData);
-        if (this.sceneData) {
-            console.log('sceneData.objects exists?', !!this.sceneData.objects);
-            console.log('sceneData.objects length:', this.sceneData.objects ? this.sceneData.objects.length : 'N/A');
-        }
-
         // Refresh hierarchy using hierarchy module
         if (hierarchy) {
-            console.log('Calling hierarchy.refresh()');
             hierarchy.refresh();
-        } else {
-            console.warn('hierarchy module not available');
         }
 
         // Refresh layer manager
         if (layerManager && layerManager.container) {
-            console.log('Calling layerManager.refresh()');
             layerManager.refresh();
-        } else {
-            console.warn('layerManager not available');
         }
 
         // Update Add Object button state
         if (typeof window !== 'undefined' && typeof window.updateAddObjectButton === 'function') {
             window.updateAddObjectButton();
-        } else {
-            console.warn('updateAddObjectButton function not available');
         }
     },
 
     refreshEditor() {
-        let sceneEditor = document.querySelector("#sceneEditor");
-        sceneEditor.style.width = sceneEditor.parentElement.clientWidth + "px";
-        sceneEditor.style.height = sceneEditor.parentElement.clientHeight - 32 + "px";
+        let sceneEditorView = document.querySelector("#sceneEditorView");
+        sceneEditorView.style.width = sceneEditorView.parentElement.clientWidth + "px";
+        sceneEditorView.style.height = sceneEditorView.parentElement.clientHeight - 32 + "px";
         //
         let scnEditor = document.querySelector("#scnEditor");
-        scnEditor.style.width = sceneEditor.clientWidth + "px";
-        scnEditor.style.height = sceneEditor.clientHeight - 32 + "px";
+        scnEditor.style.width = sceneEditorView.clientWidth + "px";
+        scnEditor.style.height = sceneEditorView.clientHeight - 32 + "px";
         //
         let virtualBox = document.querySelector("#scnVirtualBox");
         if (virtualBox != null) {
@@ -286,7 +255,6 @@ module.exports = {
 
                 // Create DOM layers for all used layer numbers (sorted from 0 upwards)
                 const sortedLayers = Array.from(layersUsed).sort((a, b) => a - b);
-                console.log('Creating DOM layers for:', sortedLayers);
 
                 let scene = document.querySelector("#scnSceneBox");
                 sortedLayers.forEach((layerNum) => {
@@ -324,7 +292,6 @@ module.exports = {
                         // Show grid after scene is loaded - ALWAYS recreate canvas first
                         const grid = window.grid;
                         if (grid) {
-                            console.log('[SCENE EDITOR] Recreating and showing grid after scene load');
                             // Force recreation of grid canvas to ensure it's in the new scnZoomWrapper
                             if (grid.createGridCanvas) {
                                 grid.createGridCanvas();
@@ -340,7 +307,6 @@ module.exports = {
                         // Initialize zoom after scene is loaded
                         const zoom = window.zoom;
                         if (zoom) {
-                            console.log('[SCENE EDITOR] Initializing zoom after scene load');
                             zoom.init(document.getElementById('scnEditor'));
                             zoom.setZoom(100); // Reset to 100%
                         }
@@ -348,8 +314,18 @@ module.exports = {
                         // Initialize rectangle selection for multi-select
                         const scnEditor = document.getElementById('scnEditor');
                         if (rectangleSelection && scnEditor) {
-                            console.log('[SCENE EDITOR] Initializing rectangle selection');
                             rectangleSelection.init(scnEditor);
+                        }
+
+                        // Add click handler to scene box to show scene properties
+                        const sceneBox = document.getElementById('scnSceneBox');
+                        if (sceneBox) {
+                            sceneBox.addEventListener('click', (e) => {
+                                // Only handle if clicking directly on scnSceneBox (not on objects)
+                                if (e.target.id === 'scnSceneBox' || e.target.classList.contains('__ajs_scene_layer')) {
+                                    this.showSceneProperties();
+                                }
+                            });
                         }
                     }, 100);
                 }, 100);
@@ -437,6 +413,9 @@ module.exports = {
         // Update scene data
         if (this.sceneData && this.sceneData.properties) {
             this.sceneData.properties.width = width;
+            // Automatically update virtualWidth to be width + 1000
+            this.sceneData.properties.virtualWidth = width + 1000;
+            this.setVirtualWidth(width + 1000);
         }
         this.refreshEditor();
 
@@ -465,6 +444,9 @@ module.exports = {
         // Update scene data
         if (this.sceneData && this.sceneData.properties) {
             this.sceneData.properties.height = height;
+            // Automatically update virtualHeight to be height + 1000
+            this.sceneData.properties.virtualHeight = height + 1000;
+            this.setVirtualHeight(height + 1000);
         }
         this.refreshEditor();
 
@@ -532,15 +514,28 @@ module.exports = {
                 // Create a safe execution context with only necessary globals
                 const createSafeExtension = (code, extensionName) => {
                     try {
+                        // Create a mock module object for CommonJS compatibility
+                        const module = { exports: {} };
+                        const exports = module.exports;
+
                         // Use Function constructor instead of eval - slightly safer
-                        // Wrap the code to ensure it returns the script object
-                        // The original code ends with "script;" which is an expression, not a return
-                        const func = new Function('sceneEditor', 'application', 'globals', `
-                            'use strict';
+                        // Provide module and exports for CommonJS compatibility
+                        // Support both patterns:
+                        // 1. module.exports = ... (runtime.js)
+                        // 2. const script = { ... }; script; (editor.js)
+                        const func = new Function('module', 'exports', 'sceneEditor', 'application', 'globals', `
                             ${code}
-                            return script;
+                            // Return module.exports if it was set, otherwise try to return script or runtime or editor
+                            if (typeof module.exports === 'object' && Object.keys(module.exports).length > 0) {
+                                return module.exports;
+                            }
+                            // Try common variable names used in extensions
+                            if (typeof script !== 'undefined') return script;
+                            if (typeof runtime !== 'undefined') return runtime;
+                            if (typeof editor !== 'undefined') return editor;
+                            throw new Error('Extension did not export anything');
                         `);
-                        return func(this, application, globals);
+                        return func(module, exports, this, application, globals);
                     } catch (err) {
                         console.error(`Failed to load extension ${extensionName}:`, err);
                         throw new Error(`Extension ${extensionName} failed to load: ${err.message}`);
@@ -570,18 +565,14 @@ module.exports = {
      * Used by CreateObjectCommand and paste operations
      */
     createObject(data) {
-        console.log('[SCENE EDITOR] Creating object:', data.oid, data.properties.name);
-
         // Load extension if not already loaded
         this.requireOnceExtension(data.extension);
 
         // Call the extension's create function to add object to DOM
         __editorExtensions[data.extension].create(data);
 
-        console.log('[SCENE EDITOR] Object created in DOM, now refreshing...');
-
-        // Refresh the object to apply all properties (position, size, etc.)
-        const object = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${data.oid}"]`);
+        // PERFORMANCE: Use cached element lookup
+        const object = this.getObjectElement(data.oid);
         if (object) {
             // Clear canvas if it's a canvas element
             if (object.tagName === "CANVAS") {
@@ -592,57 +583,55 @@ module.exports = {
             // Update object with its data to apply all properties
             __editorExtensions[data.extension].update(object, data);
 
+            // Render collider visualizations if any collider scripts are attached
+            this.renderColliderVisualizations(object, data);
+
             // Apply locked state if object is locked
             if (data.locked) {
                 object.classList.add('locked-object');
             } else {
                 object.classList.remove('locked-object');
             }
-
-            console.log('[SCENE EDITOR] ✓ Object refreshed with properties at position:', data.properties.x, data.properties.y);
-        } else {
-            console.warn('[SCENE EDITOR] Could not find created object in DOM:', data.oid);
         }
     },
 
     refreshSceneObjects(oData) {
+        // PERFORMANCE: Batch canvas operations and use cached elements
         oData.forEach((data, index) => {
-            //get corresponding object
-            let object = document.querySelector(".__ajs_scene_object[__ajs_object_ID='" + data.oid + "']");
-            //call the extension object create function
-            if (object.tagName == "CANVAS") {
+            // PERFORMANCE: Use cached element lookup (O(1) instead of querySelector)
+            const object = this.getObjectElement(data.oid);
+            if (!object) return;
+
+            // Clear canvas if needed
+            if (object.tagName === "CANVAS") {
                 const ctx = object.getContext('2d');
-                // Clear the entire canvas
                 ctx.clearRect(0, 0, object.width, object.height);
             }
+
+            // Update object via extension
             __editorExtensions[data.extension].update(object, data);
 
-            // Apply locked state if object is locked
-            if (object && data.locked) {
+            // Render collider visualizations if any collider scripts are attached
+            this.renderColliderVisualizations(object, data);
+
+            // PERFORMANCE: Batch class operations
+            if (data.locked) {
                 object.classList.add('locked-object');
-            } else if (object) {
+            } else {
                 object.classList.remove('locked-object');
             }
         });
 
         // Refresh thumbnails in hierarchy after objects are updated
-        console.log('refreshSceneObjects: refreshing hierarchy and layer previews...');
-
         const hierarchyModule = window.hierarchy || hierarchy;
         if (hierarchyModule && hierarchyModule.refreshThumbnails) {
-            console.log('Calling hierarchy.refreshThumbnails with', oData.length, 'objects');
             hierarchyModule.refreshThumbnails(oData);
-        } else {
-            console.warn('Hierarchy module or refreshThumbnails method not found');
         }
 
         // Refresh layer previews in real-time
         const layerManagerModule = window.layerManager || layerManager;
         if (layerManagerModule && layerManagerModule.refreshLayerPreviews) {
-            console.log('Calling layerManager.refreshLayerPreviews with', oData.length, 'objects');
             layerManagerModule.refreshLayerPreviews(oData);
-        } else {
-            console.warn('LayerManager module or refreshLayerPreviews method not found');
         }
     },
 
@@ -746,6 +735,9 @@ module.exports = {
                     transformControls.activateMultiple($self.selectedObjects);
                 }
 
+                // Refresh collider visualizations for all objects (shows/hides based on selection)
+                $self.refreshAllColliderVisualizations();
+
                 // If there's at least one object, show its properties
                 if ($self.selectedObjects.length > 0) {
                     const firstSelected = $self.selectedObjects[0];
@@ -796,6 +788,9 @@ module.exports = {
                     if (typeof transformControls !== 'undefined') {
                         transformControls.activate(elem, objectData);
                     }
+
+                    // Refresh collider visualizations for all objects (shows/hides based on selection)
+                    $self.refreshAllColliderVisualizations();
                 }
             }
         });
@@ -816,7 +811,6 @@ module.exports = {
     selectObject(elem, objectData) {
         // Check if object is locked
         if (objectData.locked) {
-            console.log('Cannot select locked object:', objectData.properties.name);
             const notifications = nw.require('./assets/js/objects/notifications');
             if (notifications) {
                 notifications.warning(`Object "${objectData.properties.name}" is locked`);
@@ -841,9 +835,8 @@ module.exports = {
 
         // Open properties
         let extensionData = __dataExtensions[objectData.extension];
-        const propertiesModule = window.properties || properties;
-        if (propertiesModule) {
-            propertiesModule.openObjectProperties(objectData, extensionData);
+        if (properties && properties.openObjectProperties) {
+            properties.openObjectProperties(objectData, extensionData);
         }
 
         // Activate transform controls
@@ -865,8 +858,6 @@ module.exports = {
                 screenHeight: screenHeight
             });
         }
-
-        console.log('Object selected:', objectData.properties.name);
     },
 
     deselectAllObjects() {
@@ -909,6 +900,9 @@ module.exports = {
         if (alignTools && alignTools.updateToolbarState) {
             alignTools.updateToolbarState();
         }
+
+        // Refresh collider visualizations (hide all colliders since nothing is selected)
+        this.refreshAllColliderVisualizations();
     },
 
     /**
@@ -916,7 +910,6 @@ module.exports = {
      */
     selectAllObjects() {
         if (!this.sceneData || !this.sceneData.objects) {
-            console.warn('No scene data available');
             return;
         }
 
@@ -927,7 +920,8 @@ module.exports = {
         let selectedCount = 0;
         this.sceneData.objects.forEach(obj => {
             if (!obj.locked) {
-                const elem = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${obj.oid}"]`);
+                // PERFORMANCE: Use cached element lookup
+                const elem = this.getObjectElement(obj.oid);
                 if (elem) {
                     elem.classList.add('clickable_selected');
                     this.selectedObjects.push({ element: elem, data: obj });
@@ -972,7 +966,8 @@ module.exports = {
             alignTools.updateToolbarState();
         }
 
-        console.log(`Selected ${selectedCount} objects`);
+        // Refresh collider visualizations for selected objects
+        this.refreshAllColliderVisualizations();
     },
 
     /**
@@ -1003,9 +998,22 @@ module.exports = {
             }
 
             // Remove from DOM
-            const objectElement = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${objectData.oid}"]`);
+            // PERFORMANCE: Use cached element lookup and clear cache
+            const objectElement = this.getObjectElement(objectData.oid);
             if (objectElement) {
+                // Also remove collider overlay if it exists
+                const parentLayer = objectElement.parentElement;
+                if (parentLayer) {
+                    const overlayId = `collider-overlay-${objectData.oid}`;
+                    const colliderOverlay = parentLayer.querySelector(`#${overlayId}`);
+                    if (colliderOverlay) {
+                        colliderOverlay.remove();
+                    }
+                }
+
                 objectElement.remove();
+                // Clear from cache
+                this.objectElementsCache.delete(objectData.oid);
             }
 
             // Call extension destroy method if exists
@@ -1035,7 +1043,6 @@ module.exports = {
             // Refresh all scene UI (hierarchy, layer manager)
             this.refreshSceneUI();
 
-            console.log('Object deleted:', objectName, '(OID:', objectData.oid + ')');
             return true;
         }
         catch (err) {
@@ -1052,6 +1059,61 @@ module.exports = {
     initObject(object) {
         object.style.position = "absolute";
         object.classList.add("__ajs_scene_object");
+
+        // Add drag and drop support for script files
+        object.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const scriptPath = e.dataTransfer.types.includes('text/script-path');
+            if (scriptPath) {
+                e.dataTransfer.dropEffect = 'copy';
+                this.style.outline = '2px dashed #4CAF50';
+            }
+        });
+
+        object.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.outline = '';
+        });
+
+        object.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.outline = '';
+
+            const scriptPath = e.dataTransfer.getData('text/script-path');
+            const scriptName = e.dataTransfer.getData('text/script-name');
+
+            if (scriptPath && scriptName.toLowerCase().endsWith('.js')) {
+                const oid = this.getAttribute('__ajs_object_ID');
+                const sceneEditor = window.sceneEditor || nw.require('./assets/js/objects/sceneEditor');
+                const objectData = sceneEditor.sceneData.objects.find(obj => obj.oid === oid);
+
+                if (objectData) {
+                    // Convert to relative path
+                    const application = nw.require('./assets/js/objects/application');
+                    const relativePath = application.getResourcesPathFromFile(scriptPath);
+
+                    objectData.properties.script = relativePath;
+
+                    // Mark scene as modified
+                    sceneEditor.markAsModified();
+
+                    // Update properties panel if this object is selected
+                    const properties = nw.require('./assets/js/objects/properties');
+                    if (properties && properties.update) {
+                        properties.update();
+                    }
+
+                    // Show notification
+                    const notifications = nw.require('./assets/js/objects/notifications');
+                    if (notifications) {
+                        notifications.success(`Script "${scriptName}" attached to ${objectData.name}`);
+                    }
+                }
+            }
+        });
     },
 
     generateObjectID(object) {
@@ -1069,7 +1131,16 @@ module.exports = {
         }
         else {
             object.setAttribute("__ajs_object_ID", oid);
+            // PERFORMANCE: Cache element for fast lookup
+            this.objectElementsCache.set(oid, object);
         }
+    },
+
+    /**
+     * PERFORMANCE: Get object element from cache (O(1) instead of querySelector)
+     */
+    getObjectElement(oid) {
+        return this.objectElementsCache.get(oid) || document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${oid}"]`);
     },
 
     getObjectID(object) {
@@ -1203,13 +1274,183 @@ module.exports = {
         object.style.transform = "rotate(" + angle + "deg)";
     },
 
+    /**
+     * Show scene properties in the properties panel
+     * @param {string} sceneFilePath - Optional path to a .scn file to load and display properties from
+     */
+    showSceneProperties(sceneFilePath = null) {
+        const fs = nw.require('fs');
+        const path = nw.require('path');
+        let sceneDataToDisplay = null;
+
+        // If a file path is provided, load the scene data from that file
+        if (sceneFilePath && fs.existsSync(sceneFilePath)) {
+            try {
+                const fileContent = fs.readFileSync(sceneFilePath, 'utf8');
+                sceneDataToDisplay = JSON.parse(fileContent);
+            } catch (err) {
+                console.error('Failed to load scene from file:', err);
+                if (typeof notifications !== 'undefined') {
+                    notifications.error('Failed to load scene file: ' + err.message);
+                }
+                return;
+            }
+        } else if (this.sceneData) {
+            // Use the currently open scene data
+            sceneDataToDisplay = this.sceneData;
+            sceneFilePath = this.cache.sceneFilePath;
+        } else {
+            return;
+        }
+
+        // Get properties and extension data objects
+        const properties = nw.require('./assets/js/objects/properties');
+
+        // Try different extension path formats
+        let extensionData = __dataExtensions['internal/com.ajs.scene'];
+        if (!extensionData) {
+            // Load the scene extension if not already loaded
+            try {
+                const dataFilePath = "./extensions/internal/com.ajs.scene/data.json";
+                const dataFileContent = fs.readFileSync(dataFilePath, 'utf8');
+                __dataExtensions['internal/com.ajs.scene'] = JSON.parse(dataFileContent);
+                extensionData = __dataExtensions['internal/com.ajs.scene'];
+            } catch (err) {
+                console.error('Failed to load scene extension:', err);
+                return;
+            }
+        }
+
+        if (!extensionData) {
+            return;
+        }
+
+        // Store the loaded scene data in properties cache for editing
+        properties.cache.loadedSceneData = sceneDataToDisplay;
+        properties.cache.loadedSceneFilePath = sceneFilePath;
+
+        // Create a pseudo-object data for the scene
+        const sceneObjectData = {
+            oid: 'scene_properties',
+            extension: extensionData.extension,
+            properties: sceneDataToDisplay.properties,
+            layer: 0,
+            __sceneFilePath: sceneFilePath, // Store the file path for saving later
+            __sceneData: sceneDataToDisplay // Store full scene data
+        };
+
+        // Clear current selection in transform controls
+        if (typeof transformControls !== 'undefined' && transformControls.deselect) {
+            transformControls.deselect();
+        }
+
+        // Load scene properties into properties panel
+        properties.closeProperties();
+
+        // Store loaded scene data AFTER closeProperties (which clears the cache)
+        properties.cache.loadedSceneData = sceneDataToDisplay;
+        properties.cache.loadedSceneFilePath = sceneFilePath;
+
+        properties.openObjectProperties(sceneObjectData, extensionData);
+    },
+
     ////////////////////////////
     //
     //internal object functions
     //
     ////////////////////////////
+    setSceneProperty(propertyName, value, sceneDataToUpdate = null) {
+        // Use provided scene data or fall back to current scene data
+        const targetSceneData = sceneDataToUpdate || this.sceneData;
+
+        if (!targetSceneData || !targetSceneData.properties) {
+            return;
+        }
+
+        // Check if we're modifying the currently open scene
+        // by comparing file paths from properties cache
+        const properties = nw.require('./assets/js/objects/properties');
+        const loadedSceneFilePath = properties.cache.loadedSceneFilePath;
+        const currentSceneFilePath = this.cache.sceneFilePath;
+
+        // Normalize paths for comparison
+        const normalizePath = (p) => p ? p.replace(/\\/g, '/').toLowerCase() : '';
+        const isCurrentScene = normalizePath(loadedSceneFilePath) === normalizePath(currentSceneFilePath);
+
+        // Update the target scene data
+        switch (propertyName) {
+            case 'name':
+                targetSceneData.properties.name = value;
+                break;
+
+            case 'visible':
+                targetSceneData.properties.visible = value;
+                break;
+
+            case 'width':
+                targetSceneData.properties.width = parseFloat(value) || 0;
+                targetSceneData.properties.virtualWidth = (parseFloat(value) || 0) + 1000;
+                break;
+
+            case 'height':
+                targetSceneData.properties.height = parseFloat(value) || 0;
+                targetSceneData.properties.virtualHeight = (parseFloat(value) || 0) + 1000;
+                break;
+
+            case 'virtualWidth':
+                targetSceneData.properties.virtualWidth = parseFloat(value) || 0;
+                break;
+
+            case 'virtualHeight':
+                targetSceneData.properties.virtualHeight = parseFloat(value) || 0;
+                break;
+
+            case 'backgroundColor':
+                targetSceneData.properties.backgroundColor = value;
+                break;
+
+            default:
+                targetSceneData.properties[propertyName] = value;
+                break;
+        }
+
+        // If editing the currently open scene, also update this.sceneData and visual scene
+        if (isCurrentScene) {
+            // Update this.sceneData with the same values
+            if (this.sceneData && this.sceneData.properties) {
+                this.sceneData.properties[propertyName] = targetSceneData.properties[propertyName];
+
+                // For width/height, also update virtual dimensions
+                if (propertyName === 'width') {
+                    this.sceneData.properties.virtualWidth = targetSceneData.properties.virtualWidth;
+                } else if (propertyName === 'height') {
+                    this.sceneData.properties.virtualHeight = targetSceneData.properties.virtualHeight;
+                }
+            }
+
+            // Update visual scene
+            switch (propertyName) {
+                case 'width':
+                    this.setSceneWidth(parseFloat(value) || 0);
+                    break;
+                case 'height':
+                    this.setSceneHeight(parseFloat(value) || 0);
+                    break;
+                case 'virtualWidth':
+                    this.setVirtualWidth(parseFloat(value) || 0);
+                    break;
+                case 'virtualHeight':
+                    this.setVirtualHeight(parseFloat(value) || 0);
+                    break;
+                case 'backgroundColor':
+                    this.setSceneBackgroundColor(value);
+                    break;
+            }
+        }
+    },
+
+
     setObjectProperty(objectData, propertyName, value) {
-        console.log('setObjectProperty called:', propertyName, '=', value);
         try {
             //check if property is for single object or no
             let singleObject = false;
@@ -1285,5 +1526,636 @@ module.exports = {
         catch (err) {
             alert("objects extension is dammaged or corrupted !");
         }
+    },
+
+    /**
+     * Bring selected object(s) to front within their layer
+     */
+    bringToFront() {
+        const selectedElements = document.querySelectorAll('.clickable_selected');
+        if (selectedElements.length === 0) return;
+
+        const commands = nw.require('./assets/js/objects/commands');
+        const commandManager = nw.require('./assets/js/objects/commandManager');
+        const notifications = nw.require('./assets/js/objects/notifications');
+        const reorderCommands = [];
+
+        selectedElements.forEach(elem => {
+            const oid = elem.getAttribute('__ajs_object_ID');
+            const objectData = this.sceneData.objects.find(obj => obj.oid === oid);
+            if (!objectData) return;
+
+            const currentLayer = objectData.layer;
+            const objectsInLayer = this.sceneData.objects.filter(obj => obj.layer === currentLayer);
+            const currentIndex = this.sceneData.objects.indexOf(objectData);
+
+            // Find the last index in the same layer
+            const lastInLayerIndex = this.sceneData.objects.lastIndexOf(
+                objectsInLayer[objectsInLayer.length - 1]
+            );
+
+            if (currentIndex !== lastInLayerIndex) {
+                reorderCommands.push(
+                    new commands.ReorderObjectCommand(this, objectData, currentIndex, lastInLayerIndex)
+                );
+            }
+        });
+
+        if (reorderCommands.length > 0) {
+            if (reorderCommands.length === 1) {
+                commandManager.execute(reorderCommands[0]);
+            } else {
+                const batchCmd = new commands.BatchCommand('Bring to Front', reorderCommands);
+                commandManager.execute(batchCmd);
+            }
+
+            const objCount = reorderCommands.length;
+            notifications.success(`Brought ${objCount} object${objCount > 1 ? 's' : ''} to front`);
+        }
+    },
+
+    /**
+     * Send selected object(s) to back within their layer
+     */
+    sendToBack() {
+        const selectedElements = document.querySelectorAll('.clickable_selected');
+        if (selectedElements.length === 0) return;
+
+        const commands = nw.require('./assets/js/objects/commands');
+        const commandManager = nw.require('./assets/js/objects/commandManager');
+        const notifications = nw.require('./assets/js/objects/notifications');
+        const reorderCommands = [];
+
+        selectedElements.forEach(elem => {
+            const oid = elem.getAttribute('__ajs_object_ID');
+            const objectData = this.sceneData.objects.find(obj => obj.oid === oid);
+            if (!objectData) return;
+
+            const currentLayer = objectData.layer;
+            const objectsInLayer = this.sceneData.objects.filter(obj => obj.layer === currentLayer);
+            const currentIndex = this.sceneData.objects.indexOf(objectData);
+
+            // Find the first index in the same layer
+            const firstInLayerIndex = this.sceneData.objects.indexOf(objectsInLayer[0]);
+
+            if (currentIndex !== firstInLayerIndex) {
+                reorderCommands.push(
+                    new commands.ReorderObjectCommand(this, objectData, currentIndex, firstInLayerIndex)
+                );
+            }
+        });
+
+        if (reorderCommands.length > 0) {
+            if (reorderCommands.length === 1) {
+                commandManager.execute(reorderCommands[0]);
+            } else {
+                const batchCmd = new commands.BatchCommand('Send to Back', reorderCommands);
+                commandManager.execute(batchCmd);
+            }
+
+            const objCount = reorderCommands.length;
+            notifications.success(`Sent ${objCount} object${objCount > 1 ? 's' : ''} to back`);
+        }
+    },
+
+    /**
+     * Move selected object(s) forward one step within their layer
+     */
+    moveForward() {
+        const selectedElements = document.querySelectorAll('.clickable_selected');
+        if (selectedElements.length === 0) return;
+
+        const commands = nw.require('./assets/js/objects/commands');
+        const commandManager = nw.require('./assets/js/objects/commandManager');
+        const notifications = nw.require('./assets/js/objects/notifications');
+        const reorderCommands = [];
+
+        selectedElements.forEach(elem => {
+            const oid = elem.getAttribute('__ajs_object_ID');
+            const objectData = this.sceneData.objects.find(obj => obj.oid === oid);
+            if (!objectData) return;
+
+            const currentLayer = objectData.layer;
+            const currentIndex = this.sceneData.objects.indexOf(objectData);
+
+            // Find next object in same layer
+            let nextIndex = -1;
+            for (let i = currentIndex + 1; i < this.sceneData.objects.length; i++) {
+                if (this.sceneData.objects[i].layer === currentLayer) {
+                    nextIndex = i;
+                    break;
+                }
+            }
+
+            if (nextIndex !== -1) {
+                reorderCommands.push(
+                    new commands.ReorderObjectCommand(this, objectData, currentIndex, nextIndex)
+                );
+            }
+        });
+
+        if (reorderCommands.length > 0) {
+            if (reorderCommands.length === 1) {
+                commandManager.execute(reorderCommands[0]);
+            } else {
+                const batchCmd = new commands.BatchCommand('Move Forward', reorderCommands);
+                commandManager.execute(batchCmd);
+            }
+
+            const objCount = reorderCommands.length;
+            notifications.success(`Moved ${objCount} object${objCount > 1 ? 's' : ''} forward`);
+        }
+    },
+
+    /**
+     * Move selected object(s) backward one step within their layer
+     */
+    moveBackward() {
+        const selectedElements = document.querySelectorAll('.clickable_selected');
+        if (selectedElements.length === 0) return;
+
+        const commands = nw.require('./assets/js/objects/commands');
+        const commandManager = nw.require('./assets/js/objects/commandManager');
+        const notifications = nw.require('./assets/js/objects/notifications');
+        const reorderCommands = [];
+
+        selectedElements.forEach(elem => {
+            const oid = elem.getAttribute('__ajs_object_ID');
+            const objectData = this.sceneData.objects.find(obj => obj.oid === oid);
+            if (!objectData) return;
+
+            const currentLayer = objectData.layer;
+            const currentIndex = this.sceneData.objects.indexOf(objectData);
+
+            // Find previous object in same layer
+            let prevIndex = -1;
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                if (this.sceneData.objects[i].layer === currentLayer) {
+                    prevIndex = i;
+                    break;
+                }
+            }
+
+            if (prevIndex !== -1) {
+                reorderCommands.push(
+                    new commands.ReorderObjectCommand(this, objectData, currentIndex, prevIndex)
+                );
+            }
+        });
+
+        if (reorderCommands.length > 0) {
+            if (reorderCommands.length === 1) {
+                commandManager.execute(reorderCommands[0]);
+            } else {
+                const batchCmd = new commands.BatchCommand('Move Backward', reorderCommands);
+                commandManager.execute(batchCmd);
+            }
+
+            const objCount = reorderCommands.length;
+            notifications.success(`Moved ${objCount} object${objCount > 1 ? 's' : ''} backward`);
+        }
+    },
+
+    /**
+     * Refresh collider visualizations for all objects in the scene
+     * Called when selection changes to show/hide collider overlays
+     */
+    refreshAllColliderVisualizations() {
+        if (!this.sceneData || !this.sceneData.objects) {
+            return;
+        }
+
+        // Iterate through all objects and refresh their collider visualizations
+        this.sceneData.objects.forEach(objectData => {
+            const element = document.querySelector(`[__ajs_object_ID="${objectData.oid}"]`);
+            if (element) {
+                this.renderColliderVisualizations(element, objectData);
+            }
+        });
+    },
+
+    /**
+     * Render collider visualizations for physics debugging
+     * Shows BoxCollider2D and CircleCollider2D bounds in the editor
+     */
+    renderColliderVisualizations(object, data) {
+        // Only render for objects with scripts
+        if (!data.properties.scripts || data.properties.scripts.length === 0) {
+            return;
+        }
+
+        // Get parent layer (canvas elements can't have visible child divs)
+        const parentLayer = object.parentElement;
+        if (!parentLayer) {
+            console.warn('[ColliderViz] Object has no parent layer');
+            return;
+        }
+
+        // Find or create collider overlay in the parent layer
+        const overlayId = `collider-overlay-${data.oid}`;
+        let colliderOverlay = parentLayer.querySelector(`#${overlayId}`);
+
+        if (!colliderOverlay) {
+            colliderOverlay = document.createElement('div');
+            colliderOverlay.id = overlayId;
+            colliderOverlay.className = 'collider-visualization';
+            colliderOverlay.style.position = 'absolute';
+            colliderOverlay.style.pointerEvents = 'none';
+            colliderOverlay.style.zIndex = '999999'; // Very high z-index to appear above objects
+            parentLayer.appendChild(colliderOverlay);
+            console.log('[ColliderViz] Created new overlay:', overlayId);
+        }
+
+        // Position and size the overlay to match the object
+        const objLeft = parseFloat(object.style.left) || 0;
+        const objTop = parseFloat(object.style.top) || 0;
+        const objWidth = data.properties.width || 64;
+        const objHeight = data.properties.height || 64;
+
+        colliderOverlay.style.left = objLeft + 'px';
+        colliderOverlay.style.top = objTop + 'px';
+        colliderOverlay.style.width = objWidth + 'px';
+        colliderOverlay.style.height = objHeight + 'px';
+
+        // Apply rotation if the object is rotated
+        const angle = data.properties.angle || 0;
+        if (angle !== 0) {
+            colliderOverlay.style.transform = `rotate(${angle}deg)`;
+            colliderOverlay.style.transformOrigin = 'center center';
+        } else {
+            colliderOverlay.style.transform = '';
+        }
+
+        // Clear previous visualizations
+        colliderOverlay.innerHTML = '';
+
+        // Check if this object is selected
+        const isSelected = this.selectedObjects.some(obj => obj.data.oid === data.oid);
+
+        console.log('[ColliderViz] ======== Rendering colliders ========');
+        console.log('[ColliderViz] Object:', data.properties.name);
+        console.log('[ColliderViz] Position:', objLeft, objTop, 'Size:', objWidth, objHeight);
+        console.log('[ColliderViz] Scripts count:', data.properties.scripts.length);
+        console.log('[ColliderViz] Is selected:', isSelected);
+
+        // Render each collider script
+        data.properties.scripts.forEach((script, scriptIndex) => {
+            const scriptPath = script.path;
+            const scriptProps = script.properties || {};
+
+            console.log('[ColliderViz] Checking script:', scriptPath, 'Props:', scriptProps);
+
+            // Check if this script's collider should be shown in editor
+            // Default to true if showInEditor is not explicitly set (backward compatibility)
+            const showInEditor = scriptProps.showInEditor !== false;
+
+            if (!showInEditor) {
+                console.log('[ColliderViz] Skipping - showInEditor is false');
+                return; // Skip this collider
+            }
+
+            // Check if this is a BoxCollider2D
+            if (scriptPath && scriptPath.includes('BoxCollider2D')) {
+                console.log('[ColliderViz] Rendering BoxCollider2D');
+                this.renderBoxCollider(colliderOverlay, data, scriptProps, scriptIndex, isSelected);
+            }
+            // Check if this is a CircleCollider2D
+            else if (scriptPath && scriptPath.includes('CircleCollider2D')) {
+                console.log('[ColliderViz] Rendering CircleCollider2D');
+                this.renderCircleCollider(colliderOverlay, data, scriptProps, scriptIndex, isSelected);
+            }
+        });
+    },
+
+    /**
+     * Render BoxCollider2D visualization
+     */
+    renderBoxCollider(container, objectData, colliderProps, scriptIndex, isSelected) {
+        const $self = this;
+        const objectProps = objectData.properties;
+
+        const box = document.createElement('div');
+        box.style.position = 'absolute';
+        box.style.border = '2px solid #ff8800';
+        box.style.backgroundColor = colliderProps.isTrigger ? 'rgba(255, 136, 0, 0.2)' : 'rgba(255, 136, 0, 0.1)';
+        box.style.pointerEvents = 'none';
+        box.style.boxSizing = 'border-box';
+
+        // Get collider dimensions and offset
+        const width = colliderProps.width || objectProps.width || 64;
+        const height = colliderProps.height || objectProps.height || 64;
+        const offsetX = colliderProps.offsetX || 0;
+        const offsetY = colliderProps.offsetY || 0;
+
+        // Calculate position (offset from object center)
+        const objWidth = objectProps.width || 64;
+        const objHeight = objectProps.height || 64;
+        const left = (objWidth / 2) - (width / 2) + offsetX;
+        const top = (objHeight / 2) - (height / 2) + offsetY;
+
+        box.style.left = left + 'px';
+        box.style.top = top + 'px';
+        box.style.width = width + 'px';
+        box.style.height = height + 'px';
+
+        // Add label
+        const label = document.createElement('div');
+        label.textContent = colliderProps.isTrigger ? 'Trigger' : 'BoxCollider';
+        label.style.position = 'absolute';
+        label.style.top = '-18px';
+        label.style.left = '0';
+        label.style.fontSize = '10px';
+        label.style.color = '#ff8800';
+        label.style.fontWeight = 'bold';
+        label.style.textShadow = '1px 1px 2px rgba(0,0,0,0.8)';
+        box.appendChild(label);
+
+        // Add to container
+        container.appendChild(box);
+        console.log('[ColliderViz] Box collider added to container. Width:', width, 'Height:', height, 'Left:', left, 'Top:', top);
+
+        // Add control points for dragging only if object is selected
+        if (isSelected) {
+            console.log('[ColliderViz] Adding control points (object is selected)');
+            const controlPoints = [
+            { pos: 'top-left', cursor: 'nw-resize' },
+            { pos: 'top-right', cursor: 'ne-resize' },
+            { pos: 'bottom-left', cursor: 'sw-resize' },
+            { pos: 'bottom-right', cursor: 'se-resize' },
+            { pos: 'center', cursor: 'move' }
+        ];
+
+        controlPoints.forEach(cp => {
+            const point = document.createElement('div');
+            point.style.position = 'absolute';
+            point.style.width = '8px';
+            point.style.height = '8px';
+            point.style.backgroundColor = '#ff8800';
+            point.style.border = '2px solid #ffffff';
+            point.style.borderRadius = '50%';
+            point.style.cursor = cp.cursor;
+            point.style.pointerEvents = 'auto';
+            point.style.zIndex = '1001';
+
+            // Position control point
+            if (cp.pos === 'top-left') {
+                point.style.left = '-6px';
+                point.style.top = '-6px';
+            } else if (cp.pos === 'top-right') {
+                point.style.right = '-6px';
+                point.style.top = '-6px';
+            } else if (cp.pos === 'bottom-left') {
+                point.style.left = '-6px';
+                point.style.bottom = '-6px';
+            } else if (cp.pos === 'bottom-right') {
+                point.style.right = '-6px';
+                point.style.bottom = '-6px';
+            } else if (cp.pos === 'center') {
+                point.style.left = '50%';
+                point.style.top = '50%';
+                point.style.transform = 'translate(-50%, -50%)';
+            }
+
+            // Add drag functionality
+            let isDragging = false;
+            let startX, startY;
+            let startWidth, startHeight, startOffsetX, startOffsetY;
+
+            point.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = colliderProps.width || objectProps.width || 64;
+                startHeight = colliderProps.height || objectProps.height || 64;
+                startOffsetX = colliderProps.offsetX || 0;
+                startOffsetY = colliderProps.offsetY || 0;
+
+                const handleMouseMove = (e) => {
+                    if (!isDragging) return;
+
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+
+                    // Get the scale from scene zoom
+                    const scale = $self.zoomLevel || 1;
+                    const scaledDeltaX = deltaX / scale;
+                    const scaledDeltaY = deltaY / scale;
+
+                    if (cp.pos === 'center') {
+                        // Move offset
+                        colliderProps.offsetX = startOffsetX + scaledDeltaX;
+                        colliderProps.offsetY = startOffsetY + scaledDeltaY;
+                    } else {
+                        // Resize
+                        let newWidth = startWidth;
+                        let newHeight = startHeight;
+                        let newOffsetX = startOffsetX;
+                        let newOffsetY = startOffsetY;
+
+                        if (cp.pos === 'top-left') {
+                            newWidth = startWidth - scaledDeltaX;
+                            newHeight = startHeight - scaledDeltaY;
+                            newOffsetX = startOffsetX + scaledDeltaX / 2;
+                            newOffsetY = startOffsetY + scaledDeltaY / 2;
+                        } else if (cp.pos === 'top-right') {
+                            newWidth = startWidth + scaledDeltaX;
+                            newHeight = startHeight - scaledDeltaY;
+                            newOffsetX = startOffsetX + scaledDeltaX / 2;
+                            newOffsetY = startOffsetY + scaledDeltaY / 2;
+                        } else if (cp.pos === 'bottom-left') {
+                            newWidth = startWidth - scaledDeltaX;
+                            newHeight = startHeight + scaledDeltaY;
+                            newOffsetX = startOffsetX + scaledDeltaX / 2;
+                            newOffsetY = startOffsetY + scaledDeltaY / 2;
+                        } else if (cp.pos === 'bottom-right') {
+                            newWidth = startWidth + scaledDeltaX;
+                            newHeight = startHeight + scaledDeltaY;
+                            newOffsetX = startOffsetX + scaledDeltaX / 2;
+                            newOffsetY = startOffsetY + scaledDeltaY / 2;
+                        }
+
+                        // Ensure minimum size
+                        if (newWidth > 10) {
+                            colliderProps.width = newWidth;
+                            colliderProps.offsetX = newOffsetX;
+                        }
+                        if (newHeight > 10) {
+                            colliderProps.height = newHeight;
+                            colliderProps.offsetY = newOffsetY;
+                        }
+                    }
+
+                    // Update the visualization
+                    const objectElement = $self.selectedObjects.find(obj => obj.data.oid === objectData.oid);
+                    if (objectElement) {
+                        $self.renderColliderVisualizations(objectElement.element, objectData);
+
+                        // Update properties panel if visible
+                        if (window.properties && typeof window.properties.update === 'function') {
+                            window.properties.update();
+                        }
+                    }
+                };
+
+                const handleMouseUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                };
+
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            });
+
+            box.appendChild(point);
+        });
+        }
+
+        container.appendChild(box);
+    },
+
+    /**
+     * Render CircleCollider2D visualization
+     */
+    renderCircleCollider(container, objectData, colliderProps, scriptIndex, isSelected) {
+        const $self = this;
+        const objectProps = objectData.properties;
+
+        const circle = document.createElement('div');
+        circle.style.position = 'absolute';
+        circle.style.border = '2px solid #ff8800';
+        circle.style.borderRadius = '50%';
+        circle.style.backgroundColor = colliderProps.isTrigger ? 'rgba(255, 136, 0, 0.2)' : 'rgba(255, 136, 0, 0.1)';
+        circle.style.pointerEvents = 'none';
+        circle.style.boxSizing = 'border-box';
+
+        // Get collider dimensions and offset
+        const radius = colliderProps.radius || 32;
+        const offsetX = colliderProps.offsetX || 0;
+        const offsetY = colliderProps.offsetY || 0;
+
+        // Calculate position (offset from object center)
+        const objWidth = objectProps.width || 64;
+        const objHeight = objectProps.height || 64;
+        const diameter = radius * 2;
+        const left = (objWidth / 2) - radius + offsetX;
+        const top = (objHeight / 2) - radius + offsetY;
+
+        circle.style.left = left + 'px';
+        circle.style.top = top + 'px';
+        circle.style.width = diameter + 'px';
+        circle.style.height = diameter + 'px';
+
+        // Add label
+        const label = document.createElement('div');
+        label.textContent = colliderProps.isTrigger ? 'Trigger' : 'CircleCollider';
+        label.style.position = 'absolute';
+        label.style.top = '-18px';
+        label.style.left = '50%';
+        label.style.transform = 'translateX(-50%)';
+        label.style.fontSize = '10px';
+        label.style.color = '#ff8800';
+        label.style.fontWeight = 'bold';
+        label.style.textShadow = '1px 1px 2px rgba(0,0,0,0.8)';
+        label.style.whiteSpace = 'nowrap';
+        circle.appendChild(label);
+
+        // Add control points for dragging only if object is selected
+        if (isSelected) {
+            const controlPoints = [
+            { pos: 'center', cursor: 'move' },
+            { pos: 'radius', cursor: 'ew-resize' }
+        ];
+
+        controlPoints.forEach(cp => {
+            const point = document.createElement('div');
+            point.style.position = 'absolute';
+            point.style.width = '8px';
+            point.style.height = '8px';
+            point.style.backgroundColor = '#ff8800';
+            point.style.border = '2px solid #ffffff';
+            point.style.borderRadius = '50%';
+            point.style.cursor = cp.cursor;
+            point.style.pointerEvents = 'auto';
+            point.style.zIndex = '1001';
+
+            // Position control point
+            if (cp.pos === 'center') {
+                point.style.left = '50%';
+                point.style.top = '50%';
+                point.style.transform = 'translate(-50%, -50%)';
+            } else if (cp.pos === 'radius') {
+                point.style.right = '-6px';
+                point.style.top = '50%';
+                point.style.transform = 'translateY(-50%)';
+            }
+
+            // Add drag functionality
+            let isDragging = false;
+            let startX, startY;
+            let startRadius, startOffsetX, startOffsetY;
+
+            point.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startRadius = colliderProps.radius || 32;
+                startOffsetX = colliderProps.offsetX || 0;
+                startOffsetY = colliderProps.offsetY || 0;
+
+                const handleMouseMove = (e) => {
+                    if (!isDragging) return;
+
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+
+                    // Get the scale from scene zoom
+                    const scale = $self.zoomLevel || 1;
+                    const scaledDeltaX = deltaX / scale;
+                    const scaledDeltaY = deltaY / scale;
+
+                    if (cp.pos === 'center') {
+                        // Move offset
+                        colliderProps.offsetX = startOffsetX + scaledDeltaX;
+                        colliderProps.offsetY = startOffsetY + scaledDeltaY;
+                    } else if (cp.pos === 'radius') {
+                        // Adjust radius
+                        const newRadius = startRadius + scaledDeltaX;
+
+                        // Ensure minimum size
+                        if (newRadius > 5) {
+                            colliderProps.radius = newRadius;
+                        }
+                    }
+
+                    // Update the visualization
+                    const objectElement = $self.selectedObjects.find(obj => obj.data.oid === objectData.oid);
+                    if (objectElement) {
+                        $self.renderColliderVisualizations(objectElement.element, objectData);
+
+                        // Update properties panel if visible
+                        if (window.properties && typeof window.properties.update === 'function') {
+                            window.properties.update();
+                        }
+                    }
+                };
+
+                const handleMouseUp = () => {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                };
+
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            });
+
+            circle.appendChild(point);
+        });
+        }
+
+        container.appendChild(circle);
     }
 };

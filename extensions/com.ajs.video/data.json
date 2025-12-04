@@ -1,0 +1,152 @@
+{
+    "extension": "com.ajs.video",
+    "extensionName": "Video",
+    "extensionIcon": "videoicon.png",
+    "description": "Display and control video playback",
+    "category": "Multimedia",
+    "hierarchyPreview": "preview",
+    "propertiesTabs": [
+        {
+            "name": "Object",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Transform",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Display",
+            "icon-type": "icon",
+            "icon": "pip"
+        },
+        {
+            "name": "Scripts",
+            "icon-type": "icon",
+            "icon": "pip"
+        }
+    ],
+    "propertiesVariables": [
+        {
+            "name": "name",
+            "tab": 0,
+            "label": "Object Name",
+            "type": "text",
+            "description": "Name of the object."
+        },
+        {
+            "name": "visible",
+            "tab": 0,
+            "label": "Object Visibility",
+            "type": "checkbox",
+            "checkbox-label": "visible",
+            "description": "Visibility of the object."
+        },
+        {
+            "name": "x",
+            "tab": 1,
+            "label": "Object X",
+            "type": "number",
+            "description": "X position of object.",
+            "singleObject": true
+        },
+        {
+            "name": "y",
+            "tab": 1,
+            "label": "Object Y",
+            "type": "number",
+            "description": "Y position of object",
+            "singleObject": true
+        },
+        {
+            "name": "width",
+            "tab": 1,
+            "label": "Width",
+            "type": "number",
+            "description": "Width of the video."
+        },
+        {
+            "name": "height",
+            "tab": 1,
+            "label": "Height",
+            "type": "number",
+            "description": "Height of the video."
+        },
+        {
+            "name": "angle",
+            "tab": 1,
+            "label": "Rotation",
+            "type": "number",
+            "description": "Rotation angle of the object."
+        },
+        {
+            "name": "videoPath",
+            "tab": 2,
+            "label": "Video File",
+            "type": "video",
+            "description": "Video file to play."
+        },
+        {
+            "name": "autoplay",
+            "tab": 2,
+            "label": "Autoplay",
+            "type": "checkbox",
+            "checkbox-label": "Auto play on start",
+            "description": "Automatically play video when scene starts."
+        },
+        {
+            "name": "loop",
+            "tab": 2,
+            "label": "Loop",
+            "type": "checkbox",
+            "checkbox-label": "Loop playback",
+            "description": "Loop the video when it finishes."
+        },
+        {
+            "name": "muted",
+            "tab": 2,
+            "label": "Muted",
+            "type": "checkbox",
+            "checkbox-label": "Mute audio",
+            "description": "Mute the video audio."
+        },
+        {
+            "name": "volume",
+            "tab": 2,
+            "label": "Volume",
+            "type": "number",
+            "description": "Volume level (0-100)."
+        },
+        {
+            "name": "playbackRate",
+            "tab": 2,
+            "label": "Playback Speed",
+            "type": "number",
+            "description": "Playback speed (0.5 = half speed, 2.0 = double speed)."
+        },
+        {
+            "name": "script",
+            "tab": 3,
+            "label": "Script",
+            "type": "script",
+            "description": "JavaScript script to attach to this object."
+        }
+    ],
+    "properties": {
+        "name": "New Video",
+        "visible": true,
+        "x": 0,
+        "y": 0,
+        "width": 640,
+        "height": 360,
+        "angle": 0,
+        "videoPath": "",
+        "autoplay": false,
+        "loop": false,
+        "muted": false,
+        "volume": 100,
+        "playbackRate": 1.0,
+        "script": ""
+    }
+}

@@ -20,7 +20,6 @@ module.exports = {
     init(sceneEditorRef, objectFactoryRef) {
         if (this._initialized) return;
 
-        console.log('Initializing hierarchy module...');
         this.sceneEditor = sceneEditorRef;
         this.objectFactory = objectFactoryRef;
         this.container = document.getElementById('hierarchyTree');
@@ -31,7 +30,6 @@ module.exports = {
         }
 
         this._initialized = true;
-        console.log('Hierarchy module initialized');
     },
 
     /**
@@ -51,7 +49,6 @@ module.exports = {
                     }
                 }
                 this._initialized = true;
-                console.log('Hierarchy auto-initialized');
             }
         }
     },
@@ -70,21 +67,17 @@ module.exports = {
 
         // Use global sceneEditor reference
         const editor = window.sceneEditor || this.sceneEditor;
-        console.log('Hierarchy refresh called - sceneEditor.sceneData:', editor?.sceneData);
 
         if (!editor || !editor.sceneData) {
             this.container.innerHTML = '<div class="hierarchy-empty">No scene loaded</div>';
-            console.log('Hierarchy: sceneData is null or undefined');
             return;
         }
 
         if (!editor.sceneData.objects) {
             this.container.innerHTML = '<div class="hierarchy-empty">No objects in scene</div>';
-            console.log('Hierarchy: sceneData.objects is null or undefined');
             return;
         }
 
-        console.log('Refreshing hierarchy with', editor.sceneData.objects.length, 'objects');
 
         // Save current selection before refresh
         const selectedOIDs = [];
@@ -124,7 +117,6 @@ module.exports = {
             });
         }
 
-        console.log('Hierarchy refreshed with', sortedLayers.length, 'layers');
     },
 
     /**
@@ -240,6 +232,15 @@ module.exports = {
         groupCount.className = 'hierarchy-group-count';
         groupCount.textContent = objects.length;
 
+        // Arrow icon click handler - only toggles collapse/expand
+        arrowIcon.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent header click from firing
+            const groupManager = nw.require('./assets/js/objects/groupManager');
+            if (groupManager) {
+                groupManager.toggleGroupCollapse(groupId);
+            }
+        });
+
         header.appendChild(arrowIcon);
         header.appendChild(groupIcon);
         header.appendChild(groupNameSpan);
@@ -264,21 +265,97 @@ module.exports = {
         header.appendChild(ungroupBtn);
 
         // Double-click on group name to rename
+        let clickTimeout = null;
         groupNameSpan.addEventListener('dblclick', (e) => {
             e.stopPropagation();
+            // Clear the single-click timeout to prevent selection
+            if (clickTimeout) {
+                clearTimeout(clickTimeout);
+                clickTimeout = null;
+            }
             this.startRenamingGroup(groupId, groupData, groupNameSpan);
         });
 
-        // Toggle expand/collapse on header click (but not on name span)
+        // Click on header (including group name) to select all objects
         header.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Don't toggle if clicking on the name span
-            if (e.target === groupNameSpan) return;
+            // Don't trigger selection if clicking on the ungroup button
+            if (e.target.closest('.hierarchy-group-ungroup-btn')) return;
 
-            const groupManager = nw.require('./assets/js/objects/groupManager');
-            if (groupManager) {
-                groupManager.toggleGroupCollapse(groupId);
+            // Use timeout to allow double-click to cancel the selection
+            if (clickTimeout) {
+                clearTimeout(clickTimeout);
             }
+
+            clickTimeout = setTimeout(() => {
+                // Select all objects in the group (works for both header and name clicks)
+
+                // Deselect all other items in hierarchy
+                document.querySelectorAll('.hierarchy-object-item').forEach(el => {
+                    el.classList.remove('selected');
+                });
+
+                // Select all objects in this group (visually in hierarchy)
+                const groupObjects = groupDiv.querySelectorAll('.hierarchy-object-item');
+                groupObjects.forEach(item => {
+                    item.classList.add('selected');
+                });
+
+                // Select all objects in scene editor
+                const editor = window.sceneEditor || this.sceneEditor;
+                if (editor && objects.length > 0) {
+                    // Filter out locked objects
+                    const selectableObjects = objects.filter(obj => !obj.locked);
+
+                    if (selectableObjects.length === 0) {
+                        const notifications = nw.require('./assets/js/objects/notifications');
+                        if (notifications) {
+                            notifications.warning('All objects in this group are locked');
+                        }
+                        return;
+                    }
+
+                    // Deselect all objects first
+                    if (editor.deselectAllObjects) {
+                        editor.deselectAllObjects();
+                    }
+
+                    // Find all object elements in the scene
+                    const objectElements = [];
+                    selectableObjects.forEach(obj => {
+                        const objectElement = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${obj.oid}"]`);
+                        if (objectElement) {
+                            // Add selection class to make them visually selected
+                            objectElement.classList.add("clickable_selected");
+                            objectElements.push({ element: objectElement, data: obj });
+                        }
+                    });
+
+                    if (objectElements.length > 0) {
+
+                        // If only one object, use standard selectObject
+                        if (objectElements.length === 1 && editor.selectObject) {
+                            editor.selectObject(objectElements[0].element, objectElements[0].data);
+                        } else if (objectElements.length > 1) {
+                            // For multiple objects, activate transform controls on first object
+                            const transformControls = window.transformControls;
+                            if (transformControls) {
+                                // Store all selected objects in transform controls
+                                transformControls.activeObjects = objectElements;
+                                // Activate on the first object to show handles
+                                transformControls.activate(objectElements[0].element, objectElements[0].data);
+                            }
+
+                            // Show properties for the first object
+                            const extensionData = __dataExtensions[objectElements[0].data.extension];
+                            const propertiesModule = window.properties;
+                            if (propertiesModule) {
+                                propertiesModule.openObjectProperties(objectElements[0].data, extensionData);
+                            }
+                        }
+                    }
+                }
+            }, 200); // Delay to allow double-click detection
         });
 
         groupDiv.appendChild(header);
@@ -306,12 +383,10 @@ module.exports = {
     getExtensionMetadata(extensionId) {
         try {
             const extensionPath = path.join(this.appPath, 'extensions', extensionId, 'data.json');
-            console.log('Attempting to load extension from:', extensionPath);
 
             if (fs.existsSync(extensionPath)) {
                 const data = fs.readFileSync(extensionPath, 'utf8');
                 const parsed = JSON.parse(data);
-                console.log('Successfully loaded extension data:', extensionId, parsed);
                 return parsed;
             } else {
                 console.warn('Extension file does not exist:', extensionPath);
@@ -344,13 +419,9 @@ module.exports = {
         const previewMode = extensionData?.hierarchyPreview || 'icon'; // Default to 'icon' if not specified
         const extensionIcon = extensionData?.extensionIcon; // PNG icon path
 
-        console.log('Creating thumbnail for:', objectData.properties.name);
-        console.log('  Preview mode:', previewMode);
-        console.log('  Extension icon:', extensionIcon);
 
         // Try to find the object in the scene
         const objectElement = document.querySelector(`.__ajs_scene_object[__ajs_object_ID="${objectData.oid}"]`);
-        console.log('  Object element found in scene:', !!objectElement);
 
         if (previewMode === 'preview') {
             // Create a mini canvas and render directly via extension
@@ -372,16 +443,12 @@ module.exports = {
                 const freshObjectData = editor.sceneData?.objects?.find(obj => obj.oid === objectData.oid);
 
                 if (!freshObjectData) {
-                    console.warn('Object not found in scene data:', objectData.oid);
                     return false;
                 }
-
-                console.log('Rendering thumbnail for:', freshObjectData.properties.name);
 
                 // Get the extension
                 const extension = window.__editorExtensions?.[freshObjectData.extension];
                 if (!extension || !extension.update) {
-                    console.warn('Extension not found or has no update method:', freshObjectData.extension);
                     return false;
                 }
 
@@ -418,7 +485,6 @@ module.exports = {
                 try {
                     // Call extension's update method to draw on our mini canvas
                     extension.update(canvas, thumbnailData);
-                    console.log('✓ Thumbnail rendered successfully for:', freshObjectData.properties.name);
                     return true;
                 } catch (e) {
                     console.error('Failed to render thumbnail:', e);
@@ -443,13 +509,11 @@ module.exports = {
                 // Use the extension's PNG icon with absolute path
                 const img = document.createElement('img');
                 const iconPath = path.join(this.appPath, 'extensions', objectData.extension, extensionIcon).replace(/\\/g, '/');
-                console.log('Loading icon from:', iconPath);
                 img.src = iconPath;
                 img.style.width = '100%';
                 img.style.height = '100%';
                 img.style.objectFit = 'contain';
                 img.onload = () => {
-                    console.log('✓ Icon loaded successfully:', extensionIcon);
                 };
                 img.onerror = (e) => {
                     // Fallback if icon fails to load
@@ -459,7 +523,6 @@ module.exports = {
                 thumbnail.appendChild(img);
             } else {
                 // Fallback: colored box
-                console.log('No extensionIcon defined, using colored box');
                 thumbnail.style.background = this.getObjectColor(objectData);
             }
         } else {
@@ -580,7 +643,6 @@ module.exports = {
                 editor.selectObject(objectElement, objectData);
             }
 
-            console.log('Selected object from hierarchy:', objectData.properties.name);
         });
 
         // Double-click handler - rename object
@@ -676,7 +738,6 @@ module.exports = {
                 if (editor.markAsModified) {
                     editor.markAsModified();
                 }
-                console.log('Object renamed to:', newName);
             }
         };
 
@@ -742,7 +803,6 @@ module.exports = {
                     editor.refreshSceneUI();
                 }
 
-                console.log('Group renamed to:', newName);
             }
         };
 
@@ -808,7 +868,6 @@ module.exports = {
             notifications.info(`Object "${objectData.properties.name}" ${objectData.locked ? 'locked' : 'unlocked'}`);
         }
 
-        console.log(`Object ${objectData.properties.name} ${objectData.locked ? 'locked' : 'unlocked'}`);
     },
 
     /**
@@ -823,26 +882,39 @@ module.exports = {
         this.ensureInitialized();
 
         if (!this.container) {
-            console.warn('Hierarchy container not available, cannot refresh thumbnails');
             return;
         }
 
-        console.log('Refreshing thumbnails for', objectsData.length, 'objects');
+        // PERFORMANCE: Batch DOM lookups
+        const thumbnailElements = this.container.querySelectorAll('canvas[data-oid], img[data-oid]');
+        const thumbnailMap = new Map();
 
-        objectsData.forEach(objData => {
-            // Find the thumbnail canvas by OID (could be canvas or img depending on preview mode)
-            const thumbnailElement = this.container.querySelector(`canvas[data-oid="${objData.oid}"], img[data-oid="${objData.oid}"]`);
-
-            if (thumbnailElement && thumbnailElement._updateThumbnail) {
-                console.log('Refreshing thumbnail for:', objData.properties.name);
-
-                // Call the render function immediately and with delays for async image loading
-                thumbnailElement._updateThumbnail();
-                setTimeout(() => thumbnailElement._updateThumbnail(), 100);
-                setTimeout(() => thumbnailElement._updateThumbnail(), 300);
-                setTimeout(() => thumbnailElement._updateThumbnail(), 600);
+        // Build lookup map once
+        thumbnailElements.forEach(elem => {
+            const oid = elem.getAttribute('data-oid');
+            if (oid) {
+                thumbnailMap.set(oid, elem);
             }
         });
+
+        // PERFORMANCE: Batch updates and reduce setTimeout calls
+        const elementsToUpdate = [];
+        objectsData.forEach(objData => {
+            const thumbnailElement = thumbnailMap.get(objData.oid);
+            if (thumbnailElement && thumbnailElement._updateThumbnail) {
+                elementsToUpdate.push(thumbnailElement);
+            }
+        });
+
+        // Update immediately
+        elementsToUpdate.forEach(elem => elem._updateThumbnail());
+
+        // PERFORMANCE: Single batched delayed update instead of 3 per element
+        if (elementsToUpdate.length > 0) {
+            setTimeout(() => {
+                elementsToUpdate.forEach(elem => elem._updateThumbnail());
+            }, 500);
+        }
     },
 
     /**
@@ -856,6 +928,5 @@ module.exports = {
         }
 
         editor.destroyObject(objectData);
-        console.log('Object deleted from hierarchy:', objectData.properties.name);
     }
 };

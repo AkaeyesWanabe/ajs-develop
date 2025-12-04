@@ -24,7 +24,6 @@ module.exports = {
         this.sceneEditorElement = sceneEditorElement;
         this.createGridCanvas();
 
-        console.log('[GRID] Initialized');
     },
 
     /**
@@ -53,7 +52,6 @@ module.exports = {
         const zoomWrapper = document.getElementById('scnZoomWrapper');
         if (zoomWrapper) {
             zoomWrapper.insertBefore(this.gridCanvas, zoomWrapper.firstChild);
-            console.log('[GRID] Canvas created and inserted into zoom wrapper');
         } else {
             console.error('[GRID] Zoom wrapper not found!');
         }
@@ -73,7 +71,6 @@ module.exports = {
             notifications.success('Grid disabled');
         }
 
-        console.log('[GRID] Toggled:', this.enabled);
     },
 
     /**
@@ -90,8 +87,6 @@ module.exports = {
         this.drawGrid();
         this.gridCanvas.style.display = 'block';
 
-        console.log('[GRID] Grid shown - Canvas display:', this.gridCanvas.style.display);
-        console.log('[GRID] Canvas dimensions:', this.gridCanvas.width, 'x', this.gridCanvas.height);
     },
 
     /**
@@ -116,7 +111,6 @@ module.exports = {
             notifications.success('Snap to grid disabled');
         }
 
-        console.log('[GRID] Snap toggled:', this.snapEnabled);
     },
 
     /**
@@ -136,7 +130,6 @@ module.exports = {
             this.drawGrid();
         }
 
-        console.log('[GRID] Show lines toggled:', this.showLines);
     },
 
     /**
@@ -154,7 +147,6 @@ module.exports = {
             this.drawGrid();
         }
 
-        console.log('[GRID] Size set to:', size);
     },
 
     /**
@@ -163,7 +155,6 @@ module.exports = {
     drawGrid() {
         // Recreate canvas if it doesn't exist or is not in the DOM
         if (!this.gridCanvas || !this.gridCanvas.parentElement) {
-            console.log('[GRID] Recreating canvas...');
             this.createGridCanvas();
         }
 
@@ -194,7 +185,6 @@ module.exports = {
         const viewportWidth = parseInt(virtualBox.style.width) || virtualBox.clientWidth || 1920;
         const viewportHeight = parseInt(virtualBox.style.height) || virtualBox.clientHeight || 1080;
 
-        console.log('[GRID] Drawing grid - Viewport:', viewportWidth, 'x', viewportHeight, 'Scene offset:', sceneLeft, 'x', sceneTop, 'Grid size:', this.gridSize);
 
         // Set canvas size to cover entire viewport
         this.gridCanvas.width = viewportWidth;
@@ -295,12 +285,6 @@ module.exports = {
             }
         }
 
-        console.log('[GRID] ✓ Grid drawn successfully!');
-        console.log('[GRID] Canvas element:', this.gridCanvas);
-        console.log('[GRID] Canvas parent:', this.gridCanvas.parentElement);
-        console.log('[GRID] Canvas display:', this.gridCanvas.style.display);
-        console.log('[GRID] Canvas zIndex:', this.gridCanvas.style.zIndex);
-        console.log('[GRID] Canvas dimensions:', this.gridCanvas.width, 'x', this.gridCanvas.height);
     },
 
     /**

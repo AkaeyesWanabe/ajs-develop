@@ -91,6 +91,9 @@ module.exports = {
             layer: layer
         };
 
+        // Generate unique name
+        objectData.properties.name = this.generateUniqueName(objectData.properties.name);
+
         // Set default position (center of viewport)
         const scnEditor = document.querySelector("#scnEditor");
         if (scnEditor) {
@@ -104,6 +107,33 @@ module.exports = {
         }
 
         return objectData;
+    },
+
+    /**
+     * Generate unique object name by checking existing names
+     */
+    generateUniqueName(baseName) {
+        if (!sceneEditor.sceneData || !sceneEditor.sceneData.objects) {
+            return baseName;
+        }
+
+        const existingNames = sceneEditor.sceneData.objects.map(obj => obj.properties.name);
+
+        // If base name doesn't exist, use it
+        if (!existingNames.includes(baseName)) {
+            return baseName;
+        }
+
+        // Find the highest counter for this base name
+        let counter = 1;
+        let uniqueName;
+
+        do {
+            uniqueName = `${baseName} (${counter})`;
+            counter++;
+        } while (existingNames.includes(uniqueName));
+
+        return uniqueName;
     },
 
     /**

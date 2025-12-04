@@ -20,6 +20,11 @@
             "name": "Display",
             "icon-type": "icon",
             "icon": "pip"
+        },
+        {
+            "name": "Scripts",
+            "icon-type": "icon",
+            "icon": "pip"
         }
     ],
     "propertiesVariables": [
@@ -29,6 +34,14 @@
             "label": "Object Name",
             "type": "text",
             "description": "Name of the object."
+        },
+        {
+            "name": "visible",
+            "tab": 0,
+            "label": "Object Visibility",
+            "type": "checkbox",
+            "checkbox-label": "visible",
+            "description": "Visibility of the object."
         },
         {
             "name": "x",
@@ -79,17 +92,190 @@
             "tab": 2,
             "label": "Button Color",
             "type": "color",
-            "description": "Color of the button."
+            "description": "Background color of the button."
+        },
+        {
+            "name": "textColor",
+            "tab": 2,
+            "label": "Text Color",
+            "type": "color",
+            "description": "Color of the button text."
+        },
+        {
+            "name": "fontSize",
+            "tab": 2,
+            "label": "Font Size",
+            "type": "number",
+            "description": "Size of the button text."
+        },
+        {
+            "name": "fontFamily",
+            "tab": 2,
+            "label": "Font Family",
+            "type": "text",
+            "description": "Font family (e.g., Arial, Times New Roman)."
+        },
+        {
+            "name": "fontWeight",
+            "tab": 2,
+            "label": "Font Weight",
+            "type": "dropdown",
+            "description": "Font weight (boldness).",
+            "dropdown-values": [
+                {"name": "Normal", "value": "normal"},
+                {"name": "Bold", "value": "bold"}
+            ]
+        },
+        {
+            "name": "fontStyle",
+            "tab": 2,
+            "label": "Font Style",
+            "type": "dropdown",
+            "description": "Font style.",
+            "dropdown-values": [
+                {"name": "Normal", "value": "normal"},
+                {"name": "Italic", "value": "italic"}
+            ]
+        },
+        {
+            "name": "textDecoration",
+            "tab": 2,
+            "label": "Text Decoration",
+            "type": "dropdown",
+            "description": "Text decoration style.",
+            "dropdown-values": [
+                {"name": "None", "value": "none"},
+                {"name": "Underline", "value": "underline"},
+                {"name": "Line Through", "value": "line-through"},
+                {"name": "Overline", "value": "overline"}
+            ]
+        },
+        {
+            "name": "textTransform",
+            "tab": 2,
+            "label": "Text Transform",
+            "type": "dropdown",
+            "description": "Text transformation.",
+            "dropdown-values": [
+                {"name": "None", "value": "none"},
+                {"name": "Uppercase", "value": "uppercase"},
+                {"name": "Lowercase", "value": "lowercase"},
+                {"name": "Capitalize", "value": "capitalize"}
+            ]
+        },
+        {
+            "name": "letterSpacing",
+            "tab": 2,
+            "label": "Letter Spacing",
+            "type": "number",
+            "description": "Space between letters in pixels."
+        },
+        {
+            "name": "wordSpacing",
+            "tab": 2,
+            "label": "Word Spacing",
+            "type": "number",
+            "description": "Space between words in pixels."
+        },
+        {
+            "name": "textShadowX",
+            "tab": 2,
+            "label": "Shadow Offset X",
+            "type": "number",
+            "description": "Horizontal shadow offset in pixels."
+        },
+        {
+            "name": "textShadowY",
+            "tab": 2,
+            "label": "Shadow Offset Y",
+            "type": "number",
+            "description": "Vertical shadow offset in pixels."
+        },
+        {
+            "name": "textShadowBlur",
+            "tab": 2,
+            "label": "Shadow Blur",
+            "type": "number",
+            "description": "Shadow blur radius in pixels."
+        },
+        {
+            "name": "textShadowColor",
+            "tab": 2,
+            "label": "Shadow Color",
+            "type": "color",
+            "description": "Color of the text shadow."
+        },
+        {
+            "name": "borderRadius",
+            "tab": 2,
+            "label": "Border Radius",
+            "type": "number",
+            "description": "Roundness of button corners (0 = square)."
+        },
+        {
+            "name": "borderWidth",
+            "tab": 2,
+            "label": "Border Width",
+            "type": "number",
+            "description": "Width of the button border (0 = no border)."
+        },
+        {
+            "name": "borderColor",
+            "tab": 2,
+            "label": "Border Color",
+            "type": "color",
+            "description": "Color of the button border."
+        },
+        {
+            "name": "hoverColor",
+            "tab": 2,
+            "label": "Hover Color",
+            "type": "color",
+            "description": "Background color when hovering the button."
+        },
+        {
+            "name": "pressedColor",
+            "tab": 2,
+            "label": "Pressed Color",
+            "type": "color",
+            "description": "Background color when button is pressed."
+        },
+        {
+            "name": "script",
+            "tab": 3,
+            "label": "Script",
+            "type": "script",
+            "description": "JavaScript script to attach to this object."
         }
     ],
     "properties": {
         "name": "New button",
+        "visible": true,
         "x": 0,
         "y": 0,
-        "width": 320,
-        "height": 240,
+        "width": 160,
+        "height": 50,
         "angle": 0,
-        "text": "button",
-        "bkgColor": "#dedede"
+        "text": "Button",
+        "bkgColor": "#4CAF50",
+        "textColor": "#ffffff",
+        "fontSize": 16,
+        "fontFamily": "Arial",
+        "fontWeight": "normal",
+        "fontStyle": "normal",
+        "textDecoration": "none",
+        "textTransform": "none",
+        "letterSpacing": 0,
+        "wordSpacing": 0,
+        "textShadowX": 0,
+        "textShadowY": 1,
+        "textShadowBlur": 2,
+        "textShadowColor": "rgba(0,0,0,0.3)",
+        "borderRadius": 8,
+        "borderWidth": 2,
+        "borderColor": "#2e7d32",
+        "hoverColor": "#45a049",
+        "pressedColor": "#3d8b40",
+        "script": ""
     }
 }

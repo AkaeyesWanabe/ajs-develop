@@ -1,0 +1,19 @@
+{
+    "id": "com.ajs.time",
+    "name": "Time System",
+    "version": "1.0.0",
+    "type": "system",
+    "internal": true,
+    "singleton": true,
+    "description": "System extension for time management and control",
+    "author": "AJS Develop",
+    "properties": {
+        "timeScale": {
+            "type": "number",
+            "default": 1,
+            "label": "Time Scale",
+            "min": 0,
+            "max": 10
+        }
+    }
+}

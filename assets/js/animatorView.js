@@ -107,22 +107,6 @@ $(document).ready(function () {
             animator.addFramePoint();
         });
 
-        // Toggle between collider and points edit mode
-        $("#afpbColliderEdit").click(function () {
-            $(this).attr('active', 'true');
-            $("#afpbPointsEdit").attr('active', 'false');
-            $("#aibCollider").css('display', 'block');
-            $("#aibPoints").css('display', 'none');
-            animator.loadCurrentFrameCollider();
-        });
-
-        $("#afpbPointsEdit").click(function () {
-            $(this).attr('active', 'true');
-            $("#afpbColliderEdit").attr('active', 'false');
-            $("#aibCollider").css('display', 'none');
-            $("#aibPoints").css('display', 'block');
-            animator.loadCurrentFramePointsVisual();
-        });
 
         // Timeline controls
         $("#timelinePlayBtn").click(function () {
@@ -287,7 +271,6 @@ $(document).ready(function () {
             const tweenCount = parseInt($("#tweenCount").val());
             const easingType = $("#tweenEasingType").val();
             const interpolatePoints = $("#tweenInterpolatePoints").is(':checked');
-            const interpolateCollider = $("#tweenInterpolateCollider").is(':checked');
 
             // Validation
             if (isNaN(fromIndex) || isNaN(toIndex) || isNaN(tweenCount)) {
@@ -324,8 +307,7 @@ $(document).ready(function () {
                 tweenCount,
                 easingType,
                 {
-                    points: interpolatePoints,
-                    collider: interpolateCollider
+                    points: interpolatePoints
                 }
             );
 
@@ -336,7 +318,6 @@ $(document).ready(function () {
                 // Close modal
                 $("#tweenGeneratorModal").css("display", "none");
 
-                console.log('[AnimatorView] Generated and inserted', tweenFrames.length, 'tween frames');
             }
         });
 

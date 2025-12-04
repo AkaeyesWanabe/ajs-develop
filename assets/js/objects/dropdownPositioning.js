@@ -35,7 +35,6 @@ class DropdownPositioning {
             });
         });
 
-        console.log('[DropdownPositioning] Initialized for', menuItems.length, 'menu items');
     }
 
     /**

@@ -1,0 +1,44 @@
+{
+  "id": "internal.physics.circlecollider2d",
+  "name": "Circle Collider 2D",
+  "description": "Circular collision shape for 2D physics detection",
+  "version": "1.0.0",
+  "author": "AJS Engine",
+  "icon": "ri-radio-button-line",
+  "color": "#f59e0b",
+  "category": "physics",
+  "categoryName": "Physics",
+  "categoryIcon": "ri-speed-line",
+  "categoryColor": "#4ade80",
+  "file": "CircleCollider2D.js",
+  "singleton": false,
+  "dependencies": [],
+  "properties": {
+    "showInEditor": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show collider visualization in scene editor"
+    },
+    "offsetX": {
+      "type": "number",
+      "default": 0,
+      "description": "X offset from object position"
+    },
+    "offsetY": {
+      "type": "number",
+      "default": 0,
+      "description": "Y offset from object position"
+    },
+    "radius": {
+      "type": "number",
+      "default": 32,
+      "min": 1,
+      "description": "Radius of the collision circle"
+    },
+    "isTrigger": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, collisions won't push objects apart"
+    }
+  }
+}

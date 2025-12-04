@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
             zoom.init(scnEditor);
 
             // Grid will be shown automatically when scene is loaded (in sceneEditor.loadScene)
-            console.log('[SCENE EDITOR VIEW] Grid and zoom initialized');
         }
     }, 500);
 
@@ -118,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 layerManager.createNewLayer();
             });
 
-            console.log('Layer manager initialized successfully');
         });
     }
 
@@ -200,6 +198,41 @@ document.addEventListener('DOMContentLoaded', function() {
                     label: 'Duplicate',
                     icon: 'ri-file-copy-2-line',
                     shortcut: 'Ctrl+D'
+                });
+
+                menuItems.push({ type: 'separator' });
+
+                // Order management
+                menuItems.push({
+                    type: 'submenu',
+                    label: 'Order',
+                    icon: 'ri-stack-line',
+                    items: [
+                        {
+                            id: 'bring-to-front',
+                            label: 'Bring to Front',
+                            icon: 'ri-bring-to-front',
+                            shortcut: 'Ctrl+]'
+                        },
+                        {
+                            id: 'move-forward',
+                            label: 'Move Forward',
+                            icon: 'ri-arrow-up-line',
+                            shortcut: ']'
+                        },
+                        {
+                            id: 'move-backward',
+                            label: 'Move Backward',
+                            icon: 'ri-arrow-down-line',
+                            shortcut: '['
+                        },
+                        {
+                            id: 'send-to-back',
+                            label: 'Send to Back',
+                            icon: 'ri-send-to-back',
+                            shortcut: 'Ctrl+['
+                        }
+                    ]
                 });
 
                 menuItems.push({ type: 'separator' });
@@ -368,6 +401,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (clipboardDup) {
                     clipboardDup.copy();
                     clipboardDup.paste();
+                }
+                break;
+
+            case 'bring-to-front':
+                if (sceneEditor && sceneEditor.bringToFront) {
+                    sceneEditor.bringToFront();
+                }
+                break;
+
+            case 'send-to-back':
+                if (sceneEditor && sceneEditor.sendToBack) {
+                    sceneEditor.sendToBack();
+                }
+                break;
+
+            case 'move-forward':
+                if (sceneEditor && sceneEditor.moveForward) {
+                    sceneEditor.moveForward();
+                }
+                break;
+
+            case 'move-backward':
+                if (sceneEditor && sceneEditor.moveBackward) {
+                    sceneEditor.moveBackward();
                 }
                 break;
 

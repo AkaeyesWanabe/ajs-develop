@@ -40,19 +40,11 @@
 
             <section id="animatorFramePoints" class="subWinBox">
                 <section class="subWinBoxHeader">
-                    <label>Frame Points & Collider</label>
+                    <label>Frame Points</label>
                     <label></label>
                 </section>
 
                 <section id="animatorFramePointsBody">
-                    <span id="afpbColliderEdit" class="afpbEdit" active="true">
-                        <i class="ri-shape-2-line"></i>
-                        <b>Edit Frame Collider</b>
-                    </span>
-                    <span id="afpbPointsEdit" class="afpbEdit" active="false">
-                        <i class="ri-atboard-2-line"></i>
-                        <b>Edit Frame Points</b>
-                    </span>
                     <!--  -->
                     <div id="afpbPoints"></div>
                     <!--  -->
@@ -80,9 +72,7 @@
                     <section id="animatorImageBody">
                         <div id="animatorImageBox">
                             <img id="aibImg" class="no-antialiasing">
-                            <canvas id="aibColliderCanvas"></canvas>
-                            <div id="aibCollider" style="display: block;"></div>
-                            <div id="aibPoints" style="display: none;"></div>
+                            <div id="aibPoints" style="display: block;"></div>
                         </div>
                     </section>
 
@@ -104,11 +94,13 @@
                                 <input type="checkbox" id="onionSkinningEnabled">
                                 <label>Frames:</label>
                                 <div class="timelineNumberInput">
-                                    <button class="timelineNumberBtn timelineNumberDecrease" data-input-id="onionSkinningFrames">
+                                    <button class="timelineNumberBtn timelineNumberDecrease"
+                                        data-input-id="onionSkinningFrames">
                                         <i class="ri-subtract-line"></i>
                                     </button>
                                     <input type="text" id="onionSkinningFrames" data-min="1" data-max="10" value="2">
-                                    <button class="timelineNumberBtn timelineNumberIncrease" data-input-id="onionSkinningFrames">
+                                    <button class="timelineNumberBtn timelineNumberIncrease"
+                                        data-input-id="onionSkinningFrames">
                                         <i class="ri-add-line"></i>
                                     </button>
                                 </div>
@@ -116,7 +108,8 @@
                                 <label>Frame Blend:</label>
                                 <input type="checkbox" id="frameBlendingEnabled">
                                 <label>Amount:</label>
-                                <input type="range" id="frameBlendingAmount" min="0" max="100" value="50" style="width: 80px;">
+                                <input type="range" id="frameBlendingAmount" min="0" max="100" value="50"
+                                    style="width: 80px;">
                             </div>
                         </section>
 
@@ -136,8 +129,19 @@
                         <label>Image resources</label>
                         <div class="searchBar">
                             <i class="ri-search-line"></i>
-                            <input type="text">
+                            <input type="text" class="no-focus-outline" id="animatorImagePickerSearch"
+                                placeholder="Search images...">
                         </div>
+                    </section>
+
+                    <section id="animatorImagePickerFooter" style="display: none;">
+                        <div id="aipSelectionInfo">
+                            <i class="ri-image-line"></i>
+                            <span id="aipSelectionCount">0 images selected</span>
+                        </div>
+                        <button id="aipAddSelectedBtn" class="btn btn-primary">
+                            <i class="ri-add-line"></i> Add Selected
+                        </button>
                     </section>
 
                     <section id="animatorImagePickerBody"></section>
@@ -297,12 +301,6 @@
                 <label>
                     <input type="checkbox" id="tweenInterpolatePoints" checked>
                     Interpolate Frame Points
-                </label>
-            </div>
-            <div class="modal-field">
-                <label>
-                    <input type="checkbox" id="tweenInterpolateCollider" checked>
-                    Interpolate Collider
                 </label>
             </div>
         </div>

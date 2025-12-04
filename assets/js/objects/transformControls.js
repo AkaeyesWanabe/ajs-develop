@@ -382,6 +382,11 @@ module.exports = {
                         objInScene.properties.y = newY;
                     }
                 }
+
+                // Update collider overlay position in real-time
+                if (sceneEditor && sceneEditor.renderColliderVisualizations) {
+                    sceneEditor.renderColliderVisualizations(startPos.element, startPos.data);
+                }
             });
 
             // Update bounding box position (use first object's snapped position)
@@ -422,6 +427,11 @@ module.exports = {
                 }
             }
 
+            // Update collider overlay position in real-time
+            if (sceneEditor && sceneEditor.renderColliderVisualizations) {
+                sceneEditor.renderColliderVisualizations(this.activeObject.element, this.activeObject.data);
+            }
+
             // Update properties panel if available
             if (properties && typeof properties.refresh === 'function') {
                 properties.refresh(this.activeObject.data);
@@ -438,7 +448,6 @@ module.exports = {
     startResize(e, handlePosition) {
         // Check if object is resizable
         if (!this.isObjectResizable()) {
-            console.log('[TRANSFORM CONTROLS] Object is not resizable');
             return;
         }
 
@@ -566,6 +575,11 @@ module.exports = {
             }
         }
 
+        // Update collider overlay during resize
+        if (sceneEditor && sceneEditor.renderColliderVisualizations) {
+            sceneEditor.renderColliderVisualizations(this.activeObject.element, this.activeObject.data);
+        }
+
         // Update properties panel if available
         if (properties && typeof properties.refresh === 'function') {
             properties.refresh(this.activeObject.data);
@@ -578,7 +592,6 @@ module.exports = {
     startRotate(e) {
         // Check if object is rotatable
         if (!this.isObjectRotatable()) {
-            console.log('[TRANSFORM CONTROLS] Object is not rotatable');
             return;
         }
 
@@ -658,6 +671,11 @@ module.exports = {
                     objInScene.properties.rotation = rotation;
                 }
             }
+        }
+
+        // Update collider overlay during rotation
+        if (sceneEditor && sceneEditor.renderColliderVisualizations) {
+            sceneEditor.renderColliderVisualizations(this.activeObject.element, this.activeObject.data);
         }
 
         // Update properties panel if available
@@ -786,8 +804,6 @@ module.exports = {
 
         // Handle multi-selection transform end
         if (this.activeObjects && this.activeObjects.length > 1 && this.multiSelectionStartPositions.length > 0) {
-            console.log('=== MULTI-SELECTION TRANSFORM ENDED ===');
-            console.log('Objects count:', this.activeObjects.length);
 
             if (editor && editor.sceneData && editor.sceneData.objects) {
                 const freshObjects = [];
@@ -836,11 +852,9 @@ module.exports = {
 
             // Reactivate transform controls for multi-selection
             if (editor.selectedObjects && editor.selectedObjects.length > 1) {
-                console.log('Reactivating transform controls for', editor.selectedObjects.length, 'objects');
                 this.activateMultiple(editor.selectedObjects);
             }
 
-            console.log('=== MULTI-SELECTION TRANSFORM END COMPLETE ===');
             return;
         }
 
@@ -849,18 +863,12 @@ module.exports = {
             const props = this.activeObject.data.properties;
             const oid = this.activeObject.data.oid;
 
-            console.log('=== TRANSFORM ENDED ===');
-            console.log('Object:', props.name, 'OID:', oid);
-            console.log('Position:', { x: props.x, y: props.y });
-            console.log('Size:', { width: props.width, height: props.height });
-            console.log('Rotation:', props.angle || props.rotation || 0);
 
             // Get fresh object data from sceneEditor.sceneData.objects
             if (editor && editor.sceneData && editor.sceneData.objects) {
                 const freshObjectData = editor.sceneData.objects.find(obj => obj.oid === oid);
 
                 if (freshObjectData) {
-                    console.log('Fresh object found in sceneData, refreshing scene objects...');
 
                     // Refresh scene objects (updates canvas rendering)
                     editor.refreshSceneObjects([freshObjectData]);
@@ -873,7 +881,6 @@ module.exports = {
                     // Update property values displayed in the properties panel
                     const propertiesModule = window.properties || properties;
                     if (propertiesModule && propertiesModule.updatePropertyValues) {
-                        console.log('Calling properties.updatePropertyValues');
                         propertiesModule.updatePropertyValues(freshObjectData);
                     }
                 } else {
@@ -891,14 +898,12 @@ module.exports = {
             if (objectElement && editor.sceneData) {
                 const freshObjectData = editor.sceneData.objects.find(obj => obj.oid === oid);
                 if (freshObjectData) {
-                    console.log('Reactivating transform controls for single object');
                     this.activate(objectElement, freshObjectData);
                 }
             }
         }
 
         // Keep object selected - no deselection
-        console.log('=== TRANSFORM END COMPLETE ===');
     },
 
     /**
@@ -1026,6 +1031,5 @@ module.exports = {
         // Update all handle positions
         this.updateHandles();
 
-        console.log('[TRANSFORM CONTROLS] Refreshed transform controls');
     }
 };

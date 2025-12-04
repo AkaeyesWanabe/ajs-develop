@@ -53,6 +53,20 @@ module.exports = {
                 break;
             }
 
+            case "script": {
+                if (label.endsWith(".js")) {
+                    //
+                    elem = `
+                    <div class='fpBodyItem' type = '` + file.type + `' path = '` + file.path + `'>
+                        <img src='`+ path + globals.user.fileIconTheme.data.files.js + `' filename='` + file.name + `' assetsPath='` + file.relativeParentPath + "/" + file.name + `'/>
+                        <center>
+                            <div>`+ file.name + `</div>
+                        </center>
+                    </div>`;
+                }
+                break;
+            }
+
             default: {
             }
         }

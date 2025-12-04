@@ -1,91 +1,90 @@
 {
-    "extension": "internal/com.ajs.application",
-    "propertiesTabs": [
-        {
-            "name": "application",
-            "icon-type": "icon",
-            "icon": "pip"
-        },
-        {
-            "name": "window",
-            "icon-type": "icon",
-            "icon": "pip"
-        }
-    ],
-    "propertiesVariables": [
-        {
-            "name": "name",
-            "tab": 0,
-            "label": "Application Name",
-            "type": "text",
-            "description": "Name of the application."
-        },
-        {
-            "name": "version",
-            "tab": 0,
-            "label": "Version",
-            "type": "text",
-            "description": "Version of the application."
-        },
-        {
-            "name": "icon",
-            "tab": 0,
-            "label": "Icon",
-            "type": "image-512",
-            "description": "Icon of the application."
-        },
-        {
-            "name": "compiler",
-            "tab": 0,
-            "label": "Compiler",
-            "type": "compiler",
-            "description": "Plateform compiler of the application."
-        },
-        {
-            "name": "author",
-            "tab": 0,
-            "label": "Author Name",
-            "type": "text",
-            "description": "Author of the application."
-        },
-        {
-            "name": "company",
-            "tab": 0,
-            "label": "Company Name",
-            "type": "text",
-            "description": "Company name of the application."
-        },
-        {
-            "name": "package",
-            "tab": 0,
-            "label": "Package",
-            "type": "text",
-            "description": "Package of the application."
-        },
-        {
-            "name": "width",
-            "tab": 1,
-            "label": "Window Width",
-            "type": "number",
-            "description": "Width of the application window."
-        },
-        {
-            "name": "height",
-            "tab": 1,
-            "label": "Window Height",
-            "type": "number",
-            "description": "Height of the application window."
-        }
-    ],
+    "id": "com.ajs.application",
+    "name": "Application System",
+    "version": "1.0.0",
+    "type": "system",
+    "internal": true,
+    "singleton": true,
+    "description": "System extension for application/project management",
+    "author": "AJS Develop",
     "properties": {
-        "name": "New Game",
-        "version": "1.0",
-        "icon": "favicon.png",
-        "compiler": "Windows",
-        "author": "",
-        "company": "",
-        "package": "com.company.newgame",
-        "width": 640,
-        "height": 480
+        "name": {
+            "type": "text",
+            "default": "New Game",
+            "label": "Application Name",
+            "description": "Name of the application"
+        },
+        "version": {
+            "type": "text",
+            "default": "1.0.0",
+            "label": "Version",
+            "description": "Version of the application"
+        },
+        "author": {
+            "type": "text",
+            "default": "",
+            "label": "Author",
+            "description": "Author of the application"
+        },
+        "company": {
+            "type": "text",
+            "default": "",
+            "label": "Company",
+            "description": "Company name"
+        },
+        "package": {
+            "type": "text",
+            "default": "com.company.newgame",
+            "label": "Package",
+            "description": "Package identifier"
+        },
+        "width": {
+            "type": "number",
+            "default": 640,
+            "label": "Window Width",
+            "min": 320,
+            "max": 3840,
+            "description": "Default window width"
+        },
+        "height": {
+            "type": "number",
+            "default": 480,
+            "label": "Window Height",
+            "min": 240,
+            "max": 2160,
+            "description": "Default window height"
+        },
+        "mainScene": {
+            "type": "text",
+            "default": "",
+            "label": "Main Scene",
+            "description": "Path to the main scene (entry point of the application)"
+        },
+        "icon": {
+            "type": "text",
+            "default": "favicon.png",
+            "label": "Icon",
+            "description": "Application icon path"
+        },
+        "fullscreen": {
+            "type": "boolean",
+            "default": false,
+            "label": "Fullscreen",
+            "description": "Start in fullscreen mode"
+        },
+        "resizable": {
+            "type": "boolean",
+            "default": true,
+            "label": "Resizable Window",
+            "description": "Allow window resizing"
+        },
+        "targetFPS": {
+            "type": "number",
+            "default": 60,
+            "label": "Target FPS",
+            "min": 30,
+            "max": 144,
+            "description": "Target frames per second"
+        }
     }
 }

@@ -1,0 +1,51 @@
+{
+  "id": "internal.physics.rigidbody2d",
+  "name": "Rigidbody 2D",
+  "description": "Adds 2D physics simulation with gravity, velocity, and forces",
+  "version": "1.0.0",
+  "author": "AJS Engine",
+  "icon": "ri-box-3-line",
+  "color": "#4ade80",
+  "category": "physics",
+  "categoryName": "Physics",
+  "categoryIcon": "ri-speed-line",
+  "categoryColor": "#4ade80",
+  "file": "Rigidbody2D.js",
+  "singleton": true,
+  "dependencies": [],
+  "properties": {
+    "mass": {
+      "type": "number",
+      "default": 1,
+      "min": 0.01,
+      "description": "Mass of the object"
+    },
+    "gravityScale": {
+      "type": "number",
+      "default": 1,
+      "description": "How much gravity affects this object"
+    },
+    "drag": {
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "description": "Air resistance (0 = no drag)"
+    },
+    "angularDrag": {
+      "type": "number",
+      "default": 0.05,
+      "min": 0,
+      "description": "Angular air resistance"
+    },
+    "isKinematic": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, won't be affected by forces"
+    },
+    "useGravity": {
+      "type": "boolean",
+      "default": true,
+      "description": "If true, gravity will be applied"
+    }
+  }
+}

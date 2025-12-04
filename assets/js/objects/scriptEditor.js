@@ -15,7 +15,6 @@ module.exports = {
     pendingFiles: [], // Queue files to open before Monaco is ready
 
     init() {
-        console.log('[SCRIPT EDITOR] Initializing...');
 
         // Wait for Monaco to be loaded
         if (typeof monaco === 'undefined') {
@@ -25,7 +24,6 @@ module.exports = {
         }
 
         this.monaco = monaco;
-        console.log('[SCRIPT EDITOR] Monaco Editor found, creating instance...');
 
         // Configure Monaco theme (VS Dark similar to ACE dark theme)
         monaco.editor.defineTheme('ajs-dark', {
@@ -116,10 +114,12 @@ module.exports = {
             }
         });
 
-        console.log('[SCRIPT EDITOR] Monaco Editor instance created');
 
         // Register custom snippets
         this.registerCustomSnippets();
+
+        // Register file path completion provider
+        this.registerFilePathCompletion();
 
         // Track changes to mark file as modified
         this.editor.onDidChangeModelContent(() => {
@@ -147,20 +147,16 @@ module.exports = {
 
         // Mark as ready
         this.isReady = true;
-        console.log('[SCRIPT EDITOR] Monaco Editor initialized and ready');
 
         // Process any pending files
         if (this.pendingFiles.length > 0) {
-            console.log('[SCRIPT EDITOR] Processing', this.pendingFiles.length, 'pending files...');
             const fileCount = this.pendingFiles.length;
 
             // Use setTimeout to ensure Monaco is fully ready
             setTimeout(() => {
                 this.pendingFiles.forEach((fileData, index) => {
-                    console.log('[SCRIPT EDITOR] Opening pending file', index + 1, '/', fileCount, ':', fileData.filename);
                     try {
                         this.openFile(fileData.path, fileData.filename, fileData.extension, fileData.data);
-                        console.log('[SCRIPT EDITOR] Successfully opened:', fileData.filename);
                     } catch (err) {
                         console.error('[SCRIPT EDITOR] Error opening pending file:', err);
                         if (notifications) {
@@ -233,7 +229,6 @@ module.exports = {
             return;
         }
 
-        console.log('[SCRIPT EDITOR] Registering context menu');
 
         window.contextMenu.register(codeEditorElement, (event) => {
             const menuItems = [];
@@ -399,7 +394,6 @@ module.exports = {
             }
         });
 
-        console.log('[SCRIPT EDITOR] Context menu registered');
     },
 
     /**
@@ -424,7 +418,6 @@ module.exports = {
 
             const clickedPath = $(this).attr("path");
             if (clickedPath) {
-                console.log('[SCRIPT EDITOR] Tab clicked:', clickedPath);
                 $this.switchToFile(clickedPath);
 
                 // Update selection
@@ -448,7 +441,6 @@ module.exports = {
             }
 
             const filePath = $tab.attr("path");
-            console.log('[SCRIPT EDITOR] Close button clicked for:', filePath);
 
             if (filePath) {
                 $this.closeFile(filePath);
@@ -457,7 +449,6 @@ module.exports = {
             }
         });
 
-        console.log('[SCRIPT EDITOR] Tab events initialized with delegation');
     },
 
     /**
@@ -582,7 +573,180 @@ module.exports = {
             }
         });
 
-        console.log('[SCRIPT EDITOR] Custom snippets registered:', jsSnippets.length);
+    },
+
+    /**
+     * Register file path completion provider for intelligent path suggestions
+     */
+    registerFilePathCompletion() {
+        const monaco = this.monaco;
+        const $this = this;
+
+        monaco.languages.registerCompletionItemProvider('javascript', {
+            triggerCharacters: ['/', '.', '"', "'"],
+
+            provideCompletionItems: (model, position) => {
+                const lineContent = model.getLineContent(position.lineNumber);
+                const textUntilPosition = lineContent.substring(0, position.column - 1);
+
+                // Check if we're inside a string that looks like a file path
+                const pathMatch = textUntilPosition.match(/(['"])(\.{0,2}\/[^'"]*?)$/);
+                if (!pathMatch) {
+                    return { suggestions: [] };
+                }
+
+                const quote = pathMatch[1];
+                const currentPath = pathMatch[2];
+
+                // Determine if this is a require/import context
+                const isRequireContext = /(?:require|nw\.require|import)\s*\(\s*['"]/.test(textUntilPosition);
+                const isFsContext = /fs\.\w+\s*\(\s*['"]/.test(textUntilPosition);
+
+                if (!isRequireContext && !isFsContext) {
+                    return { suggestions: [] };
+                }
+
+                // Get suggestions based on current path
+                const suggestions = $this.getFilePathSuggestions(currentPath, position, quote);
+
+                return { suggestions };
+            }
+        });
+
+    },
+
+    /**
+     * Get file path suggestions based on current path being typed
+     */
+    getFilePathSuggestions(currentPath, position, quote) {
+        const monaco = this.monaco;
+        const fs = nw.require('fs');
+        const path = nw.require('path');
+        const suggestions = [];
+
+        try {
+            // Determine the base directory for file search
+            let baseDir = process.cwd();
+            let searchPath = currentPath;
+
+            // Handle relative paths
+            if (currentPath.startsWith('./')) {
+                searchPath = currentPath.substring(2);
+            } else if (currentPath.startsWith('../')) {
+                // For now, just use current directory for ../ paths
+                baseDir = path.dirname(baseDir);
+                searchPath = currentPath.replace(/^\.\.\//, '');
+            }
+
+            // Split path into directory and partial filename
+            const lastSlash = searchPath.lastIndexOf('/');
+            let dirPath = baseDir;
+            let filePrefix = '';
+
+            if (lastSlash !== -1) {
+                const subPath = searchPath.substring(0, lastSlash);
+                dirPath = path.join(baseDir, subPath);
+                filePrefix = searchPath.substring(lastSlash + 1);
+            } else {
+                filePrefix = searchPath;
+            }
+
+            // Check if directory exists
+            if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
+                return suggestions;
+            }
+
+            // Read directory contents
+            const files = fs.readdirSync(dirPath);
+
+            // Filter and create suggestions
+            files.forEach(file => {
+                // Skip hidden files and node_modules
+                if (file.startsWith('.') || file === 'node_modules') {
+                    return;
+                }
+
+                // Check if file matches current prefix
+                if (filePrefix && !file.toLowerCase().startsWith(filePrefix.toLowerCase())) {
+                    return;
+                }
+
+                const fullPath = path.join(dirPath, file);
+                const stat = fs.statSync(fullPath);
+                const isDirectory = stat.isDirectory();
+
+                // Determine icon and kind
+                let kind = monaco.languages.CompletionItemKind.File;
+                let detail = 'File';
+                let insertText = file;
+
+                if (isDirectory) {
+                    kind = monaco.languages.CompletionItemKind.Folder;
+                    detail = 'Folder';
+                    insertText = file + '/';
+                } else {
+                    // Add file extension to detail
+                    const ext = path.extname(file);
+                    if (ext) {
+                        detail = `${ext.substring(1).toUpperCase()} File`;
+                    }
+
+                    // For require context, suggest without extension for .js files
+                    if (ext === '.js') {
+                        insertText = file.replace(/\.js$/, '');
+                    }
+                }
+
+                suggestions.push({
+                    label: file,
+                    kind: kind,
+                    detail: detail,
+                    insertText: insertText,
+                    range: {
+                        startLineNumber: position.lineNumber,
+                        startColumn: position.column - filePrefix.length,
+                        endLineNumber: position.lineNumber,
+                        endColumn: position.column
+                    },
+                    sortText: isDirectory ? '0' + file : '1' + file // Directories first
+                });
+            });
+
+            // Add common project directories as suggestions if at root level
+            if (searchPath === '' || searchPath === '/') {
+                const commonDirs = [
+                    { label: 'assets/', detail: 'Assets folder' },
+                    { label: 'scenes/', detail: 'Scenes folder' },
+                    { label: 'scripts/', detail: 'Scripts folder' },
+                    { label: 'extensions/', detail: 'Extensions folder' },
+                    { label: 'examples/', detail: 'Examples folder' }
+                ];
+
+                commonDirs.forEach(dir => {
+                    const dirPath = path.join(baseDir, dir.label);
+                    if (fs.existsSync(dirPath)) {
+                        suggestions.push({
+                            label: dir.label,
+                            kind: monaco.languages.CompletionItemKind.Folder,
+                            detail: dir.detail,
+                            insertText: dir.label,
+                            range: {
+                                startLineNumber: position.lineNumber,
+                                startColumn: position.column - filePrefix.length,
+                                endLineNumber: position.lineNumber,
+                                endColumn: position.column
+                            },
+                            sortText: '0' + dir.label
+                        });
+                    }
+                });
+            }
+
+        } catch (err) {
+            console.warn('[SCRIPT EDITOR] Error getting file path suggestions:', err);
+        }
+
+        return suggestions;
     },
 
     /**
@@ -590,11 +754,9 @@ module.exports = {
      * Creates a new tab and Monaco model
      */
     openFile(path, filename, file_extension, data) {
-        console.log('[SCRIPT EDITOR] openFile called:', filename);
 
         // If Monaco is not ready yet, queue this file
         if (!this.isReady) {
-            console.log('[SCRIPT EDITOR] Editor not ready, queueing file');
             this.pendingFiles.push({ path, filename, extension: file_extension, data });
             if (notifications) {
                 notifications.info(`Opening ${filename}...`, 2000);
@@ -604,7 +766,6 @@ module.exports = {
 
         // Check if file is already open
         if (this.openFiles.has(path)) {
-            console.log('[SCRIPT EDITOR] File already open, switching to it');
             this.switchToFile(path);
             // Update tab selection
             $('.codeEditorTab').attr('selected', 'false');
@@ -670,7 +831,6 @@ module.exports = {
         }, 100);
 
         consoleModule.info(`File opened: ${filename}`);
-        console.log('[SCRIPT EDITOR] File opened successfully');
     },
 
     /**
@@ -714,14 +874,12 @@ module.exports = {
         $body.appendTo($tab);
         $tab.appendTo('#codeEditorTabs');
 
-        console.log('[SCRIPT EDITOR] Tab created for:', filename);
     },
 
     /**
      * Switch to a different open file
      */
     switchToFile(path) {
-        console.log('[SCRIPT EDITOR] Switching to file:', path);
         const fileInfo = this.openFiles.get(path);
         if (!fileInfo) {
             console.warn('[SCRIPT EDITOR] File not found in openFiles:', path);
@@ -738,7 +896,6 @@ module.exports = {
         setTimeout(() => {
             if (this.editor) {
                 this.editor.layout();
-                console.log('[SCRIPT EDITOR] Monaco layout recalculated after switch');
             }
         }, 50);
     },
@@ -748,9 +905,6 @@ module.exports = {
      * COMPLETELY REBUILT - Ultra simple and robust
      */
     closeFile(path) {
-        console.log('='.repeat(60));
-        console.log('[SCRIPT EDITOR] ▶ CLOSE FILE CALLED');
-        console.log('[SCRIPT EDITOR] Path:', path);
 
         // ============================================================
         // STEP 1: Validate file exists
@@ -760,7 +914,6 @@ module.exports = {
             console.error('[SCRIPT EDITOR] ✗ File not found in openFiles Map');
             return;
         }
-        console.log('[SCRIPT EDITOR] ✓ File found:', fileInfo.filename);
 
         // ============================================================
         // STEP 2: Find the tab in DOM
@@ -777,13 +930,11 @@ module.exports = {
             console.error('[SCRIPT EDITOR] ✗ Tab not found in DOM');
             return;
         }
-        console.log('[SCRIPT EDITOR] ✓ Tab found in DOM');
 
         // ============================================================
         // STEP 3: Check if this tab is selected
         // ============================================================
         const isSelected = $tabToClose.attr('selected') === 'true';
-        console.log('[SCRIPT EDITOR] Tab is selected:', isSelected);
 
         // ============================================================
         // STEP 4: Get all tabs BEFORE removing
@@ -791,13 +942,11 @@ module.exports = {
         const $allTabsBefore = $('.codeEditorTab');
         const tabIndex = $allTabsBefore.index($tabToClose);
         const totalTabsBefore = $allTabsBefore.length;
-        console.log('[SCRIPT EDITOR] Tab index:', tabIndex, '/', totalTabsBefore);
 
         // ============================================================
         // STEP 5: DESTROY TAB from DOM
         // ============================================================
         $tabToClose.remove();
-        console.log('[SCRIPT EDITOR] ✓ Tab destroyed from DOM');
 
         // ============================================================
         // STEP 6: DISPOSE Monaco model (free memory)
@@ -805,7 +954,6 @@ module.exports = {
         if (fileInfo.model) {
             try {
                 fileInfo.model.dispose();
-                console.log('[SCRIPT EDITOR] ✓ Monaco model disposed');
             } catch (err) {
                 console.error('[SCRIPT EDITOR] ✗ Error disposing model:', err);
             }
@@ -815,17 +963,14 @@ module.exports = {
         // STEP 7: DELETE from openFiles Map
         // ============================================================
         this.openFiles.delete(path);
-        console.log('[SCRIPT EDITOR] ✓ Removed from openFiles Map');
 
         // ============================================================
         // STEP 8: Handle what to do next
         // ============================================================
         const $remainingTabs = $('.codeEditorTab');
-        console.log('[SCRIPT EDITOR] Remaining tabs:', $remainingTabs.length);
 
         if ($remainingTabs.length === 0) {
             // NO MORE TABS - Show empty state
-            console.log('[SCRIPT EDITOR] → No more tabs, showing empty state');
 
             this.currentFile = null;
             this.editor.setModel(null);
@@ -834,28 +979,23 @@ module.exports = {
             $('#codeEditorTabs').attr('visible', 'false');
             $('#noFileOpened').attr('visible', 'true');
 
-            console.log('[SCRIPT EDITOR] ✓ Empty state shown');
         }
         else if (isSelected) {
             // This tab WAS selected, select another
-            console.log('[SCRIPT EDITOR] → Closed tab was selected, need to select another');
 
             let $nextTab;
 
             // Try next tab (same index)
             if (tabIndex < $remainingTabs.length) {
                 $nextTab = $remainingTabs.eq(tabIndex);
-                console.log('[SCRIPT EDITOR] → Selecting next tab at index', tabIndex);
             }
             // If was last, select new last
             else {
                 $nextTab = $remainingTabs.last();
-                console.log('[SCRIPT EDITOR] → Was last, selecting new last tab');
             }
 
             if ($nextTab && $nextTab.length > 0) {
                 const nextPath = $nextTab.attr('path');
-                console.log('[SCRIPT EDITOR] → Next tab path:', nextPath);
 
                 // Deselect all
                 $remainingTabs.attr('selected', 'false');
@@ -864,16 +1004,12 @@ module.exports = {
                 // Switch to it
                 this.switchToFile(nextPath);
 
-                console.log('[SCRIPT EDITOR] ✓ Switched to next tab');
             }
         }
         else {
             // Closed tab was NOT selected, nothing to do
-            console.log('[SCRIPT EDITOR] → Closed tab was not selected, nothing to do');
         }
 
-        console.log('[SCRIPT EDITOR] ✓ CLOSE FILE COMPLETED');
-        console.log('='.repeat(60));
 
         consoleModule.info(`File closed: ${fileInfo.filename}`);
     },
